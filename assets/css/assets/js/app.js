@@ -1,18 +1,814 @@
 /* =========================================================
    LOOP RECONCILER
+
    Universal CSV / Excel Data Reconciliation Tool
 
-   Author: beto-dev94
-   Project: Loop Suite
+   Developer: beto-dev94
+   Product: Loop Suite
 ========================================================= */
 
 "use strict";
+
+
+/* =========================================================
+   TRANSLATIONS
+========================================================= */
+
+const translations = {
+
+  pt: {
+
+    navCompare: "Comparar",
+    navResults: "Resultados",
+    navFeatures: "Recursos",
+
+    heroBadge: "Conciliação Inteligente de Dados",
+
+    heroTitle1: "Encontre diferenças.",
+
+    heroTitle2: "Concilie mais rápido.",
+
+    heroDescription:
+      "Compare relatórios CSV e Excel, encontre registros ausentes, duplicidades e inconsistências e analise os resultados através de um painel simples e eficiente.",
+
+    startComparison: "Iniciar comparação",
+
+    viewGithub: "Ver no GitHub",
+
+    featureImportTitle: "Importar",
+
+    featureImportDescription:
+      "Carregue relatórios CSV, XLS e XLSX diretamente do seu computador.",
+
+    featureCompareTitle: "Comparar",
+
+    featureCompareDescription:
+      "Compare automaticamente conjuntos de dados usando uma coluna de referência.",
+
+    featureReviewTitle: "Analisar",
+
+    featureReviewDescription:
+      "Identifique correspondências, divergências, registros ausentes e duplicidades.",
+
+    workspaceLabel: "Área de trabalho",
+
+    workspaceTitle: "Compare seus relatórios",
+
+    workspaceDescription:
+      "Seus arquivos são processados localmente no navegador.",
+
+    reportA: "Relatório A",
+
+    reportB: "Relatório B",
+
+    primaryDataset: "Base principal",
+
+    comparisonDataset: "Base de comparação",
+
+    noFile: "Nenhum arquivo",
+
+    ready: "Pronto",
+
+    chooseReportA: "Selecionar Relatório A",
+
+    chooseReportB: "Selecionar Relatório B",
+
+    matchingRules: "Regras de correspondência",
+
+    comparisonConfiguration:
+      "Configuração da comparação",
+
+    matchingColumnA:
+      "Coluna de referência — Relatório A",
+
+    matchingColumnB:
+      "Coluna de referência — Relatório B",
+
+    selectColumn: "Selecione uma coluna",
+
+    normalization:
+      "Normalização dos dados",
+
+    removeSpaces:
+      "Remover espaços extras",
+
+    ignoreCase:
+      "Ignorar maiúsculas e minúsculas",
+
+    ignoreEmpty:
+      "Ignorar registros vazios",
+
+    validation:
+      "Validação",
+
+    detectDuplicates:
+      "Detectar duplicidades",
+
+    compareFields:
+      "Comparar campos dos registros",
+
+    compareReports:
+      "Comparar relatórios",
+
+    reset:
+      "Limpar",
+
+    analysis:
+      "Análise",
+
+    resultsTitle:
+      "Resultado da conciliação",
+
+    resultsDescription:
+      "Resumo da comparação entre os dois relatórios.",
+
+    reportARecords:
+      "Registros do Relatório A",
+
+    reportBRecords:
+      "Registros do Relatório B",
+
+    matches:
+      "Correspondências",
+
+    differences:
+      "Divergências",
+
+    missingReportB:
+      "Ausentes no Relatório B",
+
+    missingReportA:
+      "Ausentes no Relatório A",
+
+    duplicates:
+      "Duplicidades",
+
+    matchRate:
+      "Taxa de correspondência",
+
+    searchResults:
+      "Pesquisar resultados...",
+
+    all:
+      "Todos",
+
+    missingAFilter:
+      "Ausentes A",
+
+    missingBFilter:
+      "Ausentes B",
+
+    exportCSV:
+      "Exportar CSV",
+
+    exportExcel:
+      "Exportar Excel",
+
+    status:
+      "Status",
+
+    key:
+      "Chave",
+
+    details:
+      "Detalhes",
+
+    noResults:
+      "Nenhum resultado encontrado",
+
+    changeFilter:
+      "Tente alterar o filtro ou o termo pesquisado.",
+
+    localProcessing:
+      "Processamento local",
+
+    localProcessingDescription:
+      "O Loop Reconciler processa os arquivos diretamente no navegador. Seus relatórios não precisam ser enviados para um servidor remoto para realizar a comparação.",
+
+    capabilities:
+      "Capacidades",
+
+    capabilitiesTitle:
+      "Desenvolvido para validação prática de dados",
+
+    csvSupport:
+      "Suporte a CSV",
+
+    csvSupportDescription:
+      "Importe e analise conjuntos de dados em CSV.",
+
+    excelSupport:
+      "Suporte a Excel",
+
+    excelSupportDescription:
+      "Leia arquivos XLS e XLSX diretamente no navegador.",
+
+    duplicateDetection:
+      "Detecção de duplicidades",
+
+    duplicateDetectionDescription:
+      "Identifique chaves repetidas dentro de cada base.",
+
+    missingRecords:
+      "Registros ausentes",
+
+    missingRecordsDescription:
+      "Encontre registros existentes em apenas um dos relatórios.",
+
+    fieldDifferences:
+      "Diferenças entre campos",
+
+    fieldDifferencesDescription:
+      "Compare os dados internos de registros correspondentes.",
+
+    exportResults:
+      "Exportação de resultados",
+
+    exportResultsDescription:
+      "Gere relatórios de conciliação em CSV e Excel.",
+
+    searchFilters:
+      "Pesquisa e filtros",
+
+    searchFiltersDescription:
+      "Localize rapidamente resultados específicos.",
+
+    responsiveInterface:
+      "Interface responsiva",
+
+    responsiveInterfaceDescription:
+      "Compatível com computadores, tablets e smartphones.",
+
+    footerDescription:
+      "Ferramenta open source para conciliação de dados.",
+
+    developer:
+      "Desenvolvedor",
+
+    sourceCode:
+      "Código-fonte",
+
+    footerMessage:
+      "Desenvolvido para conciliação de dados e automação de processos.",
+
+    recordDetails:
+      "Detalhes do registro",
+
+    readingFile:
+      "Lendo arquivo",
+
+    fileLoaded:
+      "Arquivo carregado com sucesso.",
+
+    records:
+      "registros",
+
+    unsupportedFormat:
+      "Formato de arquivo não suportado.",
+
+    emptyFile:
+      "O arquivo selecionado não possui registros utilizáveis.",
+
+    csvLibraryError:
+      "Não foi possível carregar o leitor de CSV.",
+
+    excelLibraryError:
+      "Não foi possível carregar o leitor de Excel.",
+
+    excelNoSheet:
+      "O arquivo Excel não possui planilhas.",
+
+    excelReadError:
+      "Não foi possível ler o arquivo Excel.",
+
+    selectMatchingColumns:
+      "Selecione as colunas de referência dos dois relatórios.",
+
+    comparing:
+      "Comparando relatórios...",
+
+    comparisonCompleted:
+      "Comparação concluída.",
+
+    resultsGenerated:
+      "resultados gerados.",
+
+    workspaceReset:
+      "Área de trabalho limpa.",
+
+    noExportResults:
+      "Não existem resultados para exportar.",
+
+    match:
+      "Correspondência",
+
+    different:
+      "Divergente",
+
+    missingInA:
+      "Ausente no A",
+
+    missingInB:
+      "Ausente no B",
+
+    duplicateInA:
+      "Duplicado no A",
+
+    duplicateInB:
+      "Duplicado no B",
+
+    notFound:
+      "Não encontrado",
+
+    viewDetails:
+      "Ver detalhes",
+
+    fieldDifferencesTitle:
+      "Diferenças entre campos",
+
+    duplicateRecords:
+      "Registros duplicados",
+
+    reportAValue:
+      "Relatório A",
+
+    reportBValue:
+      "Relatório B"
+  },
+
+
+  en: {
+
+    navCompare: "Compare",
+    navResults: "Results",
+    navFeatures: "Features",
+
+    heroBadge:
+      "Intelligent Data Reconciliation",
+
+    heroTitle1:
+      "Find differences.",
+
+    heroTitle2:
+      "Reconcile faster.",
+
+    heroDescription:
+      "Compare CSV and Excel reports, detect missing records, duplicates and inconsistencies, and review your data through a simple reconciliation dashboard.",
+
+    startComparison:
+      "Start Comparison",
+
+    viewGithub:
+      "View on GitHub",
+
+    featureImportTitle:
+      "Import",
+
+    featureImportDescription:
+      "Load CSV, XLS and XLSX reports directly from your computer.",
+
+    featureCompareTitle:
+      "Compare",
+
+    featureCompareDescription:
+      "Automatically compare datasets using a configurable matching column.",
+
+    featureReviewTitle:
+      "Review",
+
+    featureReviewDescription:
+      "Inspect matches, differences, missing records and duplicates.",
+
+    workspaceLabel:
+      "Workspace",
+
+    workspaceTitle:
+      "Compare your reports",
+
+    workspaceDescription:
+      "Your files are processed locally in your browser.",
+
+    reportA:
+      "Report A",
+
+    reportB:
+      "Report B",
+
+    primaryDataset:
+      "Primary dataset",
+
+    comparisonDataset:
+      "Comparison dataset",
+
+    noFile:
+      "No file",
+
+    ready:
+      "Ready",
+
+    chooseReportA:
+      "Choose Report A",
+
+    chooseReportB:
+      "Choose Report B",
+
+    matchingRules:
+      "Matching Rules",
+
+    comparisonConfiguration:
+      "Comparison configuration",
+
+    matchingColumnA:
+      "Matching column — Report A",
+
+    matchingColumnB:
+      "Matching column — Report B",
+
+    selectColumn:
+      "Select a column",
+
+    normalization:
+      "Data normalization",
+
+    removeSpaces:
+      "Remove extra spaces",
+
+    ignoreCase:
+      "Ignore uppercase/lowercase",
+
+    ignoreEmpty:
+      "Ignore empty records",
+
+    validation:
+      "Validation",
+
+    detectDuplicates:
+      "Detect duplicates",
+
+    compareFields:
+      "Compare matching record fields",
+
+    compareReports:
+      "Compare Reports",
+
+    reset:
+      "Reset",
+
+    analysis:
+      "Analysis",
+
+    resultsTitle:
+      "Reconciliation Results",
+
+    resultsDescription:
+      "Summary of the comparison between both reports.",
+
+    reportARecords:
+      "Report A Records",
+
+    reportBRecords:
+      "Report B Records",
+
+    matches:
+      "Matches",
+
+    differences:
+      "Differences",
+
+    missingReportB:
+      "Missing in Report B",
+
+    missingReportA:
+      "Missing in Report A",
+
+    duplicates:
+      "Duplicates",
+
+    matchRate:
+      "Match Rate",
+
+    searchResults:
+      "Search results...",
+
+    all:
+      "All",
+
+    missingAFilter:
+      "Missing A",
+
+    missingBFilter:
+      "Missing B",
+
+    exportCSV:
+      "Export CSV",
+
+    exportExcel:
+      "Export Excel",
+
+    status:
+      "Status",
+
+    key:
+      "Key",
+
+    details:
+      "Details",
+
+    noResults:
+      "No results found",
+
+    changeFilter:
+      "Try changing the active filter or search term.",
+
+    localProcessing:
+      "Local-first processing",
+
+    localProcessingDescription:
+      "Loop Reconciler processes supported reports directly inside your browser. Files do not need to be uploaded to a remote server for comparison.",
+
+    capabilities:
+      "Capabilities",
+
+    capabilitiesTitle:
+      "Built for practical data validation",
+
+    csvSupport:
+      "CSV Support",
+
+    csvSupportDescription:
+      "Import and analyze standard CSV datasets.",
+
+    excelSupport:
+      "Excel Support",
+
+    excelSupportDescription:
+      "Read XLS and XLSX spreadsheets directly.",
+
+    duplicateDetection:
+      "Duplicate Detection",
+
+    duplicateDetectionDescription:
+      "Identify repeated keys inside each dataset.",
+
+    missingRecords:
+      "Missing Records",
+
+    missingRecordsDescription:
+      "Detect records present in only one report.",
+
+    fieldDifferences:
+      "Field Differences",
+
+    fieldDifferencesDescription:
+      "Compare the contents of matching records.",
+
+    exportResults:
+      "Export Results",
+
+    exportResultsDescription:
+      "Generate reconciled CSV and Excel reports.",
+
+    searchFilters:
+      "Search & Filters",
+
+    searchFiltersDescription:
+      "Quickly isolate specific reconciliation results.",
+
+    responsiveInterface:
+      "Responsive Interface",
+
+    responsiveInterfaceDescription:
+      "Designed for desktop, tablet and mobile devices.",
+
+    footerDescription:
+      "Open-source data reconciliation tool.",
+
+    developer:
+      "Developer",
+
+    sourceCode:
+      "Source Code",
+
+    footerMessage:
+      "Built for data reconciliation and workflow automation.",
+
+    recordDetails:
+      "Record Details",
+
+    readingFile:
+      "Reading file",
+
+    fileLoaded:
+      "File loaded successfully.",
+
+    records:
+      "records",
+
+    unsupportedFormat:
+      "Unsupported file format.",
+
+    emptyFile:
+      "The selected file contains no usable records.",
+
+    csvLibraryError:
+      "CSV reader failed to load.",
+
+    excelLibraryError:
+      "Excel reader failed to load.",
+
+    excelNoSheet:
+      "Excel file contains no worksheets.",
+
+    excelReadError:
+      "Unable to read Excel file.",
+
+    selectMatchingColumns:
+      "Select matching columns for both reports.",
+
+    comparing:
+      "Comparing reports...",
+
+    comparisonCompleted:
+      "Comparison completed.",
+
+    resultsGenerated:
+      "results generated.",
+
+    workspaceReset:
+      "Workspace reset.",
+
+    noExportResults:
+      "There are no results to export.",
+
+    match:
+      "Match",
+
+    different:
+      "Different",
+
+    missingInA:
+      "Missing in A",
+
+    missingInB:
+      "Missing in B",
+
+    duplicateInA:
+      "Duplicate in A",
+
+    duplicateInB:
+      "Duplicate in B",
+
+    notFound:
+      "Not found",
+
+    viewDetails:
+      "View details",
+
+    fieldDifferencesTitle:
+      "Field differences",
+
+    duplicateRecords:
+      "Duplicate records",
+
+    reportAValue:
+      "Report A",
+
+    reportBValue:
+      "Report B"
+  }
+
+};
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+let currentLanguage =
+  localStorage.getItem(
+    "loopLanguage"
+  ) || "pt";
+
+
+function t(key) {
+
+  return (
+    translations[
+      currentLanguage
+    ][key]
+    ||
+    translations.pt[key]
+    ||
+    key
+  );
+
+}
+
+
+function changeLanguage(language) {
+
+  if (
+    !translations[language]
+  ) {
+    return;
+  }
+
+  currentLanguage =
+    language;
+
+  localStorage.setItem(
+    "loopLanguage",
+    language
+  );
+
+  document.documentElement.lang =
+    language === "pt"
+      ? "pt-BR"
+      : "en";
+
+  document
+    .querySelectorAll(
+      "[data-i18n]"
+    )
+    .forEach(element => {
+
+      const key =
+        element.dataset.i18n;
+
+      if (
+        translations[
+          language
+        ][key]
+      ) {
+
+        element.textContent =
+          translations[
+            language
+          ][key];
+
+      }
+
+    });
+
+
+  document
+    .querySelectorAll(
+      "[data-i18n-placeholder]"
+    )
+    .forEach(element => {
+
+      const key =
+        element.dataset
+          .i18nPlaceholder;
+
+      if (
+        translations[
+          language
+        ][key]
+      ) {
+
+        element.placeholder =
+          translations[
+            language
+          ][key];
+
+      }
+
+    });
+
+
+  document
+    .querySelectorAll(
+      ".language-button"
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.language ===
+          language
+      );
+
+    });
+
+
+  document.title =
+    language === "pt"
+      ? "Loop Reconciler | Conciliação de Dados"
+      : "Loop Reconciler | Data Reconciliation";
+
+
+  refreshDynamicLanguage();
+
+}
+
 
 /* =========================================================
    APPLICATION STATE
 ========================================================= */
 
 const state = {
+
   reportA: {
     file: null,
     data: [],
@@ -26,10 +822,13 @@ const state = {
   },
 
   results: [],
+
   filteredResults: [],
 
   currentFilter: "all",
+
   searchTerm: ""
+
 };
 
 
@@ -39,272 +838,400 @@ const state = {
 
 const elements = {
 
+  languagePT:
+    document.getElementById(
+      "languagePT"
+    ),
+
+  languageEN:
+    document.getElementById(
+      "languageEN"
+    ),
+
   startButton:
-    document.getElementById("startButton"),
+    document.getElementById(
+      "startButton"
+    ),
 
   comparisonSection:
-    document.getElementById("comparison"),
+    document.getElementById(
+      "comparison"
+    ),
 
   fileA:
-    document.getElementById("fileA"),
+    document.getElementById(
+      "fileA"
+    ),
 
   fileB:
-    document.getElementById("fileB"),
+    document.getElementById(
+      "fileB"
+    ),
 
   fileAStatus:
-    document.getElementById("fileAStatus"),
+    document.getElementById(
+      "fileAStatus"
+    ),
 
   fileBStatus:
-    document.getElementById("fileBStatus"),
+    document.getElementById(
+      "fileBStatus"
+    ),
 
   fileAInfo:
-    document.getElementById("fileAInfo"),
+    document.getElementById(
+      "fileAInfo"
+    ),
 
   fileBInfo:
-    document.getElementById("fileBInfo"),
+    document.getElementById(
+      "fileBInfo"
+    ),
 
   keyColumnA:
-    document.getElementById("keyColumnA"),
+    document.getElementById(
+      "keyColumnA"
+    ),
 
   keyColumnB:
-    document.getElementById("keyColumnB"),
+    document.getElementById(
+      "keyColumnB"
+    ),
 
   trimValues:
-    document.getElementById("trimValues"),
+    document.getElementById(
+      "trimValues"
+    ),
 
   ignoreCase:
-    document.getElementById("ignoreCase"),
+    document.getElementById(
+      "ignoreCase"
+    ),
 
   ignoreEmpty:
-    document.getElementById("ignoreEmpty"),
+    document.getElementById(
+      "ignoreEmpty"
+    ),
 
   detectDuplicates:
-    document.getElementById("detectDuplicates"),
+    document.getElementById(
+      "detectDuplicates"
+    ),
 
   compareFields:
-    document.getElementById("compareFields"),
+    document.getElementById(
+      "compareFields"
+    ),
 
   compareButton:
-    document.getElementById("compareButton"),
+    document.getElementById(
+      "compareButton"
+    ),
 
   resetButton:
-    document.getElementById("resetButton"),
+    document.getElementById(
+      "resetButton"
+    ),
 
   processStatus:
-    document.getElementById("processStatus"),
+    document.getElementById(
+      "processStatus"
+    ),
 
   resultsSection:
-    document.getElementById("results"),
+    document.getElementById(
+      "results"
+    ),
 
   totalA:
-    document.getElementById("totalA"),
+    document.getElementById(
+      "totalA"
+    ),
 
   totalB:
-    document.getElementById("totalB"),
+    document.getElementById(
+      "totalB"
+    ),
 
   totalMatches:
-    document.getElementById("totalMatches"),
+    document.getElementById(
+      "totalMatches"
+    ),
 
   totalDifferences:
-    document.getElementById("totalDifferences"),
+    document.getElementById(
+      "totalDifferences"
+    ),
 
   missingA:
-    document.getElementById("missingA"),
+    document.getElementById(
+      "missingA"
+    ),
 
   missingB:
-    document.getElementById("missingB"),
+    document.getElementById(
+      "missingB"
+    ),
 
   totalDuplicates:
-    document.getElementById("totalDuplicates"),
+    document.getElementById(
+      "totalDuplicates"
+    ),
 
   matchRate:
-    document.getElementById("matchRate"),
+    document.getElementById(
+      "matchRate"
+    ),
 
   resultSearch:
-    document.getElementById("resultSearch"),
+    document.getElementById(
+      "resultSearch"
+    ),
 
   filterButtons:
-    document.getElementById("filterButtons"),
+    document.getElementById(
+      "filterButtons"
+    ),
 
   resultsTableBody:
-    document.getElementById("resultsTableBody"),
+    document.getElementById(
+      "resultsTableBody"
+    ),
 
   emptyResults:
-    document.getElementById("emptyResults"),
+    document.getElementById(
+      "emptyResults"
+    ),
 
   exportCsvButton:
-    document.getElementById("exportCsvButton"),
+    document.getElementById(
+      "exportCsvButton"
+    ),
 
   exportExcelButton:
-    document.getElementById("exportExcelButton"),
+    document.getElementById(
+      "exportExcelButton"
+    ),
 
   detailsModal:
-    document.getElementById("detailsModal"),
+    document.getElementById(
+      "detailsModal"
+    ),
 
   modalContent:
-    document.getElementById("modalContent"),
+    document.getElementById(
+      "modalContent"
+    ),
 
   closeModalButton:
-    document.getElementById("closeModalButton")
+    document.getElementById(
+      "closeModalButton"
+    )
+
 };
 
 
 /* =========================================================
-   INITIAL EVENTS
+   LANGUAGE EVENTS
 ========================================================= */
 
-elements.startButton.addEventListener(
-  "click",
-  () => {
-
-    elements.comparisonSection.scrollIntoView({
-      behavior: "smooth"
-    });
-
-  }
-);
+elements.languagePT
+  ?.addEventListener(
+    "click",
+    () => {
+      changeLanguage("pt");
+    }
+  );
 
 
-elements.fileA.addEventListener(
-  "change",
-  async event => {
-
-    await handleFile(
-      event.target.files[0],
-      "A"
-    );
-
-  }
-);
+elements.languageEN
+  ?.addEventListener(
+    "click",
+    () => {
+      changeLanguage("en");
+    }
+  );
 
 
-elements.fileB.addEventListener(
-  "change",
-  async event => {
+/* =========================================================
+   APPLICATION EVENTS
+========================================================= */
 
-    await handleFile(
-      event.target.files[0],
-      "B"
-    );
+elements.startButton
+  ?.addEventListener(
+    "click",
+    () => {
 
-  }
-);
+      elements
+        .comparisonSection
+        .scrollIntoView({
+          behavior: "smooth"
+        });
 
-
-elements.keyColumnA.addEventListener(
-  "change",
-  validateComparison
-);
-
-
-elements.keyColumnB.addEventListener(
-  "change",
-  validateComparison
-);
+    }
+  );
 
 
-elements.compareButton.addEventListener(
-  "click",
-  runComparison
-);
+elements.fileA
+  ?.addEventListener(
+    "change",
+    async event => {
 
-
-elements.resetButton.addEventListener(
-  "click",
-  resetApplication
-);
-
-
-elements.resultSearch.addEventListener(
-  "input",
-  event => {
-
-    state.searchTerm =
-      event.target.value
-        .trim()
-        .toLowerCase();
-
-    applyResultFilters();
-
-  }
-);
-
-
-elements.filterButtons.addEventListener(
-  "click",
-  event => {
-
-    const button =
-      event.target.closest(
-        ".filter-button"
+      await handleFile(
+        event.target.files[0],
+        "A"
       );
 
-    if (!button) {
-      return;
     }
+  );
 
-    document
-      .querySelectorAll(
-        ".filter-button"
-      )
-      .forEach(item => {
-        item.classList.remove(
-          "active"
+
+elements.fileB
+  ?.addEventListener(
+    "change",
+    async event => {
+
+      await handleFile(
+        event.target.files[0],
+        "B"
+      );
+
+    }
+  );
+
+
+elements.keyColumnA
+  ?.addEventListener(
+    "change",
+    validateComparison
+  );
+
+
+elements.keyColumnB
+  ?.addEventListener(
+    "change",
+    validateComparison
+  );
+
+
+elements.compareButton
+  ?.addEventListener(
+    "click",
+    runComparison
+  );
+
+
+elements.resetButton
+  ?.addEventListener(
+    "click",
+    resetApplication
+  );
+
+
+elements.resultSearch
+  ?.addEventListener(
+    "input",
+    event => {
+
+      state.searchTerm =
+        event.target.value
+          .trim()
+          .toLowerCase();
+
+      applyResultFilters();
+
+    }
+  );
+
+
+elements.filterButtons
+  ?.addEventListener(
+    "click",
+    event => {
+
+      const button =
+        event.target.closest(
+          ".filter-button"
         );
-      });
 
-    button.classList.add(
-      "active"
-    );
+      if (!button) {
+        return;
+      }
 
-    state.currentFilter =
-      button.dataset.filter;
+      document
+        .querySelectorAll(
+          ".filter-button"
+        )
+        .forEach(item => {
 
-    applyResultFilters();
+          item.classList.remove(
+            "active"
+          );
 
-  }
-);
+        });
 
+      button.classList.add(
+        "active"
+      );
 
-elements.exportCsvButton.addEventListener(
-  "click",
-  exportResultsToCSV
-);
+      state.currentFilter =
+        button.dataset.filter;
 
+      applyResultFilters();
 
-elements.exportExcelButton.addEventListener(
-  "click",
-  exportResultsToExcel
-);
-
-
-elements.closeModalButton.addEventListener(
-  "click",
-  closeModal
-);
-
-
-elements.detailsModal.addEventListener(
-  "click",
-  event => {
-
-    if (
-      event.target ===
-      elements.detailsModal
-    ) {
-      closeModal();
     }
+  );
 
-  }
-);
+
+elements.exportCsvButton
+  ?.addEventListener(
+    "click",
+    exportResultsToCSV
+  );
+
+
+elements.exportExcelButton
+  ?.addEventListener(
+    "click",
+    exportResultsToExcel
+  );
+
+
+elements.closeModalButton
+  ?.addEventListener(
+    "click",
+    closeModal
+  );
+
+
+elements.detailsModal
+  ?.addEventListener(
+    "click",
+    event => {
+
+      if (
+        event.target ===
+        elements.detailsModal
+      ) {
+
+        closeModal();
+
+      }
+
+    }
+  );
 
 
 document.addEventListener(
   "keydown",
   event => {
 
-    if (event.key === "Escape") {
+    if (
+      event.key === "Escape"
+    ) {
+
       closeModal();
+
     }
 
   }
@@ -325,8 +1252,9 @@ async function handleFile(
   }
 
   setStatus(
-    `Reading ${file.name}...`
+    `${t("readingFile")}: ${file.name}...`
   );
+
 
   try {
 
@@ -337,7 +1265,10 @@ async function handleFile(
 
     let data;
 
-    if (extension === "csv") {
+
+    if (
+      extension === "csv"
+    ) {
 
       data =
         await readCSV(
@@ -361,23 +1292,30 @@ async function handleFile(
     else {
 
       throw new Error(
-        "Unsupported file format."
+        t(
+          "unsupportedFormat"
+        )
       );
 
     }
+
 
     data =
       cleanDataset(
         data
       );
 
+
     if (!data.length) {
 
       throw new Error(
-        "The selected file contains no usable records."
+        t(
+          "emptyFile"
+        )
       );
 
     }
+
 
     const columns =
       extractColumns(
@@ -385,7 +1323,9 @@ async function handleFile(
       );
 
 
-    if (reportName === "A") {
+    if (
+      reportName === "A"
+    ) {
 
       state.reportA.file =
         file;
@@ -396,11 +1336,11 @@ async function handleFile(
       state.reportA.columns =
         columns;
 
+
       updateFileDisplay(
-        "A",
-        file,
-        data
+        "A"
       );
+
 
       populateColumnSelect(
         elements.keyColumnA,
@@ -420,11 +1360,11 @@ async function handleFile(
       state.reportB.columns =
         columns;
 
+
       updateFileDisplay(
-        "B",
-        file,
-        data
+        "B"
       );
+
 
       populateColumnSelect(
         elements.keyColumnB,
@@ -440,18 +1380,23 @@ async function handleFile(
 
 
     setStatus(
-      `${file.name} loaded successfully.`
+      `${file.name}: ${t(
+        "fileLoaded"
+      )}`,
+      "success"
     );
 
   }
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     setStatus(
-      `Error: ${error.message}`,
-      true
+      error.message,
+      "error"
     );
 
   }
@@ -466,7 +1411,10 @@ async function handleFile(
 function readCSV(file) {
 
   return new Promise(
-    (resolve, reject) => {
+    (
+      resolve,
+      reject
+    ) => {
 
       if (
         typeof Papa ===
@@ -475,7 +1423,9 @@ function readCSV(file) {
 
         reject(
           new Error(
-            "CSV library failed to load."
+            t(
+              "csvLibraryError"
+            )
           )
         );
 
@@ -495,18 +1445,6 @@ function readCSV(file) {
 
           complete:
             results => {
-
-              if (
-                results.errors &&
-                results.errors.length
-              ) {
-
-                console.warn(
-                  "CSV parsing warnings:",
-                  results.errors
-                );
-
-              }
 
               resolve(
                 results.data
@@ -539,7 +1477,10 @@ function readCSV(file) {
 function readExcel(file) {
 
   return new Promise(
-    (resolve, reject) => {
+    (
+      resolve,
+      reject
+    ) => {
 
       if (
         typeof XLSX ===
@@ -548,7 +1489,9 @@ function readExcel(file) {
 
         reject(
           new Error(
-            "Excel library failed to load."
+            t(
+              "excelLibraryError"
+            )
           )
         );
 
@@ -565,44 +1508,47 @@ function readExcel(file) {
 
           try {
 
-            const arrayBuffer =
-              event.target.result;
-
             const workbook =
               XLSX.read(
-                arrayBuffer,
+                event.target.result,
                 {
                   type: "array"
                 }
               );
 
 
-            const firstSheetName =
-              workbook.SheetNames[0];
+            const sheetName =
+              workbook
+                .SheetNames[0];
 
 
-            if (!firstSheetName) {
+            if (!sheetName) {
 
               throw new Error(
-                "Excel file contains no worksheets."
+                t(
+                  "excelNoSheet"
+                )
               );
 
             }
 
 
             const worksheet =
-              workbook.Sheets[
-                firstSheetName
-              ];
+              workbook
+                .Sheets[
+                  sheetName
+                ];
 
 
             const data =
-              XLSX.utils.sheet_to_json(
-                worksheet,
-                {
-                  defval: ""
-                }
-              );
+              XLSX
+                .utils
+                .sheet_to_json(
+                  worksheet,
+                  {
+                    defval: ""
+                  }
+                );
 
 
             resolve(
@@ -627,7 +1573,9 @@ function readExcel(file) {
 
           reject(
             new Error(
-              "Unable to read Excel file."
+              t(
+                "excelReadError"
+              )
             )
           );
 
@@ -645,7 +1593,7 @@ function readExcel(file) {
 
 
 /* =========================================================
-   DATA CLEANING
+   CLEAN DATA
 ========================================================= */
 
 function cleanDataset(data) {
@@ -656,10 +1604,14 @@ function cleanDataset(data) {
 
         if (
           !row ||
-          typeof row !== "object"
+          typeof row !==
+            "object"
         ) {
+
           return false;
+
         }
+
 
         return Object
           .values(row)
@@ -678,32 +1630,37 @@ function cleanDataset(data) {
     .map(
       row => {
 
-        const cleanRow = {};
+        const result = {};
 
-        for (
-          const [
-            key,
-            value
-          ]
-          of Object.entries(row)
-        ) {
 
-          const cleanKey =
-            String(key)
-              .trim();
+        Object
+          .entries(row)
+          .forEach(
+            ([
+              key,
+              value
+            ]) => {
 
-          if (!cleanKey) {
-            continue;
-          }
+              const cleanKey =
+                String(key)
+                  .trim();
 
-          cleanRow[
-            cleanKey
-          ] =
-            value ?? "";
 
-        }
+              if (!cleanKey) {
+                return;
+              }
 
-        return cleanRow;
+
+              result[
+                cleanKey
+              ] =
+                value ?? "";
+
+            }
+          );
+
+
+        return result;
 
       }
     );
@@ -712,10 +1669,12 @@ function cleanDataset(data) {
 
 
 /* =========================================================
-   COLUMN EXTRACTION
+   COLUMNS
 ========================================================= */
 
-function extractColumns(data) {
+function extractColumns(
+  data
+) {
 
   const columns =
     new Set();
@@ -728,7 +1687,11 @@ function extractColumns(data) {
         .keys(row)
         .forEach(
           key => {
-            columns.add(key);
+
+            columns.add(
+              key
+            );
+
           }
         );
 
@@ -744,7 +1707,7 @@ function extractColumns(data) {
 
 
 /* =========================================================
-   COLUMN SELECT
+   POPULATE COLUMN SELECT
 ========================================================= */
 
 function populateColumnSelect(
@@ -752,8 +1715,32 @@ function populateColumnSelect(
   columns
 ) {
 
+  const previous =
+    selectElement.value;
+
+
   selectElement.innerHTML =
-    '<option value="">Select a column</option>';
+    "";
+
+
+  const firstOption =
+    document.createElement(
+      "option"
+    );
+
+
+  firstOption.value =
+    "";
+
+  firstOption.textContent =
+    t(
+      "selectColumn"
+    );
+
+
+  selectElement.appendChild(
+    firstOption
+  );
 
 
   columns.forEach(
@@ -764,11 +1751,13 @@ function populateColumnSelect(
           "option"
         );
 
+
       option.value =
         column;
 
       option.textContent =
         column;
+
 
       selectElement.appendChild(
         option
@@ -777,11 +1766,23 @@ function populateColumnSelect(
     }
   );
 
+
+  if (
+    columns.includes(
+      previous
+    )
+  ) {
+
+    selectElement.value =
+      previous;
+
+  }
+
 }
 
 
 /* =========================================================
-   AUTOMATIC MATCHING COLUMN
+   AUTO COLUMN MATCHING
 ========================================================= */
 
 function autoSelectMatchingColumns() {
@@ -797,22 +1798,27 @@ function autoSelectMatchingColumns() {
     !columnsA.length ||
     !columnsB.length
   ) {
+
     return;
+
   }
 
 
-  const commonColumn =
+  const commonA =
     columnsA.find(
       columnA => {
 
         return columnsB.some(
           columnB => {
 
-            return normalizeColumnName(
-              columnA
-            ) ===
-            normalizeColumnName(
-              columnB
+            return (
+              normalizeColumnName(
+                columnA
+              )
+              ===
+              normalizeColumnName(
+                columnB
+              )
             );
 
           }
@@ -822,20 +1828,23 @@ function autoSelectMatchingColumns() {
     );
 
 
-  if (!commonColumn) {
+  if (!commonA) {
     return;
   }
 
 
-  const matchB =
+  const commonB =
     columnsB.find(
       columnB => {
 
-        return normalizeColumnName(
-          columnB
-        ) ===
-        normalizeColumnName(
-          commonColumn
+        return (
+          normalizeColumnName(
+            columnB
+          )
+          ===
+          normalizeColumnName(
+            commonA
+          )
         );
 
       }
@@ -843,21 +1852,29 @@ function autoSelectMatchingColumns() {
 
 
   if (
-    !elements.keyColumnA.value
+    !elements
+      .keyColumnA
+      .value
   ) {
 
-    elements.keyColumnA.value =
-      commonColumn;
+    elements
+      .keyColumnA
+      .value =
+        commonA;
 
   }
 
 
   if (
-    !elements.keyColumnB.value
+    !elements
+      .keyColumnB
+      .value
   ) {
 
-    elements.keyColumnB.value =
-      matchB;
+    elements
+      .keyColumnB
+      .value =
+        commonB || "";
 
   }
 
@@ -868,14 +1885,18 @@ function autoSelectMatchingColumns() {
    NORMALIZATION
 ========================================================= */
 
-function normalizeColumnName(value) {
+function normalizeColumnName(
+  value
+) {
 
   return String(
     value ?? ""
   )
     .trim()
     .toLowerCase()
-    .normalize("NFD")
+    .normalize(
+      "NFD"
+    )
     .replace(
       /[\u0300-\u036f]/g,
       ""
@@ -888,7 +1909,9 @@ function normalizeColumnName(value) {
 }
 
 
-function normalizeValue(value) {
+function normalizeValue(
+  value
+) {
 
   let normalized =
     String(
@@ -897,7 +1920,9 @@ function normalizeValue(value) {
 
 
   if (
-    elements.trimValues.checked
+    elements
+      .trimValues
+      .checked
   ) {
 
     normalized =
@@ -907,11 +1932,14 @@ function normalizeValue(value) {
 
 
   if (
-    elements.ignoreCase.checked
+    elements
+      .ignoreCase
+      .checked
   ) {
 
     normalized =
-      normalized.toLowerCase();
+      normalized
+        .toLowerCase();
 
   }
 
@@ -928,14 +1956,19 @@ function normalizeValue(value) {
 function validateComparison() {
 
   const valid =
-    state.reportA.data.length > 0 &&
-    state.reportB.data.length > 0 &&
-    elements.keyColumnA.value &&
+    state.reportA.data.length > 0
+    &&
+    state.reportB.data.length > 0
+    &&
+    elements.keyColumnA.value
+    &&
     elements.keyColumnB.value;
 
 
-  elements.compareButton.disabled =
-    !valid;
+  elements
+    .compareButton
+    .disabled =
+      !valid;
 
 }
 
@@ -945,36 +1978,67 @@ function validateComparison() {
 ========================================================= */
 
 function updateFileDisplay(
-  report,
-  file,
-  data
+  report
 ) {
 
-  const size =
-    formatFileSize(
-      file.size
+  const reportData =
+    report === "A"
+      ? state.reportA
+      : state.reportB;
+
+
+  const statusElement =
+    report === "A"
+      ? elements.fileAStatus
+      : elements.fileBStatus;
+
+
+  const infoElement =
+    report === "A"
+      ? elements.fileAInfo
+      : elements.fileBInfo;
+
+
+  if (
+    !reportData.file
+  ) {
+
+    statusElement.textContent =
+      t(
+        "noFile"
+      );
+
+    statusElement
+      .classList
+      .remove(
+        "ready"
+      );
+
+    infoElement.textContent =
+      "";
+
+    return;
+  }
+
+
+  statusElement.textContent =
+    t(
+      "ready"
+    );
+
+  statusElement
+    .classList
+    .add(
+      "ready"
     );
 
 
-  if (report === "A") {
-
-    elements.fileAStatus.textContent =
-      "Ready";
-
-    elements.fileAInfo.textContent =
-      `${file.name} · ${data.length.toLocaleString()} records · ${size}`;
-
-  }
-
-  else {
-
-    elements.fileBStatus.textContent =
-      "Ready";
-
-    elements.fileBInfo.textContent =
-      `${file.name} · ${data.length.toLocaleString()} records · ${size}`;
-
-  }
+  infoElement.textContent =
+    `${reportData.file.name} · ${reportData.data.length.toLocaleString()} ${t(
+      "records"
+    )} · ${formatFileSize(
+      reportData.file.size
+    )}`;
 
 }
 
@@ -988,15 +2052,22 @@ function runComparison() {
   try {
 
     setStatus(
-      "Comparing reports..."
+      t(
+        "comparing"
+      )
     );
 
 
     const keyA =
-      elements.keyColumnA.value;
+      elements
+        .keyColumnA
+        .value;
+
 
     const keyB =
-      elements.keyColumnB.value;
+      elements
+        .keyColumnB
+        .value;
 
 
     if (
@@ -1005,7 +2076,9 @@ function runComparison() {
     ) {
 
       throw new Error(
-        "Select matching columns for both reports."
+        t(
+          "selectMatchingColumns"
+        )
       );
 
     }
@@ -1028,12 +2101,10 @@ function runComparison() {
     const results = [];
 
 
-    /* ---------------------------------------------------------
-       DUPLICATES
-    --------------------------------------------------------- */
-
     if (
-      elements.detectDuplicates.checked
+      elements
+        .detectDuplicates
+        .checked
     ) {
 
       addDuplicateResults(
@@ -1052,10 +2123,6 @@ function runComparison() {
     }
 
 
-    /* ---------------------------------------------------------
-       REPORT A -> REPORT B
-    --------------------------------------------------------- */
-
     indexA.records.forEach(
       (
         recordA,
@@ -1063,7 +2130,10 @@ function runComparison() {
       ) => {
 
         if (
-          elements.ignoreEmpty.checked &&
+          elements
+            .ignoreEmpty
+            .checked
+          &&
           !normalizedKey
         ) {
 
@@ -1073,9 +2143,11 @@ function runComparison() {
 
 
         const recordB =
-          indexB.records.get(
-            normalizedKey
-          );
+          indexB
+            .records
+            .get(
+              normalizedKey
+            );
 
 
         if (!recordB) {
@@ -1086,17 +2158,13 @@ function runComparison() {
               type:
                 "missing-b",
 
-              status:
-                "Missing in B",
-
               key:
                 getDisplayKey(
                   recordA,
                   keyA
                 ),
 
-              recordA:
-                recordA,
+              recordA,
 
               recordB:
                 null,
@@ -1113,16 +2181,18 @@ function runComparison() {
 
 
         const differences =
-          elements.compareFields.checked
-            ?
-          compareRecords(
-            recordA,
-            recordB,
-            keyA,
-            keyB
-          )
-            :
-          [];
+          elements
+            .compareFields
+            .checked
+          ?
+            compareRecords(
+              recordA,
+              recordB,
+              keyA,
+              keyB
+            )
+          :
+            [];
 
 
         if (
@@ -1135,23 +2205,17 @@ function runComparison() {
               type:
                 "different",
 
-              status:
-                "Different",
-
               key:
                 getDisplayKey(
                   recordA,
                   keyA
                 ),
 
-              recordA:
-                recordA,
+              recordA,
 
-              recordB:
-                recordB,
+              recordB,
 
-              differences:
-                differences
+              differences
 
             }
           );
@@ -1166,20 +2230,15 @@ function runComparison() {
               type:
                 "match",
 
-              status:
-                "Match",
-
               key:
                 getDisplayKey(
                   recordA,
                   keyA
                 ),
 
-              recordA:
-                recordA,
+              recordA,
 
-              recordB:
-                recordB,
+              recordB,
 
               differences:
                 []
@@ -1193,10 +2252,6 @@ function runComparison() {
     );
 
 
-    /* ---------------------------------------------------------
-       REPORT B -> REPORT A
-    --------------------------------------------------------- */
-
     indexB.records.forEach(
       (
         recordB,
@@ -1204,19 +2259,28 @@ function runComparison() {
       ) => {
 
         if (
-          elements.ignoreEmpty.checked &&
+          elements
+            .ignoreEmpty
+            .checked
+          &&
           !normalizedKey
         ) {
+
           return;
+
         }
 
 
         if (
-          indexA.records.has(
-            normalizedKey
-          )
+          indexA
+            .records
+            .has(
+              normalizedKey
+            )
         ) {
+
           return;
+
         }
 
 
@@ -1225,9 +2289,6 @@ function runComparison() {
 
             type:
               "missing-a",
-
-            status:
-              "Missing in A",
 
             key:
               getDisplayKey(
@@ -1238,8 +2299,7 @@ function runComparison() {
             recordA:
               null,
 
-            recordB:
-              recordB,
+            recordB,
 
             differences:
               []
@@ -1264,30 +2324,39 @@ function runComparison() {
     applyResultFilters();
 
 
-    elements.resultsSection.hidden =
-      false;
+    elements
+      .resultsSection
+      .hidden =
+        false;
 
 
     setStatus(
-      `Comparison completed. ${results.length.toLocaleString()} results generated.`
+      `${t(
+        "comparisonCompleted"
+      )} ${results.length.toLocaleString()} ${t(
+        "resultsGenerated"
+      )}`,
+      "success"
     );
 
 
-    elements.resultsSection.scrollIntoView(
-      {
+    elements
+      .resultsSection
+      .scrollIntoView({
         behavior: "smooth"
-      }
-    );
+      });
 
   }
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     setStatus(
-      `Error: ${error.message}`,
-      true
+      error.message,
+      "error"
     );
 
   }
@@ -1296,7 +2365,7 @@ function runComparison() {
 
 
 /* =========================================================
-   CREATE DATASET INDEX
+   DATASET INDEX
 ========================================================= */
 
 function createDatasetIndex(
@@ -1315,23 +2384,24 @@ function createDatasetIndex(
   data.forEach(
     record => {
 
-      const originalKey =
-        record[
-          keyColumn
-        ];
-
-
       const normalizedKey =
         normalizeValue(
-          originalKey
+          record[
+            keyColumn
+          ]
         );
 
 
       if (
-        elements.ignoreEmpty.checked &&
+        elements
+          .ignoreEmpty
+          .checked
+        &&
         !normalizedKey
       ) {
+
         return;
+
       }
 
 
@@ -1391,7 +2461,7 @@ function createDatasetIndex(
 
 
 /* =========================================================
-   DUPLICATE RESULTS
+   DUPLICATES
 ========================================================= */
 
 function addDuplicateResults(
@@ -1400,48 +2470,46 @@ function addDuplicateResults(
   report
 ) {
 
-  index.duplicates.forEach(
-    (
-      duplicateRecords,
-      normalizedKey
-    ) => {
+  index
+    .duplicates
+    .forEach(
+      (
+        duplicateRecords,
+        normalizedKey
+      ) => {
 
-      results.push(
-        {
+        results.push(
+          {
 
-          type:
-            "duplicate",
+            type:
+              "duplicate",
 
-          status:
-            `Duplicate in ${report}`,
+            duplicateReport:
+              report,
 
-          key:
-            normalizedKey,
+            key:
+              normalizedKey,
 
-          recordA:
-            report === "A"
-              ? duplicateRecords[0]
-              : null,
+            recordA:
+              report === "A"
+                ? duplicateRecords[0]
+                : null,
 
-          recordB:
-            report === "B"
-              ? duplicateRecords[0]
-              : null,
+            recordB:
+              report === "B"
+                ? duplicateRecords[0]
+                : null,
 
-          duplicateRecords:
             duplicateRecords,
 
-          duplicateReport:
-            report,
+            differences:
+              []
 
-          differences:
-            []
+          }
+        );
 
-        }
-      );
-
-    }
-  );
+      }
+    );
 
 }
 
@@ -1460,25 +2528,27 @@ function compareRecords(
   const differences = [];
 
 
-  const mappedColumns =
+  const mappings =
     buildColumnMapping(
       recordA,
       recordB
     );
 
 
-  mappedColumns.forEach(
+  mappings.forEach(
     mapping => {
 
       const columnA =
         mapping.columnA;
+
 
       const columnB =
         mapping.columnB;
 
 
       if (
-        columnA === keyA ||
+        columnA === keyA
+        ||
         columnB === keyB
       ) {
 
@@ -1489,39 +2559,28 @@ function compareRecords(
 
       const valueA =
         columnA
-          ?
-        recordA[
-          columnA
-        ]
-          :
-        "";
+          ? recordA[
+              columnA
+            ]
+          : "";
 
 
       const valueB =
         columnB
-          ?
-        recordB[
-          columnB
-        ]
-          :
-        "";
-
-
-      const normalizedA =
-        normalizeValue(
-          valueA
-        );
-
-
-      const normalizedB =
-        normalizeValue(
-          valueB
-        );
+          ? recordB[
+              columnB
+            ]
+          : "";
 
 
       if (
-        normalizedA !==
-        normalizedB
+        normalizeValue(
+          valueA
+        )
+        !==
+        normalizeValue(
+          valueB
+        )
       ) {
 
         differences.push(
@@ -1531,17 +2590,13 @@ function compareRecords(
               columnA ||
               columnB,
 
-            columnA:
-              columnA,
+            columnA,
 
-            columnB:
-              columnB,
+            columnB,
 
-            valueA:
-              valueA,
+            valueA,
 
-            valueB:
-              valueB
+            valueB
 
           }
         );
@@ -1598,10 +2653,15 @@ function buildColumnMapping(
           candidate => {
 
             return (
-              !usedB.has(candidate) &&
+              !usedB.has(
+                candidate
+              )
+              &&
               normalizeColumnName(
                 candidate
-              ) === normalizedA
+              )
+              ===
+              normalizedA
             );
 
           }
@@ -1619,9 +2679,12 @@ function buildColumnMapping(
 
       mappings.push(
         {
+
           columnA,
+
           columnB:
             columnB || null
+
         }
       );
 
@@ -1637,7 +2700,9 @@ function buildColumnMapping(
           columnB
         )
       ) {
+
         return;
+
       }
 
 
@@ -1647,8 +2712,7 @@ function buildColumnMapping(
           columnA:
             null,
 
-          columnB:
-            columnB
+          columnB
 
         }
       );
@@ -1669,62 +2733,54 @@ function buildColumnMapping(
 function updateMetrics() {
 
   const matches =
-    state.results.filter(
-      result =>
-        result.type ===
-        "match"
-    ).length;
+    countResultsByType(
+      "match"
+    );
 
 
   const differences =
-    state.results.filter(
-      result =>
-        result.type ===
-        "different"
-    ).length;
+    countResultsByType(
+      "different"
+    );
 
 
   const missingA =
-    state.results.filter(
-      result =>
-        result.type ===
-        "missing-a"
-    ).length;
+    countResultsByType(
+      "missing-a"
+    );
 
 
   const missingB =
-    state.results.filter(
-      result =>
-        result.type ===
-        "missing-b"
-    ).length;
+    countResultsByType(
+      "missing-b"
+    );
 
 
   const duplicates =
-    state.results.filter(
-      result =>
-        result.type ===
-        "duplicate"
-    ).length;
+    countResultsByType(
+      "duplicate"
+    );
 
 
   const comparable =
-    matches +
-    differences +
-    missingA +
+    matches
+    +
+    differences
+    +
+    missingA
+    +
     missingB;
 
 
   const rate =
-    comparable
+    comparable > 0
       ?
-      (
-        matches /
-        comparable *
-        100
-      )
+        (
+          matches /
+          comparable
+        ) * 100
       :
-      0;
+        0;
 
 
   elements.totalA.textContent =
@@ -1738,66 +2794,96 @@ function updateMetrics() {
 
 
   elements.totalMatches.textContent =
-    matches.toLocaleString();
+    matches
+      .toLocaleString();
 
 
   elements.totalDifferences.textContent =
-    differences.toLocaleString();
+    differences
+      .toLocaleString();
 
 
   elements.missingA.textContent =
-    missingA.toLocaleString();
+    missingA
+      .toLocaleString();
 
 
   elements.missingB.textContent =
-    missingB.toLocaleString();
+    missingB
+      .toLocaleString();
 
 
   elements.totalDuplicates.textContent =
-    duplicates.toLocaleString();
+    duplicates
+      .toLocaleString();
 
 
   elements.matchRate.textContent =
-    `${rate.toFixed(1)}%`;
+    `${rate.toFixed(
+      1
+    )}%`;
+
+}
+
+
+function countResultsByType(
+  type
+) {
+
+  return state.results.filter(
+    item =>
+      item.type === type
+  ).length;
 
 }
 
 
 /* =========================================================
-   RESULT FILTERS
+   FILTERS
 ========================================================= */
 
 function applyResultFilters() {
 
-  const filtered =
+  state.filteredResults =
     state.results.filter(
       result => {
 
-        const filterMatch =
+        const matchesFilter =
           state.currentFilter ===
             "all"
-            ||
+          ||
           result.type ===
             state.currentFilter;
 
 
-        if (!filterMatch) {
+        if (!matchesFilter) {
+
           return false;
+
         }
 
 
-        if (!state.searchTerm) {
+        if (
+          !state.searchTerm
+        ) {
+
           return true;
+
         }
 
 
         const searchable =
           [
-            result.status,
+            getStatusLabel(
+              result
+            ),
+
             result.key,
+
             JSON.stringify(
               result.recordA || {}
             ),
+
             JSON.stringify(
               result.recordB || {}
             )
@@ -1814,39 +2900,43 @@ function applyResultFilters() {
     );
 
 
-  state.filteredResults =
-    filtered;
-
-
   renderResults();
 
 }
 
 
 /* =========================================================
-   RENDER RESULTS
+   RESULT RENDERING
 ========================================================= */
 
 function renderResults() {
 
-  elements.resultsTableBody.innerHTML =
-    "";
+  elements
+    .resultsTableBody
+    .innerHTML =
+      "";
 
 
   if (
-    !state.filteredResults.length
+    !state
+      .filteredResults
+      .length
   ) {
 
-    elements.emptyResults.hidden =
-      false;
+    elements
+      .emptyResults
+      .hidden =
+        false;
 
     return;
 
   }
 
 
-  elements.emptyResults.hidden =
-    true;
+  elements
+    .emptyResults
+    .hidden =
+      true;
 
 
   const fragment =
@@ -1881,7 +2971,9 @@ function renderResults() {
 
 
       badge.textContent =
-        result.status;
+        getStatusLabel(
+          result
+        );
 
 
       statusCell.appendChild(
@@ -1894,6 +2986,7 @@ function renderResults() {
           "td"
         );
 
+
       keyCell.textContent =
         result.key || "—";
 
@@ -1903,14 +2996,17 @@ function renderResults() {
           "td"
         );
 
+
       reportACell.textContent =
         result.recordA
           ?
-        summarizeRecord(
-          result.recordA
-        )
+            summarizeRecord(
+              result.recordA
+            )
           :
-        "Not found";
+            t(
+              "notFound"
+            );
 
 
       const reportBCell =
@@ -1918,14 +3014,17 @@ function renderResults() {
           "td"
         );
 
+
       reportBCell.textContent =
         result.recordB
           ?
-        summarizeRecord(
-          result.recordB
-        )
+            summarizeRecord(
+              result.recordB
+            )
           :
-        "Not found";
+            t(
+              "notFound"
+            );
 
 
       const detailsCell =
@@ -1939,14 +3038,19 @@ function renderResults() {
           "button"
         );
 
+
       detailsButton.type =
         "button";
+
 
       detailsButton.className =
         "secondary-action";
 
+
       detailsButton.textContent =
-        "View details";
+        t(
+          "viewDetails"
+        );
 
 
       detailsButton.addEventListener(
@@ -1983,9 +3087,116 @@ function renderResults() {
   );
 
 
-  elements.resultsTableBody.appendChild(
-    fragment
-  );
+  elements
+    .resultsTableBody
+    .appendChild(
+      fragment
+    );
+
+}
+
+
+/* =========================================================
+   STATUS LABEL
+========================================================= */
+
+function getStatusLabel(
+  result
+) {
+
+  switch (
+    result.type
+  ) {
+
+    case "match":
+
+      return t(
+        "match"
+      );
+
+
+    case "different":
+
+      return t(
+        "different"
+      );
+
+
+    case "missing-a":
+
+      return t(
+        "missingInA"
+      );
+
+
+    case "missing-b":
+
+      return t(
+        "missingInB"
+      );
+
+
+    case "duplicate":
+
+      return (
+        result.duplicateReport ===
+          "A"
+        ?
+          t(
+            "duplicateInA"
+          )
+        :
+          t(
+            "duplicateInB"
+          )
+      );
+
+
+    default:
+
+      return result.type;
+
+  }
+
+}
+
+
+/* =========================================================
+   STATUS CLASS
+========================================================= */
+
+function getStatusClass(
+  type
+) {
+
+  switch (type) {
+
+    case "match":
+
+      return "status-match";
+
+
+    case "different":
+
+      return "status-different";
+
+
+    case "duplicate":
+
+      return "status-duplicate";
+
+
+    case "missing-a":
+    case "missing-b":
+
+      return "status-missing";
+
+
+    default:
+
+      return "";
+
+  }
 
 }
 
@@ -2004,32 +3215,49 @@ function summarizeRecord(
     );
 
 
-  if (!entries.length) {
+  if (
+    !entries.length
+  ) {
+
     return "—";
+
   }
 
 
   return entries
-    .slice(0, 3)
-    .map(
-      ([key, value]) =>
-        `${key}: ${value}`
+    .slice(
+      0,
+      3
     )
-    .join(" · ");
+    .map(
+      ([
+        key,
+        value
+      ]) => {
+
+        return `${key}: ${value}`;
+
+      }
+    )
+    .join(
+      " · "
+    );
 
 }
 
 
 /* =========================================================
-   RESULT DETAILS MODAL
+   DETAILS MODAL
 ========================================================= */
 
 function openResultDetails(
   result
 ) {
 
-  elements.modalContent.innerHTML =
-    "";
+  elements
+    .modalContent
+    .innerHTML =
+      "";
 
 
   const status =
@@ -2039,8 +3267,14 @@ function openResultDetails(
 
 
   status.innerHTML =
-    `<strong>Status:</strong> ${escapeHTML(
-      result.status
+    `<strong>${escapeHTML(
+      t(
+        "status"
+      )
+    )}:</strong> ${escapeHTML(
+      getStatusLabel(
+        result
+      )
     )}`;
 
 
@@ -2051,7 +3285,11 @@ function openResultDetails(
 
 
   key.innerHTML =
-    `<strong>Key:</strong> ${escapeHTML(
+    `<strong>${escapeHTML(
+      t(
+        "key"
+      )
+    )}:</strong> ${escapeHTML(
       result.key || "—"
     )}`;
 
@@ -2063,7 +3301,8 @@ function openResultDetails(
 
 
   if (
-    result.differences &&
+    result.differences
+    &&
     result.differences.length
   ) {
 
@@ -2072,14 +3311,15 @@ function openResultDetails(
         "h3"
       );
 
+
     title.textContent =
-      "Field differences";
+      t(
+        "fieldDifferencesTitle"
+      );
+
 
     title.style.marginTop =
       "24px";
-
-    title.style.marginBottom =
-      "12px";
 
 
     elements.modalContent.appendChild(
@@ -2096,44 +3336,56 @@ function openResultDetails(
           );
 
 
-        block.style.padding =
-          "14px";
-
-        block.style.marginBottom =
-          "10px";
-
-        block.style.border =
-          "1px solid rgba(255,255,255,0.09)";
-
-        block.style.borderRadius =
-          "12px";
+        block.className =
+          "detail-block";
 
 
-        block.innerHTML =
-          `
-          <strong>${escapeHTML(
-            difference.column
-          )}</strong>
-
-          <p style="margin-top:8px;color:#94a3b8">
-            Report A:
-            ${escapeHTML(
-              difference.valueA
-            )}
-          </p>
-
-          <p style="margin-top:4px;color:#94a3b8">
-            Report B:
-            ${escapeHTML(
-              difference.valueB
-            )}
-          </p>
-          `;
+        const column =
+          document.createElement(
+            "strong"
+          );
 
 
-        elements.modalContent.appendChild(
-          block
+        column.textContent =
+          difference.column;
+
+
+        const valueA =
+          document.createElement(
+            "p"
+          );
+
+
+        valueA.textContent =
+          `${t(
+            "reportAValue"
+          )}: ${difference.valueA ?? ""}`;
+
+
+        const valueB =
+          document.createElement(
+            "p"
+          );
+
+
+        valueB.textContent =
+          `${t(
+            "reportBValue"
+          )}: ${difference.valueB ?? ""}`;
+
+
+        block.append(
+          column,
+          valueA,
+          valueB
         );
+
+
+        elements
+          .modalContent
+          .appendChild(
+            block
+          );
 
       }
     );
@@ -2143,77 +3395,76 @@ function openResultDetails(
 
   if (
     result.type ===
-    "duplicate" &&
+      "duplicate"
+    &&
     result.duplicateRecords
   ) {
 
-    const duplicateTitle =
+    const title =
       document.createElement(
         "h3"
       );
 
 
-    duplicateTitle.textContent =
-      `Duplicate records in Report ${result.duplicateReport}`;
+    title.textContent =
+      `${t(
+        "duplicateRecords"
+      )} — ${result.duplicateReport}`;
 
 
-    duplicateTitle.style.marginTop =
+    title.style.marginTop =
       "24px";
 
 
-    elements.modalContent.appendChild(
-      duplicateTitle
-    );
+    elements
+      .modalContent
+      .appendChild(
+        title
+      );
 
 
-    result.duplicateRecords.forEach(
-      (
-        record,
-        index
-      ) => {
+    result
+      .duplicateRecords
+      .forEach(
+        (
+          record,
+          index
+        ) => {
 
-        const pre =
-          document.createElement(
-            "pre"
-          );
-
-
-        pre.textContent =
-          `Record ${index + 1}\n\n${JSON.stringify(
-            record,
-            null,
-            2
-          )}`;
+          const pre =
+            document.createElement(
+              "pre"
+            );
 
 
-        pre.style.whiteSpace =
-          "pre-wrap";
-
-        pre.style.marginTop =
-          "12px";
-
-        pre.style.padding =
-          "14px";
-
-        pre.style.background =
-          "rgba(255,255,255,0.03)";
-
-        pre.style.borderRadius =
-          "12px";
+          pre.className =
+            "record-json";
 
 
-        elements.modalContent.appendChild(
-          pre
-        );
+          pre.textContent =
+            `#${index + 1}\n${JSON.stringify(
+              record,
+              null,
+              2
+            )}`;
 
-      }
-    );
+
+          elements
+            .modalContent
+            .appendChild(
+              pre
+            );
+
+        }
+      );
 
   }
 
 
-  elements.detailsModal.hidden =
-    false;
+  elements
+    .detailsModal
+    .hidden =
+      false;
 
 }
 
@@ -2224,8 +3475,16 @@ function openResultDetails(
 
 function closeModal() {
 
-  elements.detailsModal.hidden =
-    true;
+  if (
+    elements.detailsModal
+  ) {
+
+    elements
+      .detailsModal
+      .hidden =
+        true;
+
+  }
 
 }
 
@@ -2241,8 +3500,10 @@ function exportResultsToCSV() {
   ) {
 
     setStatus(
-      "There are no results to export.",
-      true
+      t(
+        "noExportResults"
+      ),
+      "error"
     );
 
     return;
@@ -2250,13 +3511,30 @@ function exportResultsToCSV() {
   }
 
 
-  const exportData =
+  if (
+    typeof Papa ===
+    "undefined"
+  ) {
+
+    setStatus(
+      t(
+        "csvLibraryError"
+      ),
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const data =
     buildExportData();
 
 
   const csv =
     Papa.unparse(
-      exportData
+      data
     );
 
 
@@ -2294,8 +3572,10 @@ function exportResultsToExcel() {
   ) {
 
     setStatus(
-      "There are no results to export.",
-      true
+      t(
+        "noExportResults"
+      ),
+      "error"
     );
 
     return;
@@ -2309,8 +3589,10 @@ function exportResultsToExcel() {
   ) {
 
     setStatus(
-      "Excel library is not available.",
-      true
+      t(
+        "excelLibraryError"
+      ),
+      "error"
     );
 
     return;
@@ -2318,25 +3600,31 @@ function exportResultsToExcel() {
   }
 
 
-  const exportData =
+  const data =
     buildExportData();
 
 
   const worksheet =
-    XLSX.utils.json_to_sheet(
-      exportData
-    );
+    XLSX
+      .utils
+      .json_to_sheet(
+        data
+      );
 
 
   const workbook =
-    XLSX.utils.book_new();
+    XLSX
+      .utils
+      .book_new();
 
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Reconciliation"
-  );
+  XLSX
+    .utils
+    .book_append_sheet(
+      workbook,
+      worksheet,
+      "Reconciliation"
+    );
 
 
   XLSX.writeFile(
@@ -2350,7 +3638,7 @@ function exportResultsToExcel() {
 
 
 /* =========================================================
-   BUILD EXPORT DATA
+   EXPORT DATA
 ========================================================= */
 
 function buildExportData() {
@@ -2361,37 +3649,50 @@ function buildExportData() {
       return {
 
         Status:
-          result.status,
+          getStatusLabel(
+            result
+          ),
 
         Key:
           result.key,
 
-        "Report A":
+        Report_A:
           result.recordA
             ?
-          JSON.stringify(
-            result.recordA
-          )
+              JSON.stringify(
+                result.recordA
+              )
             :
-          "",
+              "",
 
-        "Report B":
+        Report_B:
           result.recordB
             ?
-          JSON.stringify(
-            result.recordB
-          )
+              JSON.stringify(
+                result.recordB
+              )
             :
-          "",
+              "",
 
         Differences:
           result.differences
             ?.map(
-              difference =>
-                `${difference.column}: "${difference.valueA}" -> "${difference.valueB}"`
+              difference => {
+
+                return (
+                  `${difference.column}: `
+                  +
+                  `"${difference.valueA}" -> `
+                  +
+                  `"${difference.valueB}"`
+                );
+
+              }
             )
-            .join(" | ")
-            ||
+            .join(
+              " | "
+            )
+          ||
           ""
 
       };
@@ -2426,6 +3727,7 @@ function downloadBlob(
   link.href =
     url;
 
+
   link.download =
     filename;
 
@@ -2449,24 +3751,24 @@ function downloadBlob(
 
 
 /* =========================================================
-   EXPORT FILE NAME
+   EXPORT FILENAME
 ========================================================= */
 
 function createExportFilename(
   extension
 ) {
 
-  const date =
+  const now =
     new Date();
 
 
   const year =
-    date.getFullYear();
+    now.getFullYear();
 
 
   const month =
     String(
-      date.getMonth() + 1
+      now.getMonth() + 1
     ).padStart(
       2,
       "0"
@@ -2475,7 +3777,7 @@ function createExportFilename(
 
   const day =
     String(
-      date.getDate()
+      now.getDate()
     ).padStart(
       2,
       "0"
@@ -2523,45 +3825,57 @@ function resetApplication() {
   elements.fileA.value =
     "";
 
+
   elements.fileB.value =
     "";
 
 
-  elements.fileAStatus.textContent =
-    "No file";
-
-  elements.fileBStatus.textContent =
-    "No file";
-
-
-  elements.fileAInfo.textContent =
-    "";
-
-  elements.fileBInfo.textContent =
-    "";
+  elements
+    .keyColumnA
+    .innerHTML =
+      "";
 
 
-  elements.keyColumnA.innerHTML =
-    '<option value="">Select a column</option>';
-
-  elements.keyColumnB.innerHTML =
-    '<option value="">Select a column</option>';
-
-
-  elements.compareButton.disabled =
-    true;
+  elements
+    .keyColumnB
+    .innerHTML =
+      "";
 
 
-  elements.resultsSection.hidden =
-    true;
+  populateColumnSelect(
+    elements.keyColumnA,
+    []
+  );
 
 
-  elements.resultsTableBody.innerHTML =
-    "";
+  populateColumnSelect(
+    elements.keyColumnB,
+    []
+  );
 
 
-  elements.resultSearch.value =
-    "";
+  elements
+    .compareButton
+    .disabled =
+      true;
+
+
+  elements
+    .resultsSection
+    .hidden =
+      true;
+
+
+  elements
+    .resultsTableBody
+    .innerHTML =
+      "";
+
+
+  elements
+    .resultSearch
+    .value =
+      "";
 
 
   document
@@ -2574,18 +3888,31 @@ function resetApplication() {
         button.classList.toggle(
           "active",
           button.dataset.filter ===
-          "all"
+            "all"
         );
 
       }
     );
 
 
+  updateFileDisplay(
+    "A"
+  );
+
+
+  updateFileDisplay(
+    "B"
+  );
+
+
   resetMetrics();
 
 
   setStatus(
-    "Workspace reset."
+    t(
+      "workspaceReset"
+    ),
+    "success"
   );
 
 }
@@ -2625,6 +3952,47 @@ function resetMetrics() {
 
 
 /* =========================================================
+   DYNAMIC LANGUAGE REFRESH
+========================================================= */
+
+function refreshDynamicLanguage() {
+
+  populateColumnSelect(
+    elements.keyColumnA,
+    state.reportA.columns
+  );
+
+
+  populateColumnSelect(
+    elements.keyColumnB,
+    state.reportB.columns
+  );
+
+
+  updateFileDisplay(
+    "A"
+  );
+
+
+  updateFileDisplay(
+    "B"
+  );
+
+
+  if (
+    state.results.length
+  ) {
+
+    updateMetrics();
+
+    applyResultFilters();
+
+  }
+
+}
+
+
+/* =========================================================
    UTILITIES
 ========================================================= */
 
@@ -2645,22 +4013,26 @@ function formatFileSize(
 ) {
 
   if (!bytes) {
+
     return "0 B";
+
   }
 
 
-  const units = [
-    "B",
-    "KB",
-    "MB",
-    "GB"
-  ];
+  const units =
+    [
+      "B",
+      "KB",
+      "MB",
+      "GB"
+    ];
 
 
   const index =
     Math.min(
       Math.floor(
-        Math.log(bytes) /
+        Math.log(bytes)
+        /
         Math.log(1024)
       ),
       units.length - 1
@@ -2668,7 +4040,8 @@ function formatFileSize(
 
 
   const value =
-    bytes /
+    bytes
+    /
     Math.pow(
       1024,
       index
@@ -2691,61 +4064,51 @@ function getDisplayKey(
   keyColumn
 ) {
 
-  const value =
+  return String(
     record[
       keyColumn
-    ];
-
-
-  return String(
-    value ?? ""
+    ]
+    ??
+    ""
   );
-
-}
-
-
-function getStatusClass(
-  type
-) {
-
-  switch (type) {
-
-    case "match":
-      return "status-match";
-
-    case "different":
-      return "status-different";
-
-    case "duplicate":
-      return "status-duplicate";
-
-    case "missing-a":
-    case "missing-b":
-      return "status-missing";
-
-    default:
-      return "";
-
-  }
 
 }
 
 
 function setStatus(
   message,
-  error = false
+  type = ""
 ) {
 
-  elements.processStatus.textContent =
-    message;
+  elements
+    .processStatus
+    .textContent =
+      message;
 
 
-  elements.processStatus.style.color =
-    error
-      ?
-      "#fca5a5"
-      :
-      "";
+  elements
+    .processStatus
+    .classList
+    .remove(
+      "error",
+      "success"
+    );
+
+
+  if (
+    type === "error"
+    ||
+    type === "success"
+  ) {
+
+    elements
+      .processStatus
+      .classList
+      .add(
+        type
+      );
+
+  }
 
 }
 
@@ -2772,8 +4135,16 @@ function escapeHTML(
 
 
 /* =========================================================
-   READY
+   INITIALIZATION
 ========================================================= */
+
+changeLanguage(
+  currentLanguage
+);
+
+
+resetMetrics();
+
 
 console.log(
   "%cLoop Reconciler",
@@ -2782,5 +4153,5 @@ console.log(
 
 
 console.log(
-  "Data reconciliation engine initialized."
+  "Loop Reconciler initialized."
 );
