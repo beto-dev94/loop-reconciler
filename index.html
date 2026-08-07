@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <meta
     name="description"
-    content="Loop Reconciler - Compare, validate and reconcile CSV and Excel reports directly in your browser."
+    content="Loop Reconciler - Compare, valide e concilie relatórios CSV e Excel diretamente no navegador."
   />
 
   <meta
     name="keywords"
-    content="CSV, Excel, reconciliation, reports, data comparison, data validation"
+    content="CSV, Excel, conciliação, relatórios, comparação de dados, validação de dados"
   />
 
   <meta name="author" content="beto-dev94" />
 
-  <title>Loop Reconciler | Data Reconciliation</title>
+  <title>Loop Reconciler | Conciliação de Dados</title>
 
   <link rel="stylesheet" href="assets/css/style.css" />
 
-  <!-- Excel file support -->
+  <!-- Excel -->
   <script
     src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
     defer>
   </script>
 
-  <!-- CSV file support -->
+  <!-- CSV -->
   <script
     src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"
     defer>
@@ -35,16 +35,15 @@
   <script src="assets/js/app.js" defer></script>
 </head>
 
-
 <body>
 
-  <!-- =========================================================
-       NAVIGATION
-  ========================================================== -->
+  <!-- ======================================================
+       NAVEGAÇÃO
+  ======================================================= -->
 
   <header class="navbar">
 
-    <a class="brand" href="#" aria-label="Loop Reconciler Home">
+    <a class="brand" href="#" aria-label="Loop Reconciler">
       <span class="brand-mark">∞</span>
 
       <div class="brand-text">
@@ -54,9 +53,17 @@
     </a>
 
     <nav class="nav-links">
-      <a href="#comparison">Compare</a>
-      <a href="#results">Results</a>
-      <a href="#features">Features</a>
+      <a href="#comparison" data-i18n="navCompare">
+        Comparar
+      </a>
+
+      <a href="#results" data-i18n="navResults">
+        Resultados
+      </a>
+
+      <a href="#features" data-i18n="navFeatures">
+        Recursos
+      </a>
 
       <a
         href="https://github.com/beto-dev94/loop-reconciler"
@@ -67,38 +74,71 @@
       </a>
     </nav>
 
-    <span class="version">v1.0</span>
+    <div class="navbar-actions">
+
+      <div class="language-switcher">
+        <button
+          type="button"
+          class="language-button active"
+          id="languagePT"
+          data-language="pt"
+        >
+          PT-BR
+        </button>
+
+        <button
+          type="button"
+          class="language-button"
+          id="languageEN"
+          data-language="en"
+        >
+          EN
+        </button>
+      </div>
+
+      <span class="version">
+        v1.0
+      </span>
+
+    </div>
 
   </header>
 
 
-  <!-- =========================================================
-       MAIN CONTENT
-  ========================================================== -->
-
   <main>
 
-
-    <!-- =======================================================
+    <!-- ======================================================
          HERO
-    ======================================================== -->
+    ======================================================= -->
 
     <section class="hero">
 
-      <div class="badge">
-        Intelligent Data Reconciliation
+      <div class="badge" data-i18n="heroBadge">
+        Conciliação Inteligente de Dados
       </div>
 
       <h1>
-        Find differences.
+        <span data-i18n="heroTitle1">
+          Encontre diferenças.
+        </span>
+
         <br />
-        <span>Reconcile faster.</span>
+
+        <span
+          class="gradient-text"
+          data-i18n="heroTitle2"
+        >
+          Concilie mais rápido.
+        </span>
       </h1>
 
-      <p class="hero-description">
-        Compare CSV and Excel reports, detect missing records,
-        duplicates and inconsistencies, and review your data
-        through a simple reconciliation dashboard.
+      <p
+        class="hero-description"
+        data-i18n="heroDescription"
+      >
+        Compare relatórios CSV e Excel, encontre registros ausentes,
+        duplicidades e inconsistências e analise os resultados através
+        de um painel simples e eficiente.
       </p>
 
       <div class="hero-actions">
@@ -107,8 +147,9 @@
           type="button"
           class="primary-button"
           id="startButton"
+          data-i18n="startComparison"
         >
-          Start Comparison
+          Iniciar comparação
         </button>
 
         <a
@@ -116,27 +157,27 @@
           href="https://github.com/beto-dev94/loop-reconciler"
           target="_blank"
           rel="noopener noreferrer"
+          data-i18n="viewGithub"
         >
-          View on GitHub
+          Ver no GitHub
         </a>
 
       </div>
 
 
-      <!-- =====================================================
-           QUICK FEATURES
-      ====================================================== -->
+      <!-- RECURSOS RÁPIDOS -->
 
       <div class="features" id="features">
 
         <article class="feature-card">
           <span>01</span>
 
-          <h2>Import</h2>
+          <h2 data-i18n="featureImportTitle">
+            Importar
+          </h2>
 
-          <p>
-            Load CSV, XLS and XLSX reports directly
-            from your computer.
+          <p data-i18n="featureImportDescription">
+            Carregue relatórios CSV, XLS e XLSX diretamente do seu computador.
           </p>
         </article>
 
@@ -144,11 +185,12 @@
         <article class="feature-card">
           <span>02</span>
 
-          <h2>Compare</h2>
+          <h2 data-i18n="featureCompareTitle">
+            Comparar
+          </h2>
 
-          <p>
-            Automatically compare datasets using
-            a configurable matching column.
+          <p data-i18n="featureCompareDescription">
+            Compare automaticamente conjuntos de dados usando uma coluna de referência.
           </p>
         </article>
 
@@ -156,11 +198,12 @@
         <article class="feature-card">
           <span>03</span>
 
-          <h2>Review</h2>
+          <h2 data-i18n="featureReviewTitle">
+            Analisar
+          </h2>
 
-          <p>
-            Inspect matches, missing records,
-            duplicates and inconsistencies.
+          <p data-i18n="featureReviewDescription">
+            Identifique correspondências, diferenças, registros ausentes e duplicidades.
           </p>
         </article>
 
@@ -169,9 +212,9 @@
     </section>
 
 
-    <!-- =======================================================
-         COMPARISON WORKSPACE
-    ======================================================== -->
+    <!-- ======================================================
+         ÁREA DE COMPARAÇÃO
+    ======================================================= -->
 
     <section
       class="comparison-section"
@@ -180,52 +223,57 @@
 
       <div class="section-heading">
 
-        <span class="section-label">
-          Workspace
+        <span
+          class="section-label"
+          data-i18n="workspaceLabel"
+        >
+          Área de trabalho
         </span>
 
-        <h2>Compare your reports</h2>
+        <h2 data-i18n="workspaceTitle">
+          Compare seus relatórios
+        </h2>
 
-        <p>
-          Your files are processed locally in your browser.
+        <p data-i18n="workspaceDescription">
+          Seus arquivos são processados localmente no navegador.
         </p>
 
       </div>
 
-
-      <!-- =====================================================
-           FILE UPLOAD
-      ====================================================== -->
 
       <div
         class="comparison-panel"
         id="comparisonPanel"
       >
 
-
-        <!-- REPORT A -->
+        <!-- RELATÓRIO A -->
 
         <div class="upload-card">
 
           <div class="upload-card-header">
 
             <div>
-              <span class="report-label">
-                Report A
+              <span
+                class="report-label"
+                data-i18n="reportA"
+              >
+                Relatório A
               </span>
 
-              <h3>Primary dataset</h3>
+              <h3 data-i18n="primaryDataset">
+                Base principal
+              </h3>
             </div>
 
             <span
               class="file-status"
               id="fileAStatus"
+              data-i18n="noFile"
             >
-              No file
+              Nenhum arquivo
             </span>
 
           </div>
-
 
           <label
             class="file-drop-zone"
@@ -236,16 +284,15 @@
               ↑
             </span>
 
-            <strong>
-              Choose Report A
+            <strong data-i18n="chooseReportA">
+              Selecionar Relatório A
             </strong>
 
             <small>
-              CSV, XLS or XLSX
+              CSV, XLS ou XLSX
             </small>
 
           </label>
-
 
           <input
             type="file"
@@ -253,7 +300,6 @@
             accept=".csv,.xls,.xlsx"
             hidden
           />
-
 
           <div
             class="file-information"
@@ -263,29 +309,34 @@
         </div>
 
 
-        <!-- REPORT B -->
+        <!-- RELATÓRIO B -->
 
         <div class="upload-card">
 
           <div class="upload-card-header">
 
             <div>
-              <span class="report-label">
-                Report B
+              <span
+                class="report-label"
+                data-i18n="reportB"
+              >
+                Relatório B
               </span>
 
-              <h3>Comparison dataset</h3>
+              <h3 data-i18n="comparisonDataset">
+                Base de comparação
+              </h3>
             </div>
 
             <span
               class="file-status"
               id="fileBStatus"
+              data-i18n="noFile"
             >
-              No file
+              Nenhum arquivo
             </span>
 
           </div>
-
 
           <label
             class="file-drop-zone"
@@ -296,16 +347,15 @@
               ↑
             </span>
 
-            <strong>
-              Choose Report B
+            <strong data-i18n="chooseReportB">
+              Selecionar Relatório B
             </strong>
 
             <small>
-              CSV, XLS or XLSX
+              CSV, XLS ou XLSX
             </small>
 
           </label>
-
 
           <input
             type="file"
@@ -313,7 +363,6 @@
             accept=".csv,.xls,.xlsx"
             hidden
           />
-
 
           <div
             class="file-information"
@@ -323,9 +372,7 @@
         </div>
 
 
-        <!-- ===================================================
-             CONFIGURATION
-        ==================================================== -->
+        <!-- CONFIGURAÇÕES -->
 
         <div
           class="comparison-settings"
@@ -335,12 +382,15 @@
           <div class="settings-heading">
 
             <div>
-              <span class="section-label">
-                Matching Rules
+              <span
+                class="section-label"
+                data-i18n="matchingRules"
+              >
+                Regras de correspondência
               </span>
 
-              <h3>
-                Comparison configuration
+              <h3 data-i18n="comparisonConfiguration">
+                Configuração da comparação
               </h3>
             </div>
 
@@ -349,47 +399,52 @@
 
           <div class="settings-grid">
 
-
-            <!-- COLUMN A -->
-
             <div class="form-group">
 
-              <label for="keyColumnA">
-                Matching column — Report A
+              <label
+                for="keyColumnA"
+                data-i18n="matchingColumnA"
+              >
+                Coluna de referência — Relatório A
               </label>
 
               <select id="keyColumnA">
-                <option value="">
-                  Select a column
+                <option
+                  value=""
+                  data-i18n="selectColumn"
+                >
+                  Selecione uma coluna
                 </option>
               </select>
 
             </div>
 
 
-            <!-- COLUMN B -->
-
             <div class="form-group">
 
-              <label for="keyColumnB">
-                Matching column — Report B
+              <label
+                for="keyColumnB"
+                data-i18n="matchingColumnB"
+              >
+                Coluna de referência — Relatório B
               </label>
 
               <select id="keyColumnB">
-                <option value="">
-                  Select a column
+                <option
+                  value=""
+                  data-i18n="selectColumn"
+                >
+                  Selecione uma coluna
                 </option>
               </select>
 
             </div>
 
 
-            <!-- NORMALIZATION -->
-
             <div class="form-group">
 
-              <label>
-                Data normalization
+              <label data-i18n="normalization">
+                Normalização dos dados
               </label>
 
               <div class="checkbox-group">
@@ -401,7 +456,9 @@
                     checked
                   />
 
-                  Remove extra spaces
+                  <span data-i18n="removeSpaces">
+                    Remover espaços extras
+                  </span>
                 </label>
 
 
@@ -412,7 +469,9 @@
                     checked
                   />
 
-                  Ignore uppercase/lowercase
+                  <span data-i18n="ignoreCase">
+                    Ignorar maiúsculas e minúsculas
+                  </span>
                 </label>
 
 
@@ -423,7 +482,9 @@
                     checked
                   />
 
-                  Ignore empty records
+                  <span data-i18n="ignoreEmpty">
+                    Ignorar registros vazios
+                  </span>
                 </label>
 
               </div>
@@ -431,12 +492,10 @@
             </div>
 
 
-            <!-- DUPLICATE CHECK -->
-
             <div class="form-group">
 
-              <label>
-                Validation
+              <label data-i18n="validation">
+                Validação
               </label>
 
               <div class="checkbox-group">
@@ -448,7 +507,9 @@
                     checked
                   />
 
-                  Detect duplicates
+                  <span data-i18n="detectDuplicates">
+                    Detectar duplicidades
+                  </span>
                 </label>
 
 
@@ -459,7 +520,9 @@
                     checked
                   />
 
-                  Compare matching record fields
+                  <span data-i18n="compareFields">
+                    Comparar campos dos registros
+                  </span>
                 </label>
 
               </div>
@@ -471,9 +534,7 @@
         </div>
 
 
-        <!-- ===================================================
-             ACTIONS
-        ==================================================== -->
+        <!-- AÇÕES -->
 
         <div class="comparison-actions">
 
@@ -482,8 +543,9 @@
             class="primary-button compare-button"
             id="compareButton"
             disabled
+            data-i18n="compareReports"
           >
-            Compare Reports
+            Comparar relatórios
           </button>
 
 
@@ -491,14 +553,13 @@
             type="button"
             class="secondary-action"
             id="resetButton"
+            data-i18n="reset"
           >
-            Reset
+            Limpar
           </button>
 
         </div>
 
-
-        <!-- STATUS -->
 
         <div
           class="process-status"
@@ -511,9 +572,9 @@
     </section>
 
 
-    <!-- =======================================================
-         RESULTS DASHBOARD
-    ======================================================== -->
+    <!-- ======================================================
+         RESULTADOS
+    ======================================================= -->
 
     <section
       class="results-section"
@@ -523,32 +584,35 @@
 
       <div class="section-heading">
 
-        <span class="section-label">
-          Analysis
+        <span
+          class="section-label"
+          data-i18n="analysis"
+        >
+          Análise
         </span>
 
-        <h2>
-          Reconciliation Results
+        <h2 data-i18n="resultsTitle">
+          Resultado da conciliação
         </h2>
 
-        <p>
-          Summary of the comparison between both reports.
+        <p data-i18n="resultsDescription">
+          Resumo da comparação entre os dois relatórios.
         </p>
 
       </div>
 
 
-      <!-- =====================================================
-           DASHBOARD METRICS
-      ====================================================== -->
+      <!-- MÉTRICAS -->
 
       <div class="metrics-grid">
 
-
         <article class="metric-card">
 
-          <span class="metric-label">
-            Report A Records
+          <span
+            class="metric-label"
+            data-i18n="reportARecords"
+          >
+            Registros do Relatório A
           </span>
 
           <strong
@@ -563,8 +627,11 @@
 
         <article class="metric-card">
 
-          <span class="metric-label">
-            Report B Records
+          <span
+            class="metric-label"
+            data-i18n="reportBRecords"
+          >
+            Registros do Relatório B
           </span>
 
           <strong
@@ -579,8 +646,11 @@
 
         <article class="metric-card success">
 
-          <span class="metric-label">
-            Matches
+          <span
+            class="metric-label"
+            data-i18n="matches"
+          >
+            Correspondências
           </span>
 
           <strong
@@ -595,8 +665,11 @@
 
         <article class="metric-card warning">
 
-          <span class="metric-label">
-            Differences
+          <span
+            class="metric-label"
+            data-i18n="differences"
+          >
+            Divergências
           </span>
 
           <strong
@@ -611,8 +684,11 @@
 
         <article class="metric-card danger">
 
-          <span class="metric-label">
-            Missing in Report B
+          <span
+            class="metric-label"
+            data-i18n="missingReportB"
+          >
+            Ausentes no Relatório B
           </span>
 
           <strong
@@ -627,8 +703,11 @@
 
         <article class="metric-card danger">
 
-          <span class="metric-label">
-            Missing in Report A
+          <span
+            class="metric-label"
+            data-i18n="missingReportA"
+          >
+            Ausentes no Relatório A
           </span>
 
           <strong
@@ -643,8 +722,11 @@
 
         <article class="metric-card">
 
-          <span class="metric-label">
-            Duplicates
+          <span
+            class="metric-label"
+            data-i18n="duplicates"
+          >
+            Duplicidades
           </span>
 
           <strong
@@ -659,8 +741,11 @@
 
         <article class="metric-card">
 
-          <span class="metric-label">
-            Match Rate
+          <span
+            class="metric-label"
+            data-i18n="matchRate"
+          >
+            Taxa de correspondência
           </span>
 
           <strong
@@ -675,27 +760,21 @@
       </div>
 
 
-      <!-- =====================================================
-           RESULT CONTROLS
-      ====================================================== -->
+      <!-- CONTROLES -->
 
       <div class="results-toolbar">
-
-
-        <!-- SEARCH -->
 
         <div class="search-wrapper">
 
           <input
             type="search"
             id="resultSearch"
-            placeholder="Search results..."
+            placeholder="Pesquisar resultados..."
+            data-i18n-placeholder="searchResults"
           />
 
         </div>
 
-
-        <!-- FILTER -->
 
         <div
           class="filter-buttons"
@@ -706,54 +785,58 @@
             type="button"
             class="filter-button active"
             data-filter="all"
+            data-i18n="all"
           >
-            All
+            Todos
           </button>
 
           <button
             type="button"
             class="filter-button"
             data-filter="match"
+            data-i18n="matches"
           >
-            Matches
+            Correspondências
           </button>
 
           <button
             type="button"
             class="filter-button"
             data-filter="different"
+            data-i18n="differences"
           >
-            Differences
+            Divergências
           </button>
 
           <button
             type="button"
             class="filter-button"
             data-filter="missing-a"
+            data-i18n="missingAFilter"
           >
-            Missing A
+            Ausentes A
           </button>
 
           <button
             type="button"
             class="filter-button"
             data-filter="missing-b"
+            data-i18n="missingBFilter"
           >
-            Missing B
+            Ausentes B
           </button>
 
           <button
             type="button"
             class="filter-button"
             data-filter="duplicate"
+            data-i18n="duplicates"
           >
-            Duplicates
+            Duplicidades
           </button>
 
         </div>
 
-
-        <!-- EXPORT -->
 
         <div class="export-actions">
 
@@ -761,8 +844,9 @@
             type="button"
             class="secondary-action"
             id="exportCsvButton"
+            data-i18n="exportCSV"
           >
-            Export CSV
+            Exportar CSV
           </button>
 
 
@@ -770,8 +854,9 @@
             type="button"
             class="secondary-action"
             id="exportExcelButton"
+            data-i18n="exportExcel"
           >
-            Export Excel
+            Exportar Excel
           </button>
 
         </div>
@@ -779,9 +864,7 @@
       </div>
 
 
-      <!-- =====================================================
-           RESULTS TABLE
-      ====================================================== -->
+      <!-- TABELA -->
 
       <div class="table-container">
 
@@ -793,38 +876,31 @@
           <thead>
 
             <tr>
-
-              <th>
+              <th data-i18n="status">
                 Status
               </th>
 
-              <th>
-                Key
+              <th data-i18n="key">
+                Chave
               </th>
 
-              <th>
-                Report A
+              <th data-i18n="reportA">
+                Relatório A
               </th>
 
-              <th>
-                Report B
+              <th data-i18n="reportB">
+                Relatório B
               </th>
 
-              <th>
-                Details
+              <th data-i18n="details">
+                Detalhes
               </th>
-
             </tr>
 
           </thead>
 
 
           <tbody id="resultsTableBody">
-
-            <!--
-              JavaScript will populate this table.
-            -->
-
           </tbody>
 
         </table>
@@ -832,20 +908,18 @@
       </div>
 
 
-      <!-- EMPTY RESULTS -->
-
       <div
         class="empty-results"
         id="emptyResults"
         hidden
       >
 
-        <h3>
-          No results found
+        <h3 data-i18n="noResults">
+          Nenhum resultado encontrado
         </h3>
 
-        <p>
-          Try changing the active filter or search term.
+        <p data-i18n="changeFilter">
+          Tente alterar o filtro ou o termo pesquisado.
         </p>
 
       </div>
@@ -853,9 +927,9 @@
     </section>
 
 
-    <!-- =======================================================
-         PRIVACY / LOCAL PROCESSING
-    ======================================================== -->
+    <!-- ======================================================
+         PRIVACIDADE
+    ======================================================= -->
 
     <section class="privacy-section">
 
@@ -867,14 +941,14 @@
 
         <div>
 
-          <h2>
-            Local-first processing
+          <h2 data-i18n="localProcessing">
+            Processamento local
           </h2>
 
-          <p>
-            Loop Reconciler processes supported reports
-            directly inside your browser. Files do not need
-            to be uploaded to a remote server for comparison.
+          <p data-i18n="localProcessingDescription">
+            O Loop Reconciler processa os arquivos diretamente
+            no navegador. Seus relatórios não precisam ser enviados
+            para um servidor remoto para realizar a comparação.
           </p>
 
         </div>
@@ -884,20 +958,23 @@
     </section>
 
 
-    <!-- =======================================================
-         PRODUCT FEATURES
-    ======================================================== -->
+    <!-- ======================================================
+         CAPACIDADES
+    ======================================================= -->
 
     <section class="product-features">
 
       <div class="section-heading">
 
-        <span class="section-label">
-          Capabilities
+        <span
+          class="section-label"
+          data-i18n="capabilities"
+        >
+          Capacidades
         </span>
 
-        <h2>
-          Built for practical data validation
+        <h2 data-i18n="capabilitiesTitle">
+          Desenvolvido para validação prática de dados
         </h2>
 
       </div>
@@ -905,108 +982,91 @@
 
       <div class="capability-grid">
 
-
         <article class="capability-card">
-
-          <h3>
-            CSV Support
+          <h3 data-i18n="csvSupport">
+            Suporte a CSV
           </h3>
 
-          <p>
-            Import and analyze standard CSV datasets.
+          <p data-i18n="csvSupportDescription">
+            Importe e analise conjuntos de dados em CSV.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Excel Support
+          <h3 data-i18n="excelSupport">
+            Suporte a Excel
           </h3>
 
-          <p>
-            Read XLS and XLSX spreadsheets directly.
+          <p data-i18n="excelSupportDescription">
+            Leia arquivos XLS e XLSX diretamente no navegador.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Duplicate Detection
+          <h3 data-i18n="duplicateDetection">
+            Detecção de duplicidades
           </h3>
 
-          <p>
-            Identify repeated keys inside each dataset.
+          <p data-i18n="duplicateDetectionDescription">
+            Identifique chaves repetidas dentro de cada base.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Missing Records
+          <h3 data-i18n="missingRecords">
+            Registros ausentes
           </h3>
 
-          <p>
-            Detect records present in only one report.
+          <p data-i18n="missingRecordsDescription">
+            Encontre registros existentes em apenas um dos relatórios.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Field Differences
+          <h3 data-i18n="fieldDifferences">
+            Diferenças entre campos
           </h3>
 
-          <p>
-            Compare the contents of matching records.
+          <p data-i18n="fieldDifferencesDescription">
+            Compare os dados internos de registros correspondentes.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Export Results
+          <h3 data-i18n="exportResults">
+            Exportação de resultados
           </h3>
 
-          <p>
-            Generate reconciled CSV and Excel reports.
+          <p data-i18n="exportResultsDescription">
+            Gere relatórios de conciliação em CSV e Excel.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Search & Filters
+          <h3 data-i18n="searchFilters">
+            Pesquisa e filtros
           </h3>
 
-          <p>
-            Quickly isolate specific reconciliation results.
+          <p data-i18n="searchFiltersDescription">
+            Localize rapidamente resultados específicos.
           </p>
-
         </article>
 
 
         <article class="capability-card">
-
-          <h3>
-            Responsive Interface
+          <h3 data-i18n="responsiveInterface">
+            Interface responsiva
           </h3>
 
-          <p>
-            Designed for desktop, tablet and mobile devices.
+          <p data-i18n="responsiveInterfaceDescription">
+            Compatível com computadores, tablets e smartphones.
           </p>
-
         </article>
 
       </div>
@@ -1016,9 +1076,9 @@
   </main>
 
 
-  <!-- =========================================================
+  <!-- ======================================================
        FOOTER
-  ========================================================== -->
+  ======================================================= -->
 
   <footer class="footer">
 
@@ -1027,16 +1087,23 @@
       <div>
 
         <div class="brand footer-brand">
-          <span class="brand-mark">∞</span>
+
+          <span class="brand-mark">
+            ∞
+          </span>
 
           <div class="brand-text">
             <strong>Loop Reconciler</strong>
             <small>Loop Suite</small>
           </div>
+
         </div>
 
-        <p class="footer-description">
-          Open-source data reconciliation tool.
+        <p
+          class="footer-description"
+          data-i18n="footerDescription"
+        >
+          Ferramenta open source para conciliação de dados.
         </p>
 
       </div>
@@ -1048,16 +1115,18 @@
           href="https://github.com/beto-dev94"
           target="_blank"
           rel="noopener noreferrer"
+          data-i18n="developer"
         >
-          Developer
+          Desenvolvedor
         </a>
 
         <a
           href="https://github.com/beto-dev94/loop-reconciler"
           target="_blank"
           rel="noopener noreferrer"
+          data-i18n="sourceCode"
         >
-          Source Code
+          Código-fonte
         </a>
 
       </div>
@@ -1071,8 +1140,8 @@
         © 2026 beto-dev94 · Loop Suite
       </p>
 
-      <p>
-        Built for data reconciliation and workflow automation.
+      <p data-i18n="footerMessage">
+        Desenvolvido para conciliação de dados e automação de processos.
       </p>
 
     </div>
@@ -1080,9 +1149,9 @@
   </footer>
 
 
-  <!-- =========================================================
-       MODAL — RECORD DETAILS
-  ========================================================== -->
+  <!-- ======================================================
+       MODAL
+  ======================================================= -->
 
   <div
     class="modal-overlay"
@@ -1099,15 +1168,18 @@
 
       <div class="modal-header">
 
-        <h2 id="detailsModalTitle">
-          Record Details
+        <h2
+          id="detailsModalTitle"
+          data-i18n="recordDetails"
+        >
+          Detalhes do registro
         </h2>
 
         <button
           type="button"
           class="modal-close"
           id="closeModalButton"
-          aria-label="Close"
+          aria-label="Fechar"
         >
           ×
         </button>
@@ -1124,7 +1196,6 @@
     </div>
 
   </div>
-
 
 </body>
 </html>
