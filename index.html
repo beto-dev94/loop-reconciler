@@ -2,1072 +2,2803 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <meta
     name="description"
-    content="Loop Reconciler - Compare, valide e concilie relatórios CSV e Excel diretamente no navegador."
+    content="Loop Reconciler - Compare múltiplos relatórios, encontre divergências, registros ausentes, duplicidades e inconsistências diretamente no navegador."
   />
 
   <meta
     name="keywords"
-    content="CSV, Excel, conciliação, relatórios, comparação de dados, validação de dados"
+    content="CSV, Excel, XLSX, XLS, ODS, LibreOffice, OpenOffice, conciliação, comparação de dados, relatórios, auditoria, validação"
   />
 
-  <meta name="author" content="beto-dev94" />
+  <meta
+    name="author"
+    content="beto-dev94"
+  />
 
-  <title>Loop Reconciler | Conciliação de Dados</title>
+  <meta
+    name="theme-color"
+    content="#070b14"
+    id="themeColorMeta"
+  />
 
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <title>
+    Loop Reconciler | Conciliação de Dados
+  </title>
 
-  <!-- Excel -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
-    defer>
-  </script>
+  <link
+    rel="stylesheet"
+    href="assets/css/style.css"
+  />
 
   <!-- CSV -->
   <script
     src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"
-    defer>
-  </script>
+    defer
+  ></script>
 
-  <script src="assets/js/app.js" defer></script>
+  <!-- Excel / OpenDocument -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+    defer
+  ></script>
+
+  <!-- PDF -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    defer
+  ></script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"
+    defer
+  ></script>
+
+  <script
+    src="assets/js/app.js"
+    defer
+  ></script>
 </head>
+
 
 <body>
 
-  <!-- ======================================================
-       NAVEGAÇÃO
-  ======================================================= -->
+  <!-- =========================================================
+       CABEÇALHO
+  ========================================================== -->
 
-  <header class="navbar">
+  <header class="site-header">
 
-    <a class="brand" href="#" aria-label="Loop Reconciler">
-      <span class="brand-mark">∞</span>
-
-      <div class="brand-text">
-        <strong>Loop Reconciler</strong>
-        <small>Loop Suite</small>
-      </div>
-    </a>
-
-    <nav class="nav-links">
-      <a href="#comparison" data-i18n="navCompare">
-        Comparar
-      </a>
-
-      <a href="#results" data-i18n="navResults">
-        Resultados
-      </a>
-
-      <a href="#features" data-i18n="navFeatures">
-        Recursos
-      </a>
+    <div class="site-header__inner">
 
       <a
-        href="https://github.com/beto-dev94/loop-reconciler"
-        target="_blank"
-        rel="noopener noreferrer"
+        class="brand"
+        href="#top"
+        aria-label="Loop Reconciler"
       >
-        GitHub
+
+        <span class="brand__mark">
+          ∞
+        </span>
+
+        <span class="brand__text">
+
+          <strong>
+            Loop Reconciler
+          </strong>
+
+          <small>
+            Loop Suite
+          </small>
+
+        </span>
+
       </a>
-    </nav>
 
-    <div class="navbar-actions">
 
-      <div class="language-switcher">
+      <nav
+        class="site-nav"
+        aria-label="Navegação principal"
+      >
+
+        <a href="#usar">
+          Usar
+        </a>
+
+        <a href="#demonstracao">
+          Demonstração
+        </a>
+
+        <a href="#recursos">
+          Recursos
+        </a>
+
+        <a
+          href="https://github.com/beto-dev94/loop-reconciler"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+
+      </nav>
+
+
+      <div class="header-actions">
+
         <button
           type="button"
-          class="language-button active"
-          id="languagePT"
-          data-language="pt"
+          class="theme-toggle"
+          id="themeToggle"
+          aria-label="Alternar tema"
+          title="Alternar tema claro/escuro"
         >
-          PT-BR
+
+          <span
+            class="theme-toggle__icon"
+            id="themeIcon"
+            aria-hidden="true"
+          >
+            ☾
+          </span>
+
+          <span
+            class="theme-toggle__text"
+            id="themeText"
+          >
+            Tema escuro
+          </span>
+
         </button>
 
-        <button
-          type="button"
-          class="language-button"
-          id="languageEN"
-          data-language="en"
-        >
-          EN
-        </button>
+
+        <span class="version-badge">
+          v1.0
+        </span>
+
       </div>
-
-      <span class="version">
-        v1.0
-      </span>
 
     </div>
 
   </header>
 
 
-  <main>
+  <main id="top">
 
-    <!-- ======================================================
+    <!-- =========================================================
          HERO
-    ======================================================= -->
+    ========================================================== -->
 
     <section class="hero">
 
-      <div class="badge" data-i18n="heroBadge">
-        Conciliação Inteligente de Dados
-      </div>
+      <div class="hero__content">
 
-      <h1>
-        <span data-i18n="heroTitle1">
-          Encontre diferenças.
-        </span>
-
-        <br />
-
-        <span
-          class="gradient-text"
-          data-i18n="heroTitle2"
-        >
-          Concilie mais rápido.
-        </span>
-      </h1>
-
-      <p
-        class="hero-description"
-        data-i18n="heroDescription"
-      >
-        Compare relatórios CSV e Excel, encontre registros ausentes,
-        duplicidades e inconsistências e analise os resultados através
-        de um painel simples e eficiente.
-      </p>
-
-      <div class="hero-actions">
-
-        <button
-          type="button"
-          class="primary-button"
-          id="startButton"
-          data-i18n="startComparison"
-        >
-          Iniciar comparação
-        </button>
-
-        <a
-          class="secondary-button"
-          href="https://github.com/beto-dev94/loop-reconciler"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-i18n="viewGithub"
-        >
-          Ver no GitHub
-        </a>
-
-      </div>
+        <div class="eyebrow">
+          Conciliação inteligente de dados
+        </div>
 
 
-      <!-- RECURSOS RÁPIDOS -->
+        <h1>
+          Compare relatórios.
+          <br />
 
-      <div class="features" id="features">
-
-        <article class="feature-card">
-          <span>01</span>
-
-          <h2 data-i18n="featureImportTitle">
-            Importar
-          </h2>
-
-          <p data-i18n="featureImportDescription">
-            Carregue relatórios CSV, XLS e XLSX diretamente do seu computador.
-          </p>
-        </article>
+          <span class="gradient-text">
+            Encontre o que não bate.
+          </span>
+        </h1>
 
 
-        <article class="feature-card">
-          <span>02</span>
-
-          <h2 data-i18n="featureCompareTitle">
-            Comparar
-          </h2>
-
-          <p data-i18n="featureCompareDescription">
-            Compare automaticamente conjuntos de dados usando uma coluna de referência.
-          </p>
-        </article>
+        <p class="hero__description">
+          Cruze vários arquivos de duas bases diferentes,
+          encontre correspondências, divergências, registros
+          ausentes e duplicidades sem precisar conferir tudo
+          manualmente.
+        </p>
 
 
-        <article class="feature-card">
-          <span>03</span>
+        <div class="hero__actions">
 
-          <h2 data-i18n="featureReviewTitle">
-            Analisar
-          </h2>
+          <button
+            type="button"
+            class="button button--primary button--large"
+            id="startRealAnalysisButton"
+          >
+            Iniciar uma análise
+          </button>
 
-          <p data-i18n="featureReviewDescription">
-            Identifique correspondências, diferenças, registros ausentes e duplicidades.
-          </p>
-        </article>
+
+          <button
+            type="button"
+            class="button button--secondary button--large"
+            id="startDemoButton"
+          >
+            Testar demonstração
+          </button>
+
+        </div>
+
+
+        <div class="hero__trust">
+
+          <span>
+            ✓ Processamento local
+          </span>
+
+          <span>
+            ✓ Sem envio para servidor
+          </span>
+
+          <span>
+            ✓ Vários arquivos por base
+          </span>
+
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- ======================================================
-         ÁREA DE COMPARAÇÃO
-    ======================================================= -->
+    <!-- =========================================================
+         ESCOLHA DE MODO
+    ========================================================== -->
 
     <section
-      class="comparison-section"
-      id="comparison"
+      class="mode-section"
+      id="usar"
     >
 
-      <div class="section-heading">
+      <div class="section-heading section-heading--center">
 
-        <span
-          class="section-label"
-          data-i18n="workspaceLabel"
-        >
-          Área de trabalho
+        <span class="section-kicker">
+          Escolha como começar
         </span>
 
-        <h2 data-i18n="workspaceTitle">
-          Compare seus relatórios
+        <h2>
+          Uso real ou demonstração
         </h2>
 
-        <p data-i18n="workspaceDescription">
-          Seus arquivos são processados localmente no navegador.
+        <p>
+          A análise real utiliza seus próprios arquivos.
+          A demonstração usa apenas dados fictícios preparados
+          para mostrar como o sistema funciona.
         </p>
 
       </div>
 
 
-      <div
-        class="comparison-panel"
-        id="comparisonPanel"
-      >
+      <div class="mode-grid">
 
-        <!-- RELATÓRIO A -->
+        <!-- USO REAL -->
 
-        <div class="upload-card">
-
-          <div class="upload-card-header">
-
-            <div>
-              <span
-                class="report-label"
-                data-i18n="reportA"
-              >
-                Relatório A
-              </span>
-
-              <h3 data-i18n="primaryDataset">
-                Base principal
-              </h3>
-            </div>
-
-            <span
-              class="file-status"
-              id="fileAStatus"
-              data-i18n="noFile"
-            >
-              Nenhum arquivo
-            </span>
-
-          </div>
-
-          <label
-            class="file-drop-zone"
-            for="fileA"
-          >
-
-            <span class="upload-icon">
-              ↑
-            </span>
-
-            <strong data-i18n="chooseReportA">
-              Selecionar Relatório A
-            </strong>
-
-            <small>
-              CSV, XLS ou XLSX
-            </small>
-
-          </label>
-
-          <input
-            type="file"
-            id="fileA"
-            accept=".csv,.xls,.xlsx"
-            hidden
-          />
-
-          <div
-            class="file-information"
-            id="fileAInfo"
-          ></div>
-
-        </div>
-
-
-        <!-- RELATÓRIO B -->
-
-        <div class="upload-card">
-
-          <div class="upload-card-header">
-
-            <div>
-              <span
-                class="report-label"
-                data-i18n="reportB"
-              >
-                Relatório B
-              </span>
-
-              <h3 data-i18n="comparisonDataset">
-                Base de comparação
-              </h3>
-            </div>
-
-            <span
-              class="file-status"
-              id="fileBStatus"
-              data-i18n="noFile"
-            >
-              Nenhum arquivo
-            </span>
-
-          </div>
-
-          <label
-            class="file-drop-zone"
-            for="fileB"
-          >
-
-            <span class="upload-icon">
-              ↑
-            </span>
-
-            <strong data-i18n="chooseReportB">
-              Selecionar Relatório B
-            </strong>
-
-            <small>
-              CSV, XLS ou XLSX
-            </small>
-
-          </label>
-
-          <input
-            type="file"
-            id="fileB"
-            accept=".csv,.xls,.xlsx"
-            hidden
-          />
-
-          <div
-            class="file-information"
-            id="fileBInfo"
-          ></div>
-
-        </div>
-
-
-        <!-- CONFIGURAÇÕES -->
-
-        <div
-          class="comparison-settings"
-          id="comparisonSettings"
+        <article
+          class="mode-card mode-card--real"
+          id="realModeCard"
         >
 
-          <div class="settings-heading">
+          <div class="mode-card__icon">
+            ⇄
+          </div>
 
-            <div>
-              <span
-                class="section-label"
-                data-i18n="matchingRules"
-              >
-                Regras de correspondência
-              </span>
+          <div class="mode-card__content">
 
-              <h3 data-i18n="comparisonConfiguration">
-                Configuração da comparação
-              </h3>
-            </div>
+            <span class="mode-card__badge">
+              USO REAL
+            </span>
+
+            <h3>
+              Analisar meus arquivos
+            </h3>
+
+            <p>
+              Adicione relatórios reais nas Bases A e B,
+              configure as regras de comparação e execute
+              a conciliação localmente no navegador.
+            </p>
+
+
+            <ul class="mode-card__list">
+
+              <li>
+                Vários arquivos por base
+              </li>
+
+              <li>
+                CSV, Excel, LibreOffice e OpenOffice
+              </li>
+
+              <li>
+                Todas as abas podem ser analisadas
+              </li>
+
+              <li>
+                Resultado exportável
+              </li>
+
+            </ul>
+
+
+            <button
+              type="button"
+              class="button button--primary"
+              id="openRealModeButton"
+            >
+              Usar meus arquivos
+            </button>
 
           </div>
 
-
-          <div class="settings-grid">
-
-            <div class="form-group">
-
-              <label
-                for="keyColumnA"
-                data-i18n="matchingColumnA"
-              >
-                Coluna de referência — Relatório A
-              </label>
-
-              <select id="keyColumnA">
-                <option
-                  value=""
-                  data-i18n="selectColumn"
-                >
-                  Selecione uma coluna
-                </option>
-              </select>
-
-            </div>
+        </article>
 
 
-            <div class="form-group">
+        <!-- DEMONSTRAÇÃO -->
 
-              <label
-                for="keyColumnB"
-                data-i18n="matchingColumnB"
-              >
-                Coluna de referência — Relatório B
-              </label>
+        <article
+          class="mode-card mode-card--demo"
+          id="demoModeCard"
+        >
 
-              <select id="keyColumnB">
-                <option
-                  value=""
-                  data-i18n="selectColumn"
-                >
-                  Selecione uma coluna
-                </option>
-              </select>
+          <div class="mode-card__icon">
+            ◇
+          </div>
 
-            </div>
+          <div class="mode-card__content">
 
+            <span class="mode-card__badge mode-card__badge--demo">
+              DEMONSTRAÇÃO
+            </span>
 
-            <div class="form-group">
+            <h3>
+              Ver o sistema funcionando
+            </h3>
 
-              <label data-i18n="normalization">
-                Normalização dos dados
-              </label>
-
-              <div class="checkbox-group">
-
-                <label>
-                  <input
-                    type="checkbox"
-                    id="trimValues"
-                    checked
-                  />
-
-                  <span data-i18n="removeSpaces">
-                    Remover espaços extras
-                  </span>
-                </label>
+            <p>
+              Carrega automaticamente um conjunto de dados
+              fictícios com correspondências, divergências,
+              ausências e duplicidades.
+            </p>
 
 
-                <label>
-                  <input
-                    type="checkbox"
-                    id="ignoreCase"
-                    checked
-                  />
+            <ul class="mode-card__list">
 
-                  <span data-i18n="ignoreCase">
-                    Ignorar maiúsculas e minúsculas
-                  </span>
-                </label>
+              <li>
+                Nenhum arquivo necessário
+              </li>
 
+              <li>
+                Dados totalmente fictícios
+              </li>
 
-                <label>
-                  <input
-                    type="checkbox"
-                    id="ignoreEmpty"
-                    checked
-                  />
+              <li>
+                Resultado pronto para explorar
+              </li>
 
-                  <span data-i18n="ignoreEmpty">
-                    Ignorar registros vazios
-                  </span>
-                </label>
+              <li>
+                Ideal para apresentação no portfólio
+              </li>
 
-              </div>
-
-            </div>
+            </ul>
 
 
-            <div class="form-group">
-
-              <label data-i18n="validation">
-                Validação
-              </label>
-
-              <div class="checkbox-group">
-
-                <label>
-                  <input
-                    type="checkbox"
-                    id="detectDuplicates"
-                    checked
-                  />
-
-                  <span data-i18n="detectDuplicates">
-                    Detectar duplicidades
-                  </span>
-                </label>
-
-
-                <label>
-                  <input
-                    type="checkbox"
-                    id="compareFields"
-                    checked
-                  />
-
-                  <span data-i18n="compareFields">
-                    Comparar campos dos registros
-                  </span>
-                </label>
-
-              </div>
-
-            </div>
+            <button
+              type="button"
+              class="button button--secondary"
+              id="openDemoModeButton"
+            >
+              Executar demonstração
+            </button>
 
           </div>
 
-        </div>
-
-
-        <!-- AÇÕES -->
-
-        <div class="comparison-actions">
-
-          <button
-            type="button"
-            class="primary-button compare-button"
-            id="compareButton"
-            disabled
-            data-i18n="compareReports"
-          >
-            Comparar relatórios
-          </button>
-
-
-          <button
-            type="button"
-            class="secondary-action"
-            id="resetButton"
-            data-i18n="reset"
-          >
-            Limpar
-          </button>
-
-        </div>
-
-
-        <div
-          class="process-status"
-          id="processStatus"
-          aria-live="polite"
-        ></div>
+        </article>
 
       </div>
 
     </section>
 
 
-    <!-- ======================================================
-         RESULTADOS
-    ======================================================= -->
+    <!-- =========================================================
+         FAIXA DE MODO ATUAL
+    ========================================================== -->
 
     <section
-      class="results-section"
-      id="results"
+      class="active-mode-banner"
+      id="activeModeBanner"
+      hidden
+    >
+
+      <div class="active-mode-banner__content">
+
+        <div>
+
+          <span
+            class="active-mode-banner__label"
+            id="activeModeLabel"
+          >
+            MODO
+          </span>
+
+          <strong
+            id="activeModeTitle"
+          >
+            Análise real
+          </strong>
+
+          <p
+            id="activeModeDescription"
+          >
+            Seus próprios arquivos serão utilizados.
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="button button--ghost"
+          id="changeModeButton"
+        >
+          Trocar modo
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         ÁREA DE TRABALHO
+    ========================================================== -->
+
+    <section
+      class="workspace"
+      id="workspace"
       hidden
     >
 
       <div class="section-heading">
 
-        <span
-          class="section-label"
-          data-i18n="analysis"
-        >
-          Análise
+        <span class="section-kicker">
+          Área de trabalho
         </span>
 
-        <h2 data-i18n="resultsTitle">
-          Resultado da conciliação
+        <h2>
+          Conciliação de relatórios
         </h2>
 
-        <p data-i18n="resultsDescription">
-          Resumo da comparação entre os dois relatórios.
+        <p>
+          Siga as etapas abaixo. O sistema mantém os arquivos
+          e resultados somente no seu navegador durante a análise.
         </p>
 
       </div>
 
 
-      <!-- MÉTRICAS -->
+      <!-- =====================================================
+           PROGRESSO
+      ====================================================== -->
 
-      <div class="metrics-grid">
+      <div
+        class="workflow-steps"
+        id="workflowSteps"
+        aria-label="Etapas da análise"
+      >
 
-        <article class="metric-card">
+        <button
+          type="button"
+          class="workflow-step is-active"
+          data-step="1"
+        >
 
-          <span
-            class="metric-label"
-            data-i18n="reportARecords"
-          >
-            Registros do Relatório A
+          <span class="workflow-step__number">
+            1
           </span>
 
-          <strong
-            class="metric-value"
-            id="totalA"
-          >
-            0
-          </strong>
+          <span class="workflow-step__content">
 
-        </article>
+            <strong>
+              Arquivos
+            </strong>
 
+            <small>
+              Adicione as bases
+            </small>
 
-        <article class="metric-card">
-
-          <span
-            class="metric-label"
-            data-i18n="reportBRecords"
-          >
-            Registros do Relatório B
           </span>
 
-          <strong
-            class="metric-value"
-            id="totalB"
-          >
-            0
-          </strong>
-
-        </article>
+        </button>
 
 
-        <article class="metric-card success">
+        <button
+          type="button"
+          class="workflow-step"
+          data-step="2"
+        >
 
-          <span
-            class="metric-label"
-            data-i18n="matches"
-          >
-            Correspondências
+          <span class="workflow-step__number">
+            2
           </span>
 
-          <strong
-            class="metric-value"
-            id="totalMatches"
-          >
-            0
-          </strong>
+          <span class="workflow-step__content">
 
-        </article>
+            <strong>
+              Correspondência
+            </strong>
 
+            <small>
+              Escolha as chaves
+            </small>
 
-        <article class="metric-card warning">
-
-          <span
-            class="metric-label"
-            data-i18n="differences"
-          >
-            Divergências
           </span>
 
-          <strong
-            class="metric-value"
-            id="totalDifferences"
-          >
-            0
-          </strong>
-
-        </article>
+        </button>
 
 
-        <article class="metric-card danger">
+        <button
+          type="button"
+          class="workflow-step"
+          data-step="3"
+        >
 
-          <span
-            class="metric-label"
-            data-i18n="missingReportB"
-          >
-            Ausentes no Relatório B
+          <span class="workflow-step__number">
+            3
           </span>
 
-          <strong
-            class="metric-value"
-            id="missingB"
-          >
-            0
-          </strong>
+          <span class="workflow-step__content">
 
-        </article>
+            <strong>
+              Configuração
+            </strong>
 
+            <small>
+              Defina as regras
+            </small>
 
-        <article class="metric-card danger">
-
-          <span
-            class="metric-label"
-            data-i18n="missingReportA"
-          >
-            Ausentes no Relatório A
           </span>
 
-          <strong
-            class="metric-value"
-            id="missingA"
-          >
-            0
-          </strong>
-
-        </article>
+        </button>
 
 
-        <article class="metric-card">
+        <button
+          type="button"
+          class="workflow-step"
+          data-step="4"
+        >
 
-          <span
-            class="metric-label"
-            data-i18n="duplicates"
-          >
-            Duplicidades
+          <span class="workflow-step__number">
+            4
           </span>
 
-          <strong
-            class="metric-value"
-            id="totalDuplicates"
-          >
-            0
-          </strong>
+          <span class="workflow-step__content">
 
-        </article>
+            <strong>
+              Análise
+            </strong>
 
+            <small>
+              Execute a comparação
+            </small>
 
-        <article class="metric-card">
-
-          <span
-            class="metric-label"
-            data-i18n="matchRate"
-          >
-            Taxa de correspondência
           </span>
 
-          <strong
-            class="metric-value"
-            id="matchRate"
-          >
-            0%
-          </strong>
+        </button>
 
-        </article>
+
+        <button
+          type="button"
+          class="workflow-step"
+          data-step="5"
+        >
+
+          <span class="workflow-step__number">
+            5
+          </span>
+
+          <span class="workflow-step__content">
+
+            <strong>
+              Resultado
+            </strong>
+
+            <small>
+              Revise e exporte
+            </small>
+
+          </span>
+
+        </button>
 
       </div>
 
 
-      <!-- CONTROLES -->
+      <!-- =====================================================
+           ETAPA 1 — ARQUIVOS
+      ====================================================== -->
 
-      <div class="results-toolbar">
+      <section
+        class="workspace-step"
+        id="stepFiles"
+        data-workspace-step="1"
+      >
 
-        <div class="search-wrapper">
+        <div class="workspace-step__header">
 
-          <input
-            type="search"
-            id="resultSearch"
-            placeholder="Pesquisar resultados..."
-            data-i18n-placeholder="searchResults"
-          />
+          <div>
+
+            <span class="step-label">
+              Etapa 1
+            </span>
+
+            <h3>
+              Adicione os arquivos
+            </h3>
+
+            <p>
+              A Base A funciona como referência.
+              A Base B é o conjunto que será conferido contra ela.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="base-grid">
+
+          <!-- =================================================
+               BASE A
+          ================================================== -->
+
+          <article class="base-panel">
+
+            <div class="base-panel__header">
+
+              <div>
+
+                <span class="base-label">
+                  BASE A
+                </span>
+
+                <h4>
+                  Base de referência
+                </h4>
+
+                <p>
+                  Arquivos que representam o conjunto principal
+                  que você considera como referência.
+                </p>
+
+              </div>
+
+
+              <span
+                class="base-status"
+                id="baseAStatus"
+              >
+                Vazia
+              </span>
+
+            </div>
+
+
+            <label
+              class="drop-zone"
+              id="dropZoneA"
+              for="fileInputA"
+            >
+
+              <span class="drop-zone__icon">
+                ＋
+              </span>
+
+              <strong>
+                Adicionar arquivos à Base A
+              </strong>
+
+              <span>
+                Clique ou arraste os arquivos aqui
+              </span>
+
+              <small>
+                CSV · XLS · XLSX · ODS · FODS · TSV · TXT
+              </small>
+
+            </label>
+
+
+            <input
+              type="file"
+              id="fileInputA"
+              accept=".csv,.xls,.xlsx,.ods,.fods,.tsv,.txt"
+              multiple
+              hidden
+            />
+
+
+            <div
+              class="base-summary"
+              id="baseASummary"
+              hidden
+            >
+
+              <div class="base-summary__metric">
+
+                <span>
+                  Arquivos
+                </span>
+
+                <strong
+                  id="baseAFileCount"
+                >
+                  0
+                </strong>
+
+              </div>
+
+
+              <div class="base-summary__metric">
+
+                <span>
+                  Abas
+                </span>
+
+                <strong
+                  id="baseASheetCount"
+                >
+                  0
+                </strong>
+
+              </div>
+
+
+              <div class="base-summary__metric">
+
+                <span>
+                  Registros
+                </span>
+
+                <strong
+                  id="baseARecordCount"
+                >
+                  0
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div
+              class="file-list"
+              id="fileListA"
+            >
+            </div>
+
+          </article>
+
+
+          <!-- =================================================
+               BASE B
+          ================================================== -->
+
+          <article class="base-panel">
+
+            <div class="base-panel__header">
+
+              <div>
+
+                <span class="base-label base-label--comparison">
+                  BASE B
+                </span>
+
+                <h4>
+                  Base de comparação
+                </h4>
+
+                <p>
+                  Arquivos que serão conferidos contra
+                  os registros existentes na Base A.
+                </p>
+
+              </div>
+
+
+              <span
+                class="base-status"
+                id="baseBStatus"
+              >
+                Vazia
+              </span>
+
+            </div>
+
+
+            <label
+              class="drop-zone"
+              id="dropZoneB"
+              for="fileInputB"
+            >
+
+              <span class="drop-zone__icon">
+                ＋
+              </span>
+
+              <strong>
+                Adicionar arquivos à Base B
+              </strong>
+
+              <span>
+                Clique ou arraste os arquivos aqui
+              </span>
+
+              <small>
+                CSV · XLS · XLSX · ODS · FODS · TSV · TXT
+              </small>
+
+            </label>
+
+
+            <input
+              type="file"
+              id="fileInputB"
+              accept=".csv,.xls,.xlsx,.ods,.fods,.tsv,.txt"
+              multiple
+              hidden
+            />
+
+
+            <div
+              class="base-summary"
+              id="baseBSummary"
+              hidden
+            >
+
+              <div class="base-summary__metric">
+
+                <span>
+                  Arquivos
+                </span>
+
+                <strong
+                  id="baseBFileCount"
+                >
+                  0
+                </strong>
+
+              </div>
+
+
+              <div class="base-summary__metric">
+
+                <span>
+                  Abas
+                </span>
+
+                <strong
+                  id="baseBSheetCount"
+                >
+                  0
+                </strong>
+
+              </div>
+
+
+              <div class="base-summary__metric">
+
+                <span>
+                  Registros
+                </span>
+
+                <strong
+                  id="baseBRecordCount"
+                >
+                  0
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div
+              class="file-list"
+              id="fileListB"
+            >
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <!-- FORMATO E COMPATIBILIDADE -->
+
+        <div class="compatibility-panel">
+
+          <div class="compatibility-panel__header">
+
+            <div>
+
+              <span class="section-kicker">
+                Compatibilidade
+              </span>
+
+              <h4>
+                Formatos suportados
+              </h4>
+
+            </div>
+
+          </div>
+
+
+          <div class="format-grid">
+
+            <div class="format-item">
+              <strong>CSV</strong>
+              <span>.csv</span>
+            </div>
+
+            <div class="format-item">
+              <strong>Excel</strong>
+              <span>.xlsx · .xls</span>
+            </div>
+
+            <div class="format-item">
+              <strong>LibreOffice</strong>
+              <span>.ods · .fods</span>
+            </div>
+
+            <div class="format-item">
+              <strong>OpenOffice</strong>
+              <span>.ods</span>
+            </div>
+
+            <div class="format-item">
+              <strong>Texto tabulado</strong>
+              <span>.tsv</span>
+            </div>
+
+            <div class="format-item">
+              <strong>Texto delimitado</strong>
+              <span>.txt</span>
+            </div>
+
+          </div>
+
+
+          <p class="compatibility-note">
+            O sistema tentará detectar automaticamente delimitadores,
+            codificação, números, datas e abas disponíveis.
+          </p>
+
+        </div>
+
+
+        <div class="workspace-step__actions">
+
+          <button
+            type="button"
+            class="button button--primary"
+            id="goToMatchingButton"
+            disabled
+          >
+            Continuar para correspondência
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           ETAPA 2 — CORRESPONDÊNCIA
+      ====================================================== -->
+
+      <section
+        class="workspace-step"
+        id="stepMatching"
+        data-workspace-step="2"
+        hidden
+      >
+
+        <div class="workspace-step__header">
+
+          <div>
+
+            <span class="step-label">
+              Etapa 2
+            </span>
+
+            <h3>
+              Defina como os registros serão encontrados
+            </h3>
+
+            <p>
+              Escolha as colunas que identificam o mesmo registro
+              nas duas bases.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="matching-panel">
+
+          <div class="matching-row">
+
+            <div class="form-field">
+
+              <label for="matchingColumnA">
+                Chave da Base A
+              </label>
+
+              <select id="matchingColumnA">
+
+                <option value="">
+                  Selecione uma coluna
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="matching-connector">
+              ↔
+            </div>
+
+
+            <div class="form-field">
+
+              <label for="matchingColumnB">
+                Chave da Base B
+              </label>
+
+              <select id="matchingColumnB">
+
+                <option value="">
+                  Selecione uma coluna
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="matching-options">
+
+            <div class="matching-options__header">
+
+              <h4>
+                Chave composta
+              </h4>
+
+              <p>
+                Opcionalmente, utilize mais de uma coluna
+                para identificar um registro.
+              </p>
+
+            </div>
+
+
+            <label class="toggle-field">
+
+              <input
+                type="checkbox"
+                id="enableCompositeKey"
+              />
+
+              <span>
+                Usar múltiplas colunas como chave
+              </span>
+
+            </label>
+
+
+            <div
+              class="composite-key-builder"
+              id="compositeKeyBuilder"
+              hidden
+            >
+
+              <div
+                class="composite-key-list"
+                id="compositeKeyList"
+              >
+              </div>
+
+
+              <button
+                type="button"
+                class="button button--ghost"
+                id="addCompositeKeyButton"
+              >
+                + Adicionar coluna à chave
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- MAPEAMENTO -->
+
+          <div class="column-mapping-panel">
+
+            <div class="column-mapping-panel__header">
+
+              <div>
+
+                <h4>
+                  Mapeamento de colunas
+                </h4>
+
+                <p>
+                  Use quando colunas equivalentes possuem
+                  nomes diferentes entre as Bases A e B.
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                class="button button--ghost"
+                id="addColumnMappingButton"
+              >
+                + Mapear colunas
+              </button>
+
+            </div>
+
+
+            <div
+              class="column-mapping-list"
+              id="columnMappingList"
+            >
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="workspace-step__actions">
+
+          <button
+            type="button"
+            class="button button--ghost"
+            data-go-step="1"
+          >
+            Voltar
+          </button>
+
+
+          <button
+            type="button"
+            class="button button--primary"
+            id="goToConfigurationButton"
+            disabled
+          >
+            Continuar para configuração
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           ETAPA 3 — CONFIGURAÇÃO
+      ====================================================== -->
+
+      <section
+        class="workspace-step"
+        id="stepConfiguration"
+        data-workspace-step="3"
+        hidden
+      >
+
+        <div class="workspace-step__header">
+
+          <div>
+
+            <span class="step-label">
+              Etapa 3
+            </span>
+
+            <h3>
+              Configure a análise
+            </h3>
+
+            <p>
+              Escolha como os valores serão normalizados,
+              validados e comparados.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="settings-grid">
+
+          <!-- NORMALIZAÇÃO -->
+
+          <article class="settings-card">
+
+            <div class="settings-card__header">
+
+              <span class="settings-card__icon">
+                Aa
+              </span>
+
+              <div>
+
+                <h4>
+                  Normalização
+                </h4>
+
+                <p>
+                  Evite diferenças causadas apenas
+                  por formatação.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="settings-list">
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="trimValues"
+                  checked
+                />
+
+                <span>
+                  Remover espaços extras
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="ignoreCase"
+                  checked
+                />
+
+                <span>
+                  Ignorar maiúsculas e minúsculas
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="ignoreAccents"
+                  checked
+                />
+
+                <span>
+                  Ignorar acentos
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="ignoreSpecialCharacters"
+                />
+
+                <span>
+                  Ignorar caracteres especiais
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="normalizeLeadingZeros"
+                />
+
+                <span>
+                  Normalizar zeros à esquerda
+                </span>
+
+              </label>
+
+            </div>
+
+          </article>
+
+
+          <!-- VALIDAÇÃO -->
+
+          <article class="settings-card">
+
+            <div class="settings-card__header">
+
+              <span class="settings-card__icon">
+                ✓
+              </span>
+
+              <div>
+
+                <h4>
+                  Validação
+                </h4>
+
+                <p>
+                  Defina quais inconsistências
+                  devem ser detectadas.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="settings-list">
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="detectDuplicates"
+                  checked
+                />
+
+                <span>
+                  Detectar duplicidades
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="compareFields"
+                  checked
+                />
+
+                <span>
+                  Comparar campos dos registros
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="ignoreEmptyRecords"
+                  checked
+                />
+
+                <span>
+                  Ignorar registros vazios
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="detectTypeMismatch"
+                  checked
+                />
+
+                <span>
+                  Detectar diferenças de tipo
+                </span>
+
+              </label>
+
+            </div>
+
+          </article>
+
+
+          <!-- NÚMEROS -->
+
+          <article class="settings-card">
+
+            <div class="settings-card__header">
+
+              <span class="settings-card__icon">
+                123
+              </span>
+
+              <div>
+
+                <h4>
+                  Números e moeda
+                </h4>
+
+                <p>
+                  Ajustes para relatórios produzidos
+                  em programas diferentes.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="settings-list">
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="normalizeDecimalSeparators"
+                  checked
+                />
+
+                <span>
+                  Normalizar vírgula e ponto decimal
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="ignoreCurrencySymbols"
+                  checked
+                />
+
+                <span>
+                  Ignorar símbolos monetários
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="normalizeThousandsSeparators"
+                  checked
+                />
+
+                <span>
+                  Normalizar separadores de milhar
+                </span>
+
+              </label>
+
+            </div>
+
+          </article>
+
+
+          <!-- DATAS -->
+
+          <article class="settings-card">
+
+            <div class="settings-card__header">
+
+              <span class="settings-card__icon">
+                ◫
+              </span>
+
+              <div>
+
+                <h4>
+                  Datas
+                </h4>
+
+                <p>
+                  Tente reconhecer formatos
+                  diferentes da mesma data.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="settings-list">
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="normalizeDates"
+                  checked
+                />
+
+                <span>
+                  Normalizar formatos de data
+                </span>
+
+              </label>
+
+
+              <label class="checkbox-field">
+
+                <input
+                  type="checkbox"
+                  id="ignoreTimeInDates"
+                />
+
+                <span>
+                  Ignorar horário
+                </span>
+
+              </label>
+
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <!-- PRESET -->
+
+        <div class="preset-panel">
+
+          <div>
+
+            <h4>
+              Configuração reutilizável
+            </h4>
+
+            <p>
+              Salve as regras atuais para repetir
+              análises semelhantes no futuro.
+            </p>
+
+          </div>
+
+
+          <div class="preset-panel__actions">
+
+            <button
+              type="button"
+              class="button button--ghost"
+              id="savePresetButton"
+            >
+              Salvar configuração
+            </button>
+
+
+            <button
+              type="button"
+              class="button button--ghost"
+              id="loadPresetButton"
+            >
+              Carregar configuração
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="workspace-step__actions">
+
+          <button
+            type="button"
+            class="button button--ghost"
+            data-go-step="2"
+          >
+            Voltar
+          </button>
+
+
+          <button
+            type="button"
+            class="button button--primary"
+            id="goToAnalysisButton"
+          >
+            Revisar análise
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           ETAPA 4 — REVISÃO E EXECUÇÃO
+      ====================================================== -->
+
+      <section
+        class="workspace-step"
+        id="stepAnalysis"
+        data-workspace-step="4"
+        hidden
+      >
+
+        <div class="workspace-step__header">
+
+          <div>
+
+            <span class="step-label">
+              Etapa 4
+            </span>
+
+            <h3>
+              Revisar e executar
+            </h3>
+
+            <p>
+              Confira as bases e regras antes
+              de iniciar a conciliação.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="analysis-name-panel">
+
+          <div class="form-field">
+
+            <label for="analysisName">
+              Nome da análise
+            </label>
+
+            <input
+              type="text"
+              id="analysisName"
+              placeholder="Ex.: Conciliação de vendas - Agosto 2026"
+            />
+
+          </div>
+
+        </div>
+
+
+        <div class="review-grid">
+
+          <article class="review-card">
+
+            <span>
+              Base A
+            </span>
+
+            <strong
+              id="reviewBaseAFiles"
+            >
+              0 arquivos
+            </strong>
+
+            <small
+              id="reviewBaseARecords"
+            >
+              0 registros
+            </small>
+
+          </article>
+
+
+          <article class="review-card">
+
+            <span>
+              Base B
+            </span>
+
+            <strong
+              id="reviewBaseBFiles"
+            >
+              0 arquivos
+            </strong>
+
+            <small
+              id="reviewBaseBRecords"
+            >
+              0 registros
+            </small>
+
+          </article>
+
+
+          <article class="review-card">
+
+            <span>
+              Chave Base A
+            </span>
+
+            <strong
+              id="reviewKeyA"
+            >
+              —
+            </strong>
+
+          </article>
+
+
+          <article class="review-card">
+
+            <span>
+              Chave Base B
+            </span>
+
+            <strong
+              id="reviewKeyB"
+            >
+              —
+            </strong>
+
+          </article>
 
         </div>
 
 
         <div
-          class="filter-buttons"
-          id="filterButtons"
+          class="analysis-status"
+          id="analysisStatus"
+          aria-live="polite"
+        >
+        </div>
+
+
+        <div
+          class="analysis-progress"
+          id="analysisProgress"
+          hidden
         >
 
-          <button
-            type="button"
-            class="filter-button active"
-            data-filter="all"
-            data-i18n="all"
-          >
-            Todos
-          </button>
+          <div class="analysis-progress__bar">
 
-          <button
-            type="button"
-            class="filter-button"
-            data-filter="match"
-            data-i18n="matches"
-          >
-            Correspondências
-          </button>
+            <div
+              class="analysis-progress__fill"
+              id="analysisProgressFill"
+            >
+            </div>
 
-          <button
-            type="button"
-            class="filter-button"
-            data-filter="different"
-            data-i18n="differences"
-          >
-            Divergências
-          </button>
+          </div>
 
-          <button
-            type="button"
-            class="filter-button"
-            data-filter="missing-a"
-            data-i18n="missingAFilter"
-          >
-            Ausentes A
-          </button>
 
-          <button
-            type="button"
-            class="filter-button"
-            data-filter="missing-b"
-            data-i18n="missingBFilter"
-          >
-            Ausentes B
-          </button>
+          <div class="analysis-progress__info">
 
-          <button
-            type="button"
-            class="filter-button"
-            data-filter="duplicate"
-            data-i18n="duplicates"
-          >
-            Duplicidades
-          </button>
+            <span
+              id="analysisProgressText"
+            >
+              Preparando análise...
+            </span>
+
+            <strong
+              id="analysisProgressPercent"
+            >
+              0%
+            </strong>
+
+          </div>
 
         </div>
 
 
-        <div class="export-actions">
+        <div class="workspace-step__actions">
 
           <button
             type="button"
-            class="secondary-action"
-            id="exportCsvButton"
-            data-i18n="exportCSV"
+            class="button button--ghost"
+            data-go-step="3"
           >
-            Exportar CSV
+            Voltar
           </button>
 
 
           <button
             type="button"
-            class="secondary-action"
-            id="exportExcelButton"
-            data-i18n="exportExcel"
+            class="button button--primary button--large"
+            id="runAnalysisButton"
           >
-            Exportar Excel
+            Analisar arquivos
           </button>
 
         </div>
 
-      </div>
+      </section>
 
 
-      <!-- TABELA -->
+      <!-- =====================================================
+           ETAPA 5 — RESULTADOS
+      ====================================================== -->
 
-      <div class="table-container">
-
-        <table
-          class="results-table"
-          id="resultsTable"
-        >
-
-          <thead>
-
-            <tr>
-              <th data-i18n="status">
-                Status
-              </th>
-
-              <th data-i18n="key">
-                Chave
-              </th>
-
-              <th data-i18n="reportA">
-                Relatório A
-              </th>
-
-              <th data-i18n="reportB">
-                Relatório B
-              </th>
-
-              <th data-i18n="details">
-                Detalhes
-              </th>
-            </tr>
-
-          </thead>
-
-
-          <tbody id="resultsTableBody">
-          </tbody>
-
-        </table>
-
-      </div>
-
-
-      <div
-        class="empty-results"
-        id="emptyResults"
+      <section
+        class="workspace-step results-area"
+        id="stepResults"
+        data-workspace-step="5"
         hidden
       >
 
-        <h3 data-i18n="noResults">
-          Nenhum resultado encontrado
-        </h3>
+        <div class="workspace-step__header">
 
-        <p data-i18n="changeFilter">
-          Tente alterar o filtro ou o termo pesquisado.
-        </p>
+          <div>
+
+            <span class="step-label">
+              Etapa 5
+            </span>
+
+            <h3>
+              Resultado da conciliação
+            </h3>
+
+            <p
+              id="resultsSubtitle"
+            >
+              Revise as correspondências e inconsistências encontradas.
+            </p>
+
+          </div>
+
+
+          <div class="results-header-actions">
+
+            <button
+              type="button"
+              class="button button--ghost"
+              id="newAnalysisButton"
+            >
+              Nova análise
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- MÉTRICAS -->
+
+        <div class="metrics-grid">
+
+          <article class="metric-card">
+
+            <span class="metric-card__label">
+              Registros Base A
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricTotalA"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card">
+
+            <span class="metric-card__label">
+              Registros Base B
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricTotalB"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card metric-card--success">
+
+            <span class="metric-card__label">
+              Correspondências
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricMatches"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card metric-card--warning">
+
+            <span class="metric-card__label">
+              Divergências
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricDifferences"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card metric-card--danger">
+
+            <span class="metric-card__label">
+              Ausentes na Base A
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricMissingA"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card metric-card--danger">
+
+            <span class="metric-card__label">
+              Ausentes na Base B
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricMissingB"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card metric-card--duplicate">
+
+            <span class="metric-card__label">
+              Duplicidades
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricDuplicates"
+            >
+              0
+            </strong>
+
+          </article>
+
+
+          <article class="metric-card metric-card--rate">
+
+            <span class="metric-card__label">
+              Correspondência
+            </span>
+
+            <strong
+              class="metric-card__value"
+              id="metricMatchRate"
+            >
+              0%
+            </strong>
+
+          </article>
+
+        </div>
+
+
+        <!-- ATALHO ERROS -->
+
+        <div class="error-focus-panel">
+
+          <div>
+
+            <h4>
+              Quer revisar somente os problemas?
+            </h4>
+
+            <p>
+              Mostre apenas divergências, ausências
+              e duplicidades.
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="button button--danger-soft"
+            id="showOnlyErrorsButton"
+          >
+            Mostrar somente erros
+          </button>
+
+        </div>
+
+
+        <!-- FILTROS -->
+
+        <div class="results-toolbar">
+
+          <div class="results-search">
+
+            <input
+              type="search"
+              id="resultsSearch"
+              placeholder="Pesquisar chave, valor, arquivo ou conteúdo..."
+            />
+
+          </div>
+
+
+          <div
+            class="results-filters"
+            id="resultsFilters"
+          >
+
+            <button
+              type="button"
+              class="filter-button is-active"
+              data-result-filter="all"
+            >
+              Todos
+            </button>
+
+
+            <button
+              type="button"
+              class="filter-button"
+              data-result-filter="match"
+            >
+              Correspondências
+            </button>
+
+
+            <button
+              type="button"
+              class="filter-button"
+              data-result-filter="different"
+            >
+              Divergências
+            </button>
+
+
+            <button
+              type="button"
+              class="filter-button"
+              data-result-filter="missing-a"
+            >
+              Ausentes A
+            </button>
+
+
+            <button
+              type="button"
+              class="filter-button"
+              data-result-filter="missing-b"
+            >
+              Ausentes B
+            </button>
+
+
+            <button
+              type="button"
+              class="filter-button"
+              data-result-filter="duplicate"
+            >
+              Duplicidades
+            </button>
+
+          </div>
+
+
+          <div class="results-sort">
+
+            <label for="resultsSort">
+              Ordenar
+            </label>
+
+            <select id="resultsSort">
+
+              <option value="status">
+                Status
+              </option>
+
+              <option value="key-asc">
+                Chave A → Z
+              </option>
+
+              <option value="key-desc">
+                Chave Z → A
+              </option>
+
+              <option value="source">
+                Arquivo de origem
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- TABELA -->
+
+        <div class="results-table-wrapper">
+
+          <table
+            class="results-table"
+            id="resultsTable"
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Chave
+                </th>
+
+                <th>
+                  Origem A
+                </th>
+
+                <th>
+                  Origem B
+                </th>
+
+                <th>
+                  Base A
+                </th>
+
+                <th>
+                  Base B
+                </th>
+
+                <th>
+                  Detalhes
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="resultsTableBody"
+            >
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <!-- SEM RESULTADOS -->
+
+        <div
+          class="empty-state"
+          id="resultsEmptyState"
+          hidden
+        >
+
+          <span class="empty-state__icon">
+            ⌕
+          </span>
+
+          <h4>
+            Nenhum resultado encontrado
+          </h4>
+
+          <p>
+            Altere os filtros ou o texto pesquisado.
+          </p>
+
+        </div>
+
+
+        <!-- PAGINAÇÃO -->
+
+        <div class="pagination">
+
+          <div class="pagination__info">
+
+            <span
+              id="paginationInfo"
+            >
+              0 resultados
+            </span>
+
+          </div>
+
+
+          <div class="pagination__controls">
+
+            <button
+              type="button"
+              class="button button--ghost"
+              id="previousPageButton"
+              disabled
+            >
+              Anterior
+            </button>
+
+
+            <span
+              class="pagination__page"
+              id="currentPageLabel"
+            >
+              Página 1
+            </span>
+
+
+            <button
+              type="button"
+              class="button button--ghost"
+              id="nextPageButton"
+              disabled
+            >
+              Próxima
+            </button>
+
+          </div>
+
+
+          <div class="pagination__size">
+
+            <label for="pageSizeSelect">
+              Itens por página
+            </label>
+
+            <select id="pageSizeSelect">
+
+              <option value="25">
+                25
+              </option>
+
+              <option
+                value="50"
+                selected
+              >
+                50
+              </option>
+
+              <option value="100">
+                100
+              </option>
+
+              <option value="250">
+                250
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             EXPORTAÇÃO
+        ================================================== -->
+
+        <section class="export-section">
+
+          <div class="export-section__header">
+
+            <div>
+
+              <span class="section-kicker">
+                Exportar resultado
+              </span>
+
+              <h4>
+                Escolha o formato
+              </h4>
+
+              <p>
+                O arquivo exportado utiliza os resultados
+                da análise atual.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="export-grid">
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportExcelCompleteButton"
+            >
+
+              <span class="export-card__icon">
+                X
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  Excel completo
+                </strong>
+
+                <small>
+                  .xlsx com várias abas
+                </small>
+
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportErrorsExcelButton"
+            >
+
+              <span class="export-card__icon">
+                !
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  Excel só com erros
+                </strong>
+
+                <small>
+                  Divergências e pendências
+                </small>
+
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportODSButton"
+            >
+
+              <span class="export-card__icon">
+                O
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  LibreOffice / OpenOffice
+                </strong>
+
+                <small>
+                  .ods
+                </small>
+
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportCSVButton"
+            >
+
+              <span class="export-card__icon">
+                C
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  CSV
+                </strong>
+
+                <small>
+                  .csv
+                </small>
+
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportJSONButton"
+            >
+
+              <span class="export-card__icon">
+                { }
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  JSON
+                </strong>
+
+                <small>
+                  .json estruturado
+                </small>
+
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportSummaryPDFButton"
+            >
+
+              <span class="export-card__icon">
+                P
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  PDF resumido
+                </strong>
+
+                <small>
+                  Indicadores e principais problemas
+                </small>
+
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              class="export-card"
+              id="exportDetailedPDFButton"
+            >
+
+              <span class="export-card__icon">
+                P+
+              </span>
+
+              <span class="export-card__content">
+
+                <strong>
+                  PDF detalhado
+                </strong>
+
+                <small>
+                  Relatório completo
+                </small>
+
+              </span>
+
+            </button>
+
+          </div>
+
+        </section>
+
+      </section>
+
+    </section>
+
+
+    <!-- =========================================================
+         DEMONSTRAÇÃO
+    ========================================================== -->
+
+    <section
+      class="demo-section"
+      id="demonstracao"
+    >
+
+      <div class="demo-banner">
+
+        <div class="demo-banner__content">
+
+          <span class="demo-banner__badge">
+            MODO DEMONSTRAÇÃO
+          </span>
+
+          <h2>
+            Teste sem preparar nenhuma planilha
+          </h2>
+
+          <p>
+            O Loop Reconciler pode carregar automaticamente
+            dados fictícios com registros corretos, divergências,
+            duplicidades e itens ausentes.
+          </p>
+
+
+          <div class="demo-banner__actions">
+
+            <button
+              type="button"
+              class="button button--primary"
+              id="runDemoButton"
+            >
+              Executar demonstração
+            </button>
+
+
+            <button
+              type="button"
+              class="button button--ghost"
+              id="downloadDemoFilesButton"
+            >
+              Baixar arquivos de demonstração
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="demo-banner__warning">
+
+          <strong>
+            Dados fictícios
+          </strong>
+
+          <p>
+            Nenhuma informação real é utilizada
+            no modo demonstração.
+          </p>
+
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- ======================================================
+    <!-- =========================================================
+         RECURSOS
+    ========================================================== -->
+
+    <section
+      class="features-section"
+      id="recursos"
+    >
+
+      <div class="section-heading section-heading--center">
+
+        <span class="section-kicker">
+          Recursos
+        </span>
+
+        <h2>
+          Desenvolvido para conferências reais
+        </h2>
+
+        <p>
+          O sistema foi pensado para substituir verificações
+          manuais repetitivas por uma análise estruturada.
+        </p>
+
+      </div>
+
+
+      <div class="feature-grid">
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ≡
+          </span>
+
+          <h3>
+            Multi-arquivo
+          </h3>
+
+          <p>
+            Consolide diversos arquivos em cada base
+            antes da comparação.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ◫
+          </span>
+
+          <h3>
+            Múltiplas abas
+          </h3>
+
+          <p>
+            Leia planilhas com várias abas sem precisar
+            separá-las manualmente.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ⇄
+          </span>
+
+          <h3>
+            Chaves flexíveis
+          </h3>
+
+          <p>
+            Compare colunas com nomes diferentes
+            ou utilize chaves compostas.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ⧉
+          </span>
+
+          <h3>
+            Origem rastreável
+          </h3>
+
+          <p>
+            Saiba exatamente em qual arquivo
+            e aba cada registro foi encontrado.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            !
+          </span>
+
+          <h3>
+            Foco em erros
+          </h3>
+
+          <p>
+            Mostre apenas divergências, duplicidades
+            e registros ausentes.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ↓
+          </span>
+
+          <h3>
+            Exportação
+          </h3>
+
+          <p>
+            Gere Excel, ODS, CSV, JSON
+            e relatórios em PDF.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ◐
+          </span>
+
+          <h3>
+            Tema claro e escuro
+          </h3>
+
+          <p>
+            Use a interface no modo que preferir.
+          </p>
+
+        </article>
+
+
+        <article class="feature-box">
+
+          <span class="feature-box__icon">
+            ◈
+          </span>
+
+          <h3>
+            Processamento local
+          </h3>
+
+          <p>
+            Os arquivos permanecem no navegador
+            durante a análise.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================================
          PRIVACIDADE
-    ======================================================= -->
+    ========================================================== -->
 
     <section class="privacy-section">
 
-      <div class="privacy-card">
+      <div class="privacy-panel">
 
-        <span class="privacy-icon">
+        <span class="privacy-panel__icon">
           ◈
         </span>
 
         <div>
 
-          <h2 data-i18n="localProcessing">
-            Processamento local
+          <span class="section-kicker">
+            Privacidade
+          </span>
+
+          <h2>
+            Seus arquivos permanecem no seu dispositivo
           </h2>
 
-          <p data-i18n="localProcessingDescription">
-            O Loop Reconciler processa os arquivos diretamente
-            no navegador. Seus relatórios não precisam ser enviados
-            para um servidor remoto para realizar a comparação.
+          <p>
+            O Loop Reconciler foi planejado como uma aplicação
+            local-first. A leitura e a comparação são realizadas
+            diretamente no navegador sempre que o formato permitir,
+            sem necessidade de enviar os relatórios para um servidor.
           </p>
 
         </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         CAPACIDADES
-    ======================================================= -->
-
-    <section class="product-features">
-
-      <div class="section-heading">
-
-        <span
-          class="section-label"
-          data-i18n="capabilities"
-        >
-          Capacidades
-        </span>
-
-        <h2 data-i18n="capabilitiesTitle">
-          Desenvolvido para validação prática de dados
-        </h2>
-
-      </div>
-
-
-      <div class="capability-grid">
-
-        <article class="capability-card">
-          <h3 data-i18n="csvSupport">
-            Suporte a CSV
-          </h3>
-
-          <p data-i18n="csvSupportDescription">
-            Importe e analise conjuntos de dados em CSV.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="excelSupport">
-            Suporte a Excel
-          </h3>
-
-          <p data-i18n="excelSupportDescription">
-            Leia arquivos XLS e XLSX diretamente no navegador.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="duplicateDetection">
-            Detecção de duplicidades
-          </h3>
-
-          <p data-i18n="duplicateDetectionDescription">
-            Identifique chaves repetidas dentro de cada base.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="missingRecords">
-            Registros ausentes
-          </h3>
-
-          <p data-i18n="missingRecordsDescription">
-            Encontre registros existentes em apenas um dos relatórios.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="fieldDifferences">
-            Diferenças entre campos
-          </h3>
-
-          <p data-i18n="fieldDifferencesDescription">
-            Compare os dados internos de registros correspondentes.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="exportResults">
-            Exportação de resultados
-          </h3>
-
-          <p data-i18n="exportResultsDescription">
-            Gere relatórios de conciliação em CSV e Excel.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="searchFilters">
-            Pesquisa e filtros
-          </h3>
-
-          <p data-i18n="searchFiltersDescription">
-            Localize rapidamente resultados específicos.
-          </p>
-        </article>
-
-
-        <article class="capability-card">
-          <h3 data-i18n="responsiveInterface">
-            Interface responsiva
-          </h3>
-
-          <p data-i18n="responsiveInterfaceDescription">
-            Compatível com computadores, tablets e smartphones.
-          </p>
-        </article>
 
       </div>
 
@@ -1076,34 +2807,43 @@
   </main>
 
 
-  <!-- ======================================================
+  <!-- =========================================================
        FOOTER
-  ======================================================= -->
+  ========================================================== -->
 
-  <footer class="footer">
+  <footer class="site-footer">
 
-    <div class="footer-content">
+    <div class="site-footer__inner">
 
       <div>
 
-        <div class="brand footer-brand">
+        <a
+          class="brand"
+          href="#top"
+        >
 
-          <span class="brand-mark">
+          <span class="brand__mark">
             ∞
           </span>
 
-          <div class="brand-text">
-            <strong>Loop Reconciler</strong>
-            <small>Loop Suite</small>
-          </div>
+          <span class="brand__text">
 
-        </div>
+            <strong>
+              Loop Reconciler
+            </strong>
 
-        <p
-          class="footer-description"
-          data-i18n="footerDescription"
-        >
-          Ferramenta open source para conciliação de dados.
+            <small>
+              Loop Suite
+            </small>
+
+          </span>
+
+        </a>
+
+
+        <p class="footer-description">
+          Ferramenta para conciliação, comparação
+          e auditoria de dados.
         </p>
 
       </div>
@@ -1115,16 +2855,15 @@
           href="https://github.com/beto-dev94"
           target="_blank"
           rel="noopener noreferrer"
-          data-i18n="developer"
         >
           Desenvolvedor
         </a>
+
 
         <a
           href="https://github.com/beto-dev94/loop-reconciler"
           target="_blank"
           rel="noopener noreferrer"
-          data-i18n="sourceCode"
         >
           Código-fonte
         </a>
@@ -1134,24 +2873,24 @@
     </div>
 
 
-    <div class="footer-bottom">
+    <div class="site-footer__bottom">
 
-      <p>
+      <span>
         © 2026 beto-dev94 · Loop Suite
-      </p>
+      </span>
 
-      <p data-i18n="footerMessage">
-        Desenvolvido para conciliação de dados e automação de processos.
-      </p>
+      <span>
+        Processamento de dados local-first
+      </span>
 
     </div>
 
   </footer>
 
 
-  <!-- ======================================================
-       MODAL
-  ======================================================= -->
+  <!-- =========================================================
+       MODAL — DETALHES
+  ========================================================== -->
 
   <div
     class="modal-overlay"
@@ -1166,19 +2905,27 @@
       aria-labelledby="detailsModalTitle"
     >
 
-      <div class="modal-header">
+      <div class="modal__header">
 
-        <h2
-          id="detailsModalTitle"
-          data-i18n="recordDetails"
-        >
-          Detalhes do registro
-        </h2>
+        <div>
+
+          <span class="section-kicker">
+            Resultado
+          </span>
+
+          <h2
+            id="detailsModalTitle"
+          >
+            Detalhes do registro
+          </h2>
+
+        </div>
+
 
         <button
           type="button"
-          class="modal-close"
-          id="closeModalButton"
+          class="modal__close"
+          id="closeDetailsModalButton"
           aria-label="Fechar"
         >
           ×
@@ -1188,13 +2935,142 @@
 
 
       <div
-        class="modal-content"
-        id="modalContent"
+        class="modal__content"
+        id="detailsModalContent"
       >
       </div>
 
     </div>
 
+  </div>
+
+
+  <!-- =========================================================
+       MODAL — ERRO DE ARQUIVO
+  ========================================================== -->
+
+  <div
+    class="modal-overlay"
+    id="fileErrorModal"
+    hidden
+  >
+
+    <div
+      class="modal modal--small"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="fileErrorModalTitle"
+    >
+
+      <div class="modal__header">
+
+        <div>
+
+          <span class="section-kicker">
+            Arquivo incompatível
+          </span>
+
+          <h2
+            id="fileErrorModalTitle"
+          >
+            Não foi possível processar um arquivo
+          </h2>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="modal__close"
+          id="closeFileErrorModalButton"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="modal__content">
+
+        <p
+          id="fileErrorMessage"
+        >
+        </p>
+
+
+        <div
+          class="file-error-details"
+          id="fileErrorDetails"
+        >
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       MODAL — PRESET
+  ========================================================== -->
+
+  <div
+    class="modal-overlay"
+    id="presetModal"
+    hidden
+  >
+
+    <div
+      class="modal modal--small"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="presetModalTitle"
+    >
+
+      <div class="modal__header">
+
+        <h2
+          id="presetModalTitle"
+        >
+          Configurações salvas
+        </h2>
+
+
+        <button
+          type="button"
+          class="modal__close"
+          id="closePresetModalButton"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        class="modal__content"
+        id="presetModalContent"
+      >
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       TOASTS
+  ========================================================== -->
+
+  <div
+    class="toast-container"
+    id="toastContainer"
+    aria-live="polite"
+    aria-atomic="true"
+  >
   </div>
 
 </body>
