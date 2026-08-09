@@ -12,6 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <style>
     :root{
@@ -306,7 +307,8 @@
 
         <section id="tabRelatorio" hidden>
           <div class="report-actions">
-            <button class="button button--primary" id="exportExcelBtn">Excel</button>
+            <button class="button button--primary" id="downloadAllBtn">Baixar tudo</button>
+            <button class="button button--secondary" id="exportExcelBtn">Excel</button>
             <button class="button button--secondary" id="exportCsvBtn">CSV</button>
             <button class="button button--secondary" id="exportJsonBtn">JSON</button>
             <button class="button button--secondary" id="exportPdfBtn">PDF</button>
@@ -829,6 +831,247 @@
   $("exportPdfBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:"landscape"});doc.setFontSize(15);doc.text("Loop Reconciler - Relatorio Consolidado",14,15);doc.setFontSize(9);doc.text("Loja Horizonte Department | Pedidos x Financeiro / Entrega",14,22);doc.text("Desenvolvido por beto-dev94 | by BRZ1",14,28);doc.autoTable({startY:34,head:[["Status","Pedido","Cliente","Produto","Pgto","Pedido R$","Faturado R$","Financeiro","Entrega","Resolvido","Observacao"]],body:exportRows().map(r=>[r.Status,r.Pedido,r.Cliente,r.Produto,r.Pagamento,r.Valor_Pedido,r.Valor_Faturado,r.Status_Financeiro,r.Status_Entrega,r.Resolvido,r.Observacao]),styles:{fontSize:5.7,cellPadding:1.4},columnStyles:{10:{cellWidth:40}}});doc.save("loop-reconciler-relatorio.pdf")};
   $("printBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");window.print()};
 
+
+  async function dataUrlToBlob(dataUrl){
+    const response=await fetch(dataUrl);
+    return await response.blob();
+  }
+
+  async function buildPdfBlob(){
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:"landscape"});
+
+    doc.setFontSize(15);
+    doc.text("Loop Reconciler - Relatorio Consolidado",14,15);
+
+    doc.setFontSize(9);
+    doc.text("Loja Horizonte Department | Pedidos x Financeiro / Entrega",14,22);
+    doc.text("Desenvolvido por beto-dev94 | by BRZ1",14,28);
+
+    const rows=exportRows();
+
+    doc.autoTable({
+      startY:34,
+      head:[[
+        "Status",
+        "Pedido",
+        "Cliente",
+        "Produto",
+        "Pgto",
+        "Pedido R$",
+        "Faturado R$",
+        "Financeiro",
+        "Entrega",
+        "Resolvido",
+        "Observacao"
+      ]],
+      body:rows.map(r=>[
+        r.Status,
+        r.Pedido,
+        r.Cliente,
+        r.Produto,
+        r.Pagamento,
+        r.Valor_Pedido,
+        r.Valor_Faturado,
+        r.Status_Financeiro,
+        r.Status_Entrega,
+        r.Resolvido,
+        r.Observacao
+      ]),
+      styles:{
+        fontSize:5.7,
+        cellPadding:1.4
+      },
+      columnStyles:{
+        10:{
+          cellWidth:40
+        }
+      }
+    });
+
+    return doc.output("blob");
+  }
+
+  async function downloadAllFiles(){
+    if(!results.length){
+      return toast(
+        "Execute a comparação primeiro.",
+        "error"
+      );
+    }
+
+    if(!window.JSZip){
+      return toast(
+        "Não foi possível carregar o gerador do pacote ZIP.",
+        "error"
+      );
+    }
+
+    const button=$("downloadAllBtn");
+    const originalText=button.textContent;
+
+    button.disabled=true;
+    button.textContent="Preparando pacote...";
+
+    try{
+      const zip=new JSZip();
+      const rows=exportRows();
+
+      // JSON
+      zip.file(
+        "loop-reconciler-relatorio.json",
+        JSON.stringify({
+          generatedAt:new Date().toISOString(),
+          developer:"beto-dev94",
+          brand:"BRZ1",
+          results:rows
+        },null,2)
+      );
+
+      // CSV
+      const csv=Papa.unparse(
+        rows,
+        {
+          delimiter:";"
+        }
+      );
+
+      zip.file(
+        "loop-reconciler-relatorio.csv",
+        "\uFEFF"+csv
+      );
+
+      // Excel
+      const workbook=XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(rows),
+        "Conciliacao"
+      );
+
+      const excelArray=XLSX.write(
+        workbook,
+        {
+          bookType:"xlsx",
+          type:"array"
+        }
+      );
+
+      zip.file(
+        "loop-reconciler-relatorio.xlsx",
+        excelArray
+      );
+
+      // PDF
+      const pdfBlob=await buildPdfBlob();
+
+      zip.file(
+        "loop-reconciler-relatorio.pdf",
+        pdfBlob
+      );
+
+      // Gráfico personalizado
+      if(!customChart){
+        buildCustomChart();
+      }
+
+      if(customChart){
+        const chartBlob=await dataUrlToBlob(
+          customChart.toBase64Image()
+        );
+
+        zip.file(
+          "grafico-personalizado.png",
+          chartBlob
+        );
+      }
+
+      // Gráfico visão geral
+      if(!overviewChart){
+        renderOverviewChart();
+      }
+
+      if(overviewChart){
+        const overviewBlob=await dataUrlToBlob(
+          overviewChart.toBase64Image()
+        );
+
+        zip.file(
+          "grafico-visao-geral.png",
+          overviewBlob
+        );
+      }
+
+      // Resumo textual
+      const summaryLines=[
+        "Loop Reconciler",
+        "Loja Horizonte Department",
+        "",
+        `Pedidos: ${orders.length}`,
+        `Resultados conciliados: ${results.length}`,
+        `Corretos: ${results.filter(r=>r.status==="match").length}`,
+        `Divergencias: ${results.filter(r=>r.status==="difference").length}`,
+        `Nao processados: ${results.filter(r=>r.status==="missingB").length}`,
+        `Sem pedido: ${results.filter(r=>r.status==="missingA").length}`,
+        `Resolvidos: ${results.filter(r=>r.resolved).length}`,
+        "",
+        "Desenvolvido por beto-dev94",
+        "by BRZ1"
+      ];
+
+      zip.file(
+        "LEIA-ME.txt",
+        summaryLines.join("\n")
+      );
+
+      const zipBlob=await zip.generateAsync({
+        type:"blob",
+        compression:"DEFLATE",
+        compressionOptions:{
+          level:6
+        }
+      });
+
+      const url=URL.createObjectURL(zipBlob);
+      const anchor=document.createElement("a");
+
+      anchor.href=url;
+      anchor.download="loop-reconciler-pacote-completo.zip";
+
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      setTimeout(
+        ()=>URL.revokeObjectURL(url),
+        1500
+      );
+
+      toast(
+        "Pacote completo gerado: relatórios e gráficos."
+      );
+    }catch(error){
+      console.error(error);
+
+      toast(
+        "Não foi possível gerar o pacote completo.",
+        "error"
+      );
+    }finally{
+      button.disabled=false;
+      button.textContent=originalText;
+    }
+  }
+
+  if($("downloadAllBtn")){
+    $("downloadAllBtn").addEventListener(
+      "click",
+      downloadAllFiles
+    );
+  }
+
+
   // -------------------------
   // ÁREA RESTRITA
   // -------------------------
@@ -838,6 +1081,247 @@
   $("restrictedModal").onclick=e=>{if(e.target===$("restrictedModal"))$("restrictedModal").hidden=true};
 
   $("goDemoBtn").onclick=()=>$("demo").scrollIntoView({behavior:"smooth"});
+
+
+
+  async function dataUrlToBlob(dataUrl){
+    const response=await fetch(dataUrl);
+    return await response.blob();
+  }
+
+  async function buildPdfBlob(){
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:"landscape"});
+
+    doc.setFontSize(15);
+    doc.text("Loop Reconciler - Relatorio Consolidado",14,15);
+
+    doc.setFontSize(9);
+    doc.text("Loja Horizonte Department | Pedidos x Financeiro / Entrega",14,22);
+    doc.text("Desenvolvido por beto-dev94 | by BRZ1",14,28);
+
+    const rows=exportRows();
+
+    doc.autoTable({
+      startY:34,
+      head:[[
+        "Status",
+        "Pedido",
+        "Cliente",
+        "Produto",
+        "Pgto",
+        "Pedido R$",
+        "Faturado R$",
+        "Financeiro",
+        "Entrega",
+        "Resolvido",
+        "Observacao"
+      ]],
+      body:rows.map(r=>[
+        r.Status,
+        r.Pedido,
+        r.Cliente,
+        r.Produto,
+        r.Pagamento,
+        r.Valor_Pedido,
+        r.Valor_Faturado,
+        r.Status_Financeiro,
+        r.Status_Entrega,
+        r.Resolvido,
+        r.Observacao
+      ]),
+      styles:{
+        fontSize:5.7,
+        cellPadding:1.4
+      },
+      columnStyles:{
+        10:{
+          cellWidth:40
+        }
+      }
+    });
+
+    return doc.output("blob");
+  }
+
+  async function downloadAllFiles(){
+    if(!results.length){
+      return toast(
+        "Execute a comparação primeiro.",
+        "error"
+      );
+    }
+
+    if(!window.JSZip){
+      return toast(
+        "Não foi possível carregar o gerador do pacote ZIP.",
+        "error"
+      );
+    }
+
+    const button=$("downloadAllBtn");
+    const originalText=button.textContent;
+
+    button.disabled=true;
+    button.textContent="Preparando pacote...";
+
+    try{
+      const zip=new JSZip();
+      const rows=exportRows();
+
+      // JSON
+      zip.file(
+        "loop-reconciler-relatorio.json",
+        JSON.stringify({
+          generatedAt:new Date().toISOString(),
+          developer:"beto-dev94",
+          brand:"BRZ1",
+          results:rows
+        },null,2)
+      );
+
+      // CSV
+      const csv=Papa.unparse(
+        rows,
+        {
+          delimiter:";"
+        }
+      );
+
+      zip.file(
+        "loop-reconciler-relatorio.csv",
+        "\uFEFF"+csv
+      );
+
+      // Excel
+      const workbook=XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(rows),
+        "Conciliacao"
+      );
+
+      const excelArray=XLSX.write(
+        workbook,
+        {
+          bookType:"xlsx",
+          type:"array"
+        }
+      );
+
+      zip.file(
+        "loop-reconciler-relatorio.xlsx",
+        excelArray
+      );
+
+      // PDF
+      const pdfBlob=await buildPdfBlob();
+
+      zip.file(
+        "loop-reconciler-relatorio.pdf",
+        pdfBlob
+      );
+
+      // Gráfico personalizado
+      if(!customChart){
+        buildCustomChart();
+      }
+
+      if(customChart){
+        const chartBlob=await dataUrlToBlob(
+          customChart.toBase64Image()
+        );
+
+        zip.file(
+          "grafico-personalizado.png",
+          chartBlob
+        );
+      }
+
+      // Gráfico visão geral
+      if(!overviewChart){
+        renderOverviewChart();
+      }
+
+      if(overviewChart){
+        const overviewBlob=await dataUrlToBlob(
+          overviewChart.toBase64Image()
+        );
+
+        zip.file(
+          "grafico-visao-geral.png",
+          overviewBlob
+        );
+      }
+
+      // Resumo textual
+      const summaryLines=[
+        "Loop Reconciler",
+        "Loja Horizonte Department",
+        "",
+        `Pedidos: ${orders.length}`,
+        `Resultados conciliados: ${results.length}`,
+        `Corretos: ${results.filter(r=>r.status==="match").length}`,
+        `Divergencias: ${results.filter(r=>r.status==="difference").length}`,
+        `Nao processados: ${results.filter(r=>r.status==="missingB").length}`,
+        `Sem pedido: ${results.filter(r=>r.status==="missingA").length}`,
+        `Resolvidos: ${results.filter(r=>r.resolved).length}`,
+        "",
+        "Desenvolvido por beto-dev94",
+        "by BRZ1"
+      ];
+
+      zip.file(
+        "LEIA-ME.txt",
+        summaryLines.join("\n")
+      );
+
+      const zipBlob=await zip.generateAsync({
+        type:"blob",
+        compression:"DEFLATE",
+        compressionOptions:{
+          level:6
+        }
+      });
+
+      const url=URL.createObjectURL(zipBlob);
+      const anchor=document.createElement("a");
+
+      anchor.href=url;
+      anchor.download="loop-reconciler-pacote-completo.zip";
+
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      setTimeout(
+        ()=>URL.revokeObjectURL(url),
+        1500
+      );
+
+      toast(
+        "Pacote completo gerado: relatórios e gráficos."
+      );
+    }catch(error){
+      console.error(error);
+
+      toast(
+        "Não foi possível gerar o pacote completo.",
+        "error"
+      );
+    }finally{
+      button.disabled=false;
+      button.textContent=originalText;
+    }
+  }
+
+  if($("downloadAllBtn")){
+    $("downloadAllBtn").addEventListener(
+      "click",
+      downloadAllFiles
+    );
+  }
 
 
   // -------------------------
