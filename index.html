@@ -90,6 +90,57 @@
     @media(max-width:820px){.hero__grid,.bases-grid{grid-template-columns:1fr}.nav{display:none}.report-summary{grid-template-columns:1fr 1fr}.advanced-grid,.checks{grid-template-columns:1fr 1fr}.access-card{flex-direction:column;align-items:flex-start}}
     @media(max-width:600px){.container{width:min(100% - 20px,1240px)}.brand small,.theme-btn span:last-child{display:none}.hero{padding-top:48px}.metrics{grid-template-columns:1fr 1fr}.filters__row,.chart-builder,.advanced-grid,.checks,.insights{grid-template-columns:1fr}.report-sheet{padding:15px}.report-sheet__header,.report-footer,.footer__inner{flex-direction:column;align-items:flex-start}.report-sheet__brand,.credits{text-align:left}}
     @media print{body *{visibility:hidden!important}#reportSheet,#reportSheet *{visibility:visible!important}#reportSheet{position:absolute;inset:0;width:100%;border:0;border-radius:0;box-shadow:none}}
+
+    .workspace-bottom-nav{
+      position:sticky;
+      bottom:10px;
+      z-index:35;
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+      width:max-content;
+      max-width:calc(100% - 20px);
+      margin:24px auto 4px;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:color-mix(in srgb,var(--panel) 92%,transparent);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+
+    .workspace-bottom-nav .tab{
+      min-width:150px;
+    }
+
+    .comparison-download-actions{
+      margin:14px 0;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:var(--panel2);
+    }
+
+    @media(max-width:600px){
+      .workspace-bottom-nav{
+        width:100%;
+        max-width:100%;
+        bottom:4px;
+      }
+
+      .workspace-bottom-nav .tab{
+        min-width:0;
+        flex:1 1 30%;
+        padding:9px 7px;
+        font-size:.78rem;
+      }
+
+      .comparison-download-actions .button{
+        flex:1 1 100%;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -252,6 +303,24 @@
               </div>
             </div>
 
+            <div class="report-actions comparison-download-actions">
+              <button class="button button--primary" id="comparisonDownloadFilteredBtn">
+                Baixar seleção filtrada
+              </button>
+
+              <button class="button button--secondary" id="comparisonPdfFilteredBtn">
+                PDF da seleção
+              </button>
+
+              <button class="button button--secondary" id="comparisonExcelFilteredBtn">
+                Excel da seleção
+              </button>
+
+              <button class="button button--ghost" id="comparisonPrintFilteredBtn">
+                Imprimir seleção
+              </button>
+            </div>
+
             <div class="results-table-wrap">
               <table class="results-table">
                 <thead><tr>
@@ -336,6 +405,20 @@
             <div class="report-footer"><span>Desenvolvido por beto-dev94</span><strong>Loop Reconciler · by BRZ1 · © 2026</strong></div>
           </article>
         </section>
+
+        <div class="workspace-bottom-nav" aria-label="Navegação da análise">
+          <button class="tab bottom-tab is-active" data-bottom-tab="conciliacao">
+            Conciliação
+          </button>
+
+          <button class="tab bottom-tab" data-bottom-tab="dashboard">
+            Dashboard / Análises
+          </button>
+
+          <button class="tab bottom-tab" data-bottom-tab="relatorio">
+            Relatório
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -634,7 +717,45 @@
   }
 
   $("compareDemoBtn").onclick=async()=>{
-    $("compareDemoBtn").disabled=true;await runProgress();results=compare();$("resultsArea").hidden=false;renderAll();switchTab("conciliacao");$("compareDemoBtn").disabled=false;toast("Conciliação concluída com 5.000 pedidos.");$("resultsArea").scrollIntoView({behavior:"smooth",block:"start"})
+    $("compareDemoBtn").disabled=true;
+
+    try{
+      await runProgress();
+
+      results=compare();
+
+      $("resultsArea").hidden=false;
+
+      renderMetrics();
+      renderResults();
+      renderReport();
+      renderInsights();
+      renderOverviewChart();
+
+      switchTab("conciliacao");
+
+      $("progressText").textContent="Conciliação concluída.";
+      $("progressPercent").textContent="100%";
+      $("progressFill").style.width="100%";
+
+      toast("Conciliação concluída com 5.000 pedidos.");
+
+      $("resultsArea").scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+    }catch(error){
+      console.error("Erro na conciliação:",error);
+
+      $("progressText").textContent="Erro ao finalizar a conciliação.";
+
+      toast(
+        "Ocorreu um erro ao finalizar a comparação. Veja o console para detalhes.",
+        "error"
+      );
+    }finally{
+      $("compareDemoBtn").disabled=false;
+    }
   };
 
   function labelStatus(r){
@@ -714,27 +835,27 @@
 
 
   function renderFilteredReportMetrics(){
-    const data=getFilteredResults();
+    const data=getFiltered();
 
     const ok=data.filter(r=>r.status==="match").length;
     const problems=data.length-ok;
     const resolved=data.filter(r=>r.resolved).length;
 
     const revenue=data
-      .filter(r=>r.status==="match"&&r.rowB&&normalizeText(r.rowB.Status_Financeiro)==="pago")
+      .filter(r=>r.status==="match"&&r.rowB&&norm(r.rowB.Status_Financeiro)==="pago")
       .reduce((sum,r)=>sum+Number(r.rowB.Valor_Faturado||0),0);
 
-    if($("reportOrders"))$("reportOrders").textContent=formatNumber(data.length);
-    if($("reportOk"))$("reportOk").textContent=formatNumber(ok);
-    if($("reportProblems"))$("reportProblems").textContent=formatNumber(problems);
-    if($("reportResolved"))$("reportResolved").textContent=formatNumber(resolved);
-    if($("reportRevenue"))$("reportRevenue").textContent=formatMoney(revenue);
+    if($("reportOrders"))$("reportOrders").textContent=num(data.length);
+    if($("reportOk"))$("reportOk").textContent=num(ok);
+    if($("reportProblems"))$("reportProblems").textContent=num(problems);
+    if($("reportResolved"))$("reportResolved").textContent=num(resolved);
+    if($("reportRevenue"))$("reportRevenue").textContent=money(revenue);
     if($("reportDate"))$("reportDate").textContent="Gerado em "+new Date().toLocaleString("pt-BR")+" · seleção filtrada";
   }
 
   function renderReport(){
     renderFilteredReportMetrics();
-    $("reportBody").innerHTML=getFilteredResults().map(r=>{
+    $("reportBody").innerHTML=getFiltered().map(r=>{
       const a=r.rowA||{},b=r.rowB||{};
       return `<tr><td><span class="${classStatus(r)}">${labelStatus(r)}</span></td><td>${escapeHtml(a.Pedido||b.Pedido||r.key)}</td><td>${escapeHtml(a.Cliente||b.Cliente||"—")}</td><td>${escapeHtml(a.Produto||b.Produto||"—")}</td><td>${escapeHtml(a.Pagamento||b.Pagamento||"—")}</td><td>${a.Valor!=null?money(a.Valor):"—"}</td><td>${b.Valor_Faturado!=null?money(b.Valor_Faturado):"—"}</td><td>${escapeHtml(b.Status_Financeiro||a.Status_Pagamento||"—")}</td><td>${escapeHtml(b.Status_Entrega||a.Entrega_Esperada||"—")}</td><td>${escapeHtml(r.conclusion)}</td><td>${r.resolved?"Sim":"Não"}</td><td>${escapeHtml(r.note||"")}</td></tr>`;
     }).join("");
@@ -828,18 +949,58 @@
   // ABAS
   // -------------------------
   function switchTab(name){
-    $("tabConciliacao").hidden=name!=="conciliacao";$("tabDashboard").hidden=name!=="dashboard";$("tabRelatorio").hidden=name!=="relatorio";
-    $$(".tab").forEach(t=>t.classList.toggle("is-active",t.dataset.tab===name));
-    if(name==="dashboard"&&results.length){renderInsights();renderOverviewChart();if(!customChart)buildCustomChart()}
-    if(name==="relatorio"&&results.length)renderReport();
+    $("tabConciliacao").hidden=name!=="conciliacao";
+    $("tabDashboard").hidden=name!=="dashboard";
+    $("tabRelatorio").hidden=name!=="relatorio";
+
+    $$("[data-tab]").forEach(t=>{
+      t.classList.toggle("is-active",t.dataset.tab===name);
+    });
+
+    $$("[data-bottom-tab]").forEach(t=>{
+      t.classList.toggle("is-active",t.dataset.bottomTab===name);
+    });
+
+    if(name==="dashboard"&&results.length){
+      renderInsights();
+      renderOverviewChart();
+      buildCustomChart();
+    }
+
+    if(name==="relatorio"&&results.length){
+      renderReport();
+    }
   }
-  $$(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+
+  $$("[data-tab]").forEach(t=>{
+    t.onclick=()=>switchTab(t.dataset.tab);
+  });
+
+  $$("[data-bottom-tab]").forEach(t=>{
+    t.onclick=()=>{
+      switchTab(t.dataset.bottomTab);
+
+      const target=
+        t.dataset.bottomTab==="conciliacao"
+          ? $("resultsArea")
+          : t.dataset.bottomTab==="dashboard"
+            ? $("tabDashboard")
+            : $("tabRelatorio");
+
+      if(target){
+        target.scrollIntoView({
+          behavior:"smooth",
+          block:"start"
+        });
+      }
+    };
+  });
 
   // -------------------------
   // EXPORTAÇÕES
   // -------------------------
   function exportRows(){
-    return getFilteredResults().map(r=>{const a=r.rowA||{},b=r.rowB||{};return{
+    return getFiltered().map(r=>{const a=r.rowA||{},b=r.rowB||{};return{
       Status:labelStatus(r),Pedido:a.Pedido||b.Pedido||r.key,Cliente:a.Cliente||b.Cliente||"",Produto:a.Produto||b.Produto||"",Categoria:a.Categoria||"",
       Pagamento:a.Pagamento||b.Pagamento||"",Valor_Pedido:a.Valor??"",Valor_Faturado:b.Valor_Faturado??"",Status_Pedido:a.Status_Pedido||"",Status_Financeiro:b.Status_Financeiro||a.Status_Pagamento||"",
       Status_Entrega:b.Status_Entrega||a.Entrega_Esperada||"",Conclusao:r.conclusion,Resolvido:r.resolved?"Sim":"Não",Observacao:r.note||""
@@ -1095,17 +1256,17 @@
 
 
   async function downloadFilteredPackage(){
-    const filtered=getFilteredResults();
+    const filtered=getFiltered();
 
     if(!filtered.length){
-      return showToast(
+      return toast(
         "Nenhum registro corresponde aos filtros atuais.",
         "error"
       );
     }
 
     if(!window.JSZip){
-      return showToast(
+      return toast(
         "Não foi possível carregar o gerador ZIP.",
         "error"
       );
@@ -1204,8 +1365,8 @@
       1500
     );
 
-    showToast(
-      `Pacote gerado com ${formatNumber(filtered.length)} registro(s).`
+    toast(
+      `Pacote gerado com ${num(filtered.length)} registro(s).`
     );
   }
 
@@ -1344,7 +1505,7 @@
     const rows=exportRows();
 
     if(!rows.length){
-      return showToast(
+      return toast(
         "Nenhum registro corresponde aos filtros atuais.",
         "error"
       );
@@ -1371,7 +1532,7 @@
     const rows=exportRows();
 
     if(!rows.length){
-      return showToast(
+      return toast(
         "Nenhum registro corresponde aos filtros atuais.",
         "error"
       );
@@ -1392,8 +1553,8 @@
   }
 
   function printFilteredReport(){
-    if(!getFilteredResults().length){
-      return showToast(
+    if(!getFiltered().length){
+      return toast(
         "Nenhum registro corresponde aos filtros atuais.",
         "error"
       );
@@ -1688,349 +1849,6 @@
     );
   }
 
-
-
-  async function downloadFilteredPackage(){
-    const filtered=getFilteredResults();
-
-    if(!filtered.length){
-      return showToast(
-        "Nenhum registro corresponde aos filtros atuais.",
-        "error"
-      );
-    }
-
-    if(!window.JSZip){
-      return showToast(
-        "Não foi possível carregar o gerador ZIP.",
-        "error"
-      );
-    }
-
-    const zip=new JSZip();
-    const rows=exportRows();
-
-    const csv=Papa.unparse(rows,{delimiter:";"});
-    zip.file("relatorio-filtrado.csv","\uFEFF"+csv);
-
-    zip.file(
-      "relatorio-filtrado.json",
-      JSON.stringify({
-        generatedAt:new Date().toISOString(),
-        filters:{
-          search:$("searchInput").value,
-          payment:$("paymentFilter").value,
-          delivery:$("deliveryFilter").value,
-          resolution:$("resolutionFilter").value,
-          category:$("categoryFilter").value,
-          status:activeStatusFilter
-        },
-        results:rows
-      },null,2)
-    );
-
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(rows),
-      "Selecao"
-    );
-
-    const xlsx=XLSX.write(
-      wb,
-      {
-        bookType:"xlsx",
-        type:"array"
-      }
-    );
-
-    zip.file(
-      "relatorio-filtrado.xlsx",
-      xlsx
-    );
-
-    const pdfBlob=await buildFilteredPdfBlob();
-    zip.file(
-      "relatorio-filtrado.pdf",
-      pdfBlob
-    );
-
-    if(customChart){
-      const chartBlob=await dataUrlToBlob(
-        customChart.toBase64Image()
-      );
-
-      zip.file(
-        "grafico-personalizado.png",
-        chartBlob
-      );
-    }
-
-    if(overviewChart){
-      const overviewBlob=await dataUrlToBlob(
-        overviewChart.toBase64Image()
-      );
-
-      zip.file(
-        "grafico-visao-geral.png",
-        overviewBlob
-      );
-    }
-
-    const blob=await zip.generateAsync({
-      type:"blob",
-      compression:"DEFLATE",
-      compressionOptions:{
-        level:6
-      }
-    });
-
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-
-    a.href=url;
-    a.download="loop-reconciler-selecao-filtrada.zip";
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    setTimeout(
-      ()=>URL.revokeObjectURL(url),
-      1500
-    );
-
-    showToast(
-      `Pacote gerado com ${formatNumber(filtered.length)} registro(s).`
-    );
-  }
-
-  async function buildFilteredPdfBlob(){
-    const rows=exportRows();
-
-    if(!rows.length){
-      throw new Error("Nenhum registro filtrado.");
-    }
-
-    const {jsPDF}=window.jspdf;
-
-    const doc=new jsPDF({
-      orientation:"landscape",
-      unit:"mm",
-      format:"a4"
-    });
-
-    doc.setFontSize(15);
-    doc.text(
-      "Loop Reconciler - Relatorio Filtrado",
-      14,
-      14
-    );
-
-    doc.setFontSize(9);
-    doc.text(
-      "Loja Horizonte Department | Selecao atual da conciliacao",
-      14,
-      21
-    );
-
-    doc.text(
-      `Registros no relatorio: ${rows.length}`,
-      14,
-      27
-    );
-
-    doc.text(
-      "Desenvolvido por beto-dev94 | by BRZ1",
-      14,
-      33
-    );
-
-    doc.autoTable({
-      startY:38,
-
-      head:[[
-        "Status",
-        "Pedido",
-        "Cliente",
-        "Produto",
-        "Pgto",
-        "Pedido R$",
-        "Faturado R$",
-        "Financeiro",
-        "Entrega",
-        "Resolvido",
-        "Observacao"
-      ]],
-
-      body:rows.map(r=>[
-        r.Status,
-        r.Pedido,
-        r.Cliente,
-        r.Produto,
-        r.Pagamento,
-        r.Valor_Pedido,
-        r.Valor_Faturado,
-        r.Status_Financeiro,
-        r.Status_Entrega,
-        r.Resolvido,
-        r.Observacao
-      ]),
-
-      theme:"grid",
-
-      styles:{
-        fontSize:5.8,
-        cellPadding:1.7,
-        lineWidth:0.35,
-        lineColor:[80,80,80],
-        valign:"middle"
-      },
-
-      headStyles:{
-        fontStyle:"bold",
-        lineWidth:0.45,
-        lineColor:[50,50,50]
-      },
-
-      bodyStyles:{
-        lineWidth:0.30,
-        lineColor:[105,105,105]
-      },
-
-      columnStyles:{
-        10:{
-          cellWidth:38
-        }
-      },
-
-      didDrawCell:(data)=>{
-        if(data.section==="body"){
-          const x=data.cell.x;
-          const y=data.cell.y;
-          const w=data.cell.width;
-          const h=data.cell.height;
-
-          doc.setDrawColor(
-            95,
-            95,
-            95
-          );
-
-          doc.setLineWidth(
-            0.28
-          );
-
-          doc.rect(
-            x,
-            y,
-            w,
-            h
-          );
-        }
-      }
-    });
-
-    return doc.output(
-      "blob"
-    );
-  }
-
-  async function downloadFilteredPdf(){
-    const rows=exportRows();
-
-    if(!rows.length){
-      return showToast(
-        "Nenhum registro corresponde aos filtros atuais.",
-        "error"
-      );
-    }
-
-    const blob=await buildFilteredPdfBlob();
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-
-    a.href=url;
-    a.download="loop-reconciler-relatorio-filtrado.pdf";
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    setTimeout(
-      ()=>URL.revokeObjectURL(url),
-      1200
-    );
-  }
-
-  function downloadFilteredExcel(){
-    const rows=exportRows();
-
-    if(!rows.length){
-      return showToast(
-        "Nenhum registro corresponde aos filtros atuais.",
-        "error"
-      );
-    }
-
-    const wb=XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-      wb,
-      XLSX.utils.json_to_sheet(rows),
-      "Selecao"
-    );
-
-    XLSX.writeFile(
-      wb,
-      "loop-reconciler-relatorio-filtrado.xlsx"
-    );
-  }
-
-  function printFilteredReport(){
-    if(!getFilteredResults().length){
-      return showToast(
-        "Nenhum registro corresponde aos filtros atuais.",
-        "error"
-      );
-    }
-
-    renderReport();
-    switchTab("report");
-
-    setTimeout(
-      ()=>window.print(),
-      250
-    );
-  }
-
-  if($("comparisonDownloadFilteredBtn")){
-    $("comparisonDownloadFilteredBtn").addEventListener(
-      "click",
-      downloadFilteredPackage
-    );
-  }
-
-  if($("comparisonPdfFilteredBtn")){
-    $("comparisonPdfFilteredBtn").addEventListener(
-      "click",
-      downloadFilteredPdf
-    );
-  }
-
-  if($("comparisonExcelFilteredBtn")){
-    $("comparisonExcelFilteredBtn").addEventListener(
-      "click",
-      downloadFilteredExcel
-    );
-  }
-
-  if($("comparisonPrintFilteredBtn")){
-    $("comparisonPrintFilteredBtn").addEventListener(
-      "click",
-      printFilteredReport
-    );
-  }
 
 
   // -------------------------
