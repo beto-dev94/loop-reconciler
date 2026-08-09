@@ -410,6 +410,170 @@
         text-align: left;
       }
     }
+
+    /* ======================================================
+       RELATÓRIO VISÍVEL NA TELA
+       ====================================================== */
+
+    .report-sheet {
+      margin-top: 22px;
+      padding: 28px;
+      border: 1px solid var(--lr-border);
+      border-radius: 18px;
+      background: #ffffff;
+      color: #172033;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+    }
+
+    .report-sheet__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 2px solid #e6eaf0;
+    }
+
+    .report-sheet__header h3 {
+      margin: 0 0 6px;
+      font-size: 1.5rem;
+      color: #172033;
+    }
+
+    .report-sheet__header p,
+    .report-sheet__meta {
+      margin: 3px 0;
+      color: #667085;
+    }
+
+    .report-sheet__summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .report-sheet__summary div {
+      padding: 12px;
+      border: 1px solid #e4e7ec;
+      border-radius: 10px;
+      background: #f8fafc;
+    }
+
+    .report-sheet__summary small {
+      display: block;
+      color: #667085;
+      margin-bottom: 4px;
+    }
+
+    .report-sheet__summary strong {
+      font-size: 1.2rem;
+      color: #172033;
+    }
+
+    .report-sheet__table-wrap {
+      overflow-x: auto;
+      border: 1px solid #e4e7ec;
+      border-radius: 10px;
+    }
+
+    .report-sheet table {
+      width: 100%;
+      min-width: 1100px;
+      border-collapse: collapse;
+    }
+
+    .report-sheet th,
+    .report-sheet td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #e4e7ec;
+      text-align: left;
+      vertical-align: top;
+      color: #172033;
+      font-size: .82rem;
+    }
+
+    .report-sheet th {
+      background: #f2f4f7;
+      color: #475467;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .report-sheet tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .report-sheet__footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #e4e7ec;
+      color: #667085;
+      font-size: .78rem;
+    }
+
+    .report-sheet__status {
+      font-weight: 800;
+    }
+
+    .report-sheet__status.match {
+      color: #087443;
+    }
+
+    .report-sheet__status.difference {
+      color: #9a6700;
+    }
+
+    .report-sheet__status.missingA,
+    .report-sheet__status.missingB {
+      color: #b42318;
+    }
+
+    .report-sheet__status.duplicate {
+      color: #9a6700;
+    }
+
+    @media (max-width: 900px) {
+      .report-sheet {
+        padding: 18px;
+      }
+
+      .report-sheet__header,
+      .report-sheet__footer {
+        flex-direction: column;
+      }
+
+      .report-sheet__summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+
+      #screenReport,
+      #screenReport * {
+        visibility: visible !important;
+      }
+
+      #screenReport {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        margin: 0;
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+      }
+    }
+
   </style>
 </head>
 
@@ -702,13 +866,13 @@
             </h3>
 
             <p>
-              Veja o funcionamento do projeto sem utilizar
-              nenhum arquivo real.
+              Veja uma loja conciliando pedidos com faturamento e entrega,
+              sem utilizar nenhum arquivo real.
             </p>
 
             <ul class="feature-list">
               <li>
-                Dados totalmente fictícios
+                Loja fictícia com pedidos, faturamento e entrega
               </li>
 
               <li>
@@ -716,15 +880,15 @@
               </li>
 
               <li>
-                Correspondências simuladas
+                Pedidos processados corretamente
               </li>
 
               <li>
-                Divergências simuladas
+                Pedidos cancelados ou com status divergente
               </li>
 
               <li>
-                Registros ausentes
+                Pedidos não processados ou sem correspondência
               </li>
 
               <li>
@@ -1834,112 +1998,45 @@
           </div>
 
 
-          <!-- FILTROS -->
+          <!-- VISÃO COMPLETA -->
           <div class="results-toolbar">
 
-            <div class="results-search">
+            <div>
+              <strong>
+                Visualização completa
+              </strong>
 
-              <label for="resultsSearchInput">
-                Buscar
-              </label>
-
-              <input
-                type="search"
-                id="resultsSearchInput"
-                placeholder="Chave, arquivo, valor..."
-              >
-
+              <p>
+                Todos os registros da conciliação são exibidos abaixo.
+                Não há filtro nem paginação nesta visão.
+              </p>
             </div>
 
-            <div class="results-filters">
-
-              <button
-                type="button"
-                class="button button--ghost filter-button is-active"
-                data-result-filter="all"
-              >
-                Todos
-              </button>
-
-              <button
-                type="button"
-                class="button button--ghost filter-button"
-                data-result-filter="match"
-              >
-                Correspondências
-              </button>
-
-              <button
-                type="button"
-                class="button button--ghost filter-button"
-                data-result-filter="difference"
-              >
-                Divergências
-              </button>
-
-              <button
-                type="button"
-                class="button button--ghost filter-button"
-                data-result-filter="missingA"
-              >
-                Ausentes A
-              </button>
-
-              <button
-                type="button"
-                class="button button--ghost filter-button"
-                data-result-filter="missingB"
-              >
-                Ausentes B
-              </button>
-
-              <button
-                type="button"
-                class="button button--ghost filter-button"
-                data-result-filter="duplicate"
-              >
-                Duplicidades
-              </button>
-
-            </div>
+            <button
+              type="button"
+              class="button button--secondary"
+              id="printReportButton"
+            >
+              Imprimir / Salvar como PDF
+            </button>
 
           </div>
 
 
-          <!-- TABELA -->
+          <!-- TABELA COMPLETA -->
           <div class="table-wrapper">
 
             <table class="results-table">
 
               <thead>
                 <tr>
-                  <th>
-                    Status
-                  </th>
-
-                  <th>
-                    Chave
-                  </th>
-
-                  <th>
-                    Origem Base A
-                  </th>
-
-                  <th>
-                    Origem Base B
-                  </th>
-
-                  <th>
-                    Base A
-                  </th>
-
-                  <th>
-                    Base B
-                  </th>
-
-                  <th>
-                    Detalhes
-                  </th>
+                  <th>Status</th>
+                  <th>Pedido / Chave</th>
+                  <th>Origem Base A</th>
+                  <th>Origem Base B</th>
+                  <th>Dados Base A</th>
+                  <th>Dados Base B</th>
+                  <th>Resultado</th>
                 </tr>
               </thead>
 
@@ -1956,72 +2053,127 @@
             id="resultsEmptyState"
             hidden
           >
-
             <strong>
               Nenhum resultado encontrado.
             </strong>
-
-            <span>
-              Tente alterar os filtros ou a busca.
-            </span>
-
           </div>
 
 
-          <!-- PAGINAÇÃO -->
-          <div class="pagination">
+          <!-- RELATÓRIO EM FORMATO DE PÁGINA -->
+          <article
+            class="report-sheet"
+            id="screenReport"
+          >
 
-            <span id="paginationInfo">
-              0 resultados
-            </span>
+            <div class="report-sheet__header">
 
-            <div class="pagination__controls">
+              <div>
+                <h3>
+                  Relatório de Conciliação
+                </h3>
 
-              <button
-                type="button"
-                class="button button--ghost"
-                id="previousPageButton"
-              >
-                ←
-              </button>
+                <p id="screenReportScenario">
+                  Pedidos × Faturamento / Entrega
+                </p>
+              </div>
 
-              <span id="currentPageLabel">
-                Página 1 de 1
-              </span>
-
-              <button
-                type="button"
-                class="button button--ghost"
-                id="nextPageButton"
-              >
-                →
-              </button>
-
-              <select id="pageSizeSelect">
-
-                <option value="25">
-                  25 por página
-                </option>
-
-                <option
-                  value="50"
-                  selected
-                >
-                  50 por página
-                </option>
-
-                <option value="100">
-                  100 por página
-                </option>
-
-                <option value="250">
-                  250 por página
-                </option>
-
-              </select>
+              <div class="report-sheet__meta">
+                <div id="screenReportDate">
+                  —
+                </div>
+                <div>
+                  Loop Reconciler
+                </div>
+              </div>
 
             </div>
-          </div>
+
+
+            <div class="report-sheet__summary">
+
+              <div>
+                <small>
+                  Base A
+                </small>
+                <strong id="reportTotalA">
+                  0
+                </strong>
+              </div>
+
+              <div>
+                <small>
+                  Base B
+                </small>
+                <strong id="reportTotalB">
+                  0
+                </strong>
+              </div>
+
+              <div>
+                <small>
+                  Corretos
+                </small>
+                <strong id="reportMatches">
+                  0
+                </strong>
+              </div>
+
+              <div>
+                <small>
+                  Problemas
+                </small>
+                <strong id="reportProblems">
+                  0
+                </strong>
+              </div>
+
+              <div>
+                <small>
+                  Duplicidades
+                </small>
+                <strong id="reportDuplicates">
+                  0
+                </strong>
+              </div>
+
+            </div>
+
+
+            <div class="report-sheet__table-wrap">
+
+              <table>
+
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Pedido</th>
+                    <th>Sistema de Pedidos</th>
+                    <th>Faturamento / Entrega</th>
+                    <th>Conclusão</th>
+                  </tr>
+                </thead>
+
+                <tbody id="screenReportBody">
+                </tbody>
+
+              </table>
+
+            </div>
+
+
+            <div class="report-sheet__footer">
+
+              <span>
+                Desenvolvido por beto-dev94
+              </span>
+
+              <strong>
+                by BRZ1
+              </strong>
+
+            </div>
+
+          </article>
 
 
           <!-- =================================================
@@ -2050,8 +2202,7 @@
                 id="demoExportMessage"
                 hidden
               >
-                Na demonstração, os botões de download ficam bloqueados.
-                A versão completa permite exportar seus resultados.
+                A demonstração mostra o relatório completo na tela e permite imprimir/salvar pelo navegador. Os downloads estruturados ficam reservados ao uso real.
               </p>
 
             </div>
@@ -2840,8 +2991,6 @@
       $("compositeKeyList").innerHTML = "";
       $("columnMappingList").innerHTML = "";
 
-      $("resultsSearchInput").value = "";
-      $("pageSizeSelect").value = "50";
 
       renderBase("A");
       renderBase("B");
@@ -2943,118 +3092,140 @@
 
     const demoA = [
       {
-        Registro: "1001",
-        Nome: "Maria Silva",
-        Exame: "USG ABDOME",
-        Data: "08/08/2026",
-        Status: "Agendado",
-        Setor: "Ambulatório"
+        Pedido: "PED-5001",
+        Cliente: "Mariana Souza",
+        Valor: "1299.90",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Entregue",
+        Transportadora: "RotaSul"
       },
       {
-        Registro: "1002",
-        Nome: "Carlos Santos",
-        Exame: "ECOCARDIOGRAMA",
-        Data: "08/08/2026",
-        Status: "Realizado",
-        Setor: "Cardiologia"
+        Pedido: "PED-5002",
+        Cliente: "Carlos Mendes",
+        Valor: "349.90",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Em transporte",
+        Transportadora: "EntregaJá"
       },
       {
-        Registro: "1003",
-        Nome: "João Souza",
-        Exame: "USG TIREOIDE",
-        Data: "09/08/2026",
-        Status: "Pendente",
-        Setor: "Ambulatório"
+        Pedido: "PED-5003",
+        Cliente: "Ana Ribeiro",
+        Valor: "899.00",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Entregue",
+        Transportadora: "RotaSul"
       },
       {
-        Registro: "1004",
-        Nome: "Ana Lima",
-        Exame: "DOPPLER",
-        Data: "09/08/2026",
-        Status: "Agendado",
-        Setor: "Vascular"
+        Pedido: "PED-5004",
+        Cliente: "Bruno Costa",
+        Valor: "219.90",
+        Status_Pedido: "Cancelado",
+        Pagamento: "Estornado",
+        Status_Entrega: "Cancelada",
+        Transportadora: "—"
       },
       {
-        Registro: "1004",
-        Nome: "Ana Lima",
-        Exame: "DOPPLER",
-        Data: "09/08/2026",
-        Status: "Agendado",
-        Setor: "Vascular"
+        Pedido: "PED-5005",
+        Cliente: "Luciana Alves",
+        Valor: "1599.00",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Aguardando separação",
+        Transportadora: "EntregaJá"
       },
       {
-        Registro: "1005",
-        Nome: "Paula Alves",
-        Exame: "USG MAMÁRIA",
-        Data: "10/08/2026",
-        Status: "Pendente",
-        Setor: "Imagem"
+        Pedido: "PED-5006",
+        Cliente: "Rafael Lima",
+        Valor: "479.50",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Entregue",
+        Transportadora: "RotaSul"
       },
       {
-        Registro: "1007",
-        Nome: "Rafael Costa",
-        Exame: "USG AXILA",
-        Data: "10/08/2026",
-        Status: "Agendado",
-        Setor: "Imagem"
+        Pedido: "PED-5007",
+        Cliente: "Beatriz Nunes",
+        Valor: "749.90",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Em transporte",
+        Transportadora: "EntregaJá"
+      },
+      {
+        Pedido: "PED-5007",
+        Cliente: "Beatriz Nunes",
+        Valor: "749.90",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Em transporte",
+        Transportadora: "EntregaJá"
       }
     ];
 
     const demoB = [
       {
-        Registro: "1001",
-        Nome: "Maria Silva",
-        Exame: "USG ABDOME",
-        Data: "08/08/2026",
-        Status: "Agendado",
-        Setor: "Ambulatório"
+        Pedido: "PED-5001",
+        Cliente: "Mariana Souza",
+        Valor: "1299.90",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Entregue",
+        Transportadora: "RotaSul"
       },
       {
-        Registro: "1002",
-        Nome: "Carlos Santos",
-        Exame: "ECOCARDIOGRAMA",
-        Data: "08/08/2026",
-        Status: "Realizado",
-        Setor: "Cardiologia"
+        Pedido: "PED-5002",
+        Cliente: "Carlos Mendes",
+        Valor: "349.90",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Entregue",
+        Transportadora: "EntregaJá"
       },
       {
-        Registro: "1003",
-        Nome: "João Souza",
-        Exame: "USG TIREOIDE",
-        Data: "09/08/2026",
-        Status: "Realizado",
-        Setor: "Ambulatório"
+        Pedido: "PED-5003",
+        Cliente: "Ana Ribeiro",
+        Valor: "899.00",
+        Status_Pedido: "Cancelado",
+        Pagamento: "Estornado",
+        Status_Entrega: "Cancelada",
+        Transportadora: "—"
       },
       {
-        Registro: "1004",
-        Nome: "Ana Lima",
-        Exame: "DOPPLER",
-        Data: "09/08/2026",
-        Status: "Agendado",
-        Setor: "Vascular"
+        Pedido: "PED-5004",
+        Cliente: "Bruno Costa",
+        Valor: "219.90",
+        Status_Pedido: "Cancelado",
+        Pagamento: "Estornado",
+        Status_Entrega: "Cancelada",
+        Transportadora: "—"
       },
       {
-        Registro: "1006",
-        Nome: "Bruno Costa",
-        Exame: "USG AXILA",
-        Data: "10/08/2026",
-        Status: "Agendado",
-        Setor: "Imagem"
+        Pedido: "PED-5006",
+        Cliente: "Rafael Lima",
+        Valor: "479.50",
+        Status_Pedido: "Confirmado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Entregue",
+        Transportadora: "RotaSul"
       },
       {
-        Registro: "1008",
-        Nome: "Beatriz Nunes",
-        Exame: "USG TRANSVAGINAL",
-        Data: "11/08/2026",
-        Status: "Pendente",
-        Setor: "Imagem"
+        Pedido: "PED-5008",
+        Cliente: "Fernanda Rocha",
+        Valor: "279.90",
+        Status_Pedido: "Faturado",
+        Pagamento: "Aprovado",
+        Status_Entrega: "Aguardando postagem",
+        Transportadora: "EntregaJá"
       }
     ];
 
     const loadDemoData = () => {
       state.baseA.files = [
         {
-          name: "demonstracao_base_A.xlsx",
+          name: "sistema_pedidos_loja.xlsx",
           size: 16384,
           demo: true
         }
@@ -3066,7 +3237,7 @@
 
       state.baseB.files = [
         {
-          name: "demonstracao_base_B.xlsx",
+          name: "faturamento_entregas.xlsx",
           size: 15360,
           demo: true
         }
@@ -3080,8 +3251,8 @@
       renderBase("B");
       populateMatchingColumns();
 
-      $("matchingColumnA").value = "Registro";
-      $("matchingColumnB").value = "Registro";
+      $("matchingColumnA").value = "Pedido";
+      $("matchingColumnB").value = "Pedido";
 
       updateMatchingButton();
 
@@ -3538,11 +3709,11 @@
         if (state.mode === "demo") {
           $("matchingColumnA").value =
             $("matchingColumnA").value ||
-            "Registro";
+            "Pedido";
 
           $("matchingColumnB").value =
             $("matchingColumnB").value ||
-            "Registro";
+            "Pedido";
         }
 
         updateMatchingButton();
@@ -4645,8 +4816,6 @@
           state.page =
             1;
 
-          $("resultsSearchInput").value =
-            "";
 
           $("analysisStatus").textContent =
             "Análise concluída.";
@@ -4745,19 +4914,19 @@
         `${rate}%`;
 
       $("resultsSubtitle").textContent =
-        `${formatNumber(state.results.length)} resultado(s) gerado(s).`;
+        `${formatNumber(state.results.length)} registro(s) conciliado(s) — visão completa abaixo.`;
     };
 
 
     /* ======================================================
-       RESULTADOS / FILTROS
+       RESULTADOS — TODOS NA TELA
        ====================================================== */
 
     const statusLabels = {
-      match: "Correspondência",
+      match: "Correto",
       difference: "Divergência",
-      missingA: "Ausente A",
-      missingB: "Ausente B",
+      missingA: "Só na fatura",
+      missingB: "Não processado",
       duplicate: "Duplicidade"
     };
 
@@ -4774,345 +4943,181 @@
         return "—";
       }
 
-      const entries =
-        Object.entries(row)
-          .filter(
-            ([key]) =>
-              key !== "__arquivo" &&
-              key !== "__aba"
-          )
-          .slice(0, 3);
+      const priority = [
+        "Cliente",
+        "Valor",
+        "Status_Pedido",
+        "Pagamento",
+        "Status_Entrega",
+        "Transportadora"
+      ];
 
-      return entries
-        .map(
-          ([key, value]) =>
-            `${key}: ${value}`
+      const entries = priority
+        .filter((key) => Object.prototype.hasOwnProperty.call(row, key))
+        .map((key) => [key, row[key]]);
+
+      const fallback = Object.entries(row)
+        .filter(([key]) =>
+          key !== "__arquivo" &&
+          key !== "__aba" &&
+          key !== "Pedido"
         )
+        .slice(0, 6);
+
+      return (entries.length ? entries : fallback)
+        .map(([key, value]) => `${key}: ${value}`)
         .join(" · ") || "—";
     };
 
-    const resultToSearchText = (result) => {
-      return [
-        result.status,
-        result.key,
-        result.originA,
-        result.originB,
-        result.details,
-        JSON.stringify(result.rowA || {}),
-        JSON.stringify(result.rowB || {})
-      ]
-        .join(" ")
-        .toLocaleLowerCase("pt-BR");
+    const businessConclusion = (result) => {
+      if (result.status === "match") {
+        return "Pedido conciliado corretamente entre os dois sistemas.";
+      }
+
+      if (result.status === "missingB") {
+        return "Pedido existe no sistema da loja, mas não apareceu no faturamento/entrega. Verificar processamento.";
+      }
+
+      if (result.status === "missingA") {
+        return "Registro apareceu no faturamento/entrega sem pedido correspondente na base da loja.";
+      }
+
+      if (result.status === "duplicate") {
+        return result.details || "Pedido duplicado em uma das bases.";
+      }
+
+      const fields = (result.differences || []).map((item) => item.field);
+
+      if (fields.includes("Status_Entrega")) {
+        return "Status de entrega não confere entre os sistemas.";
+      }
+
+      if (fields.includes("Status_Pedido") || fields.includes("Pagamento")) {
+        return "Situação do pedido/pagamento não confere. Pode existir cancelamento ou processamento incorreto.";
+      }
+
+      if (fields.includes("Valor")) {
+        return "Valor do pedido/fatura não confere.";
+      }
+
+      return result.details || "Existem dados diferentes entre os dois sistemas.";
+    };
+
+    const renderScreenReport = () => {
+      const problems =
+        countStatus("difference") +
+        countStatus("missingA") +
+        countStatus("missingB");
+
+      $("reportTotalA").textContent =
+        formatNumber(state.baseA.rows.length);
+
+      $("reportTotalB").textContent =
+        formatNumber(state.baseB.rows.length);
+
+      $("reportMatches").textContent =
+        formatNumber(countStatus("match"));
+
+      $("reportProblems").textContent =
+        formatNumber(problems);
+
+      $("reportDuplicates").textContent =
+        formatNumber(countStatus("duplicate"));
+
+      $("screenReportScenario").textContent =
+        state.mode === "demo"
+          ? "Demonstração: Sistema de Pedidos × Faturamento / Entrega"
+          : "Conciliação completa entre Base A × Base B";
+
+      $("screenReportDate").textContent =
+        new Date().toLocaleString("pt-BR");
+
+      $("screenReportBody").innerHTML =
+        state.results.length
+          ? state.results.map((result) => `
+              <tr>
+                <td>
+                  <span class="report-sheet__status ${safeText(result.status)}">
+                    ${safeText(statusLabels[result.status] || result.status)}
+                  </span>
+                </td>
+                <td>${safeText(result.key)}</td>
+                <td>${safeText(summarizeRow(result.rowA))}</td>
+                <td>${safeText(summarizeRow(result.rowB))}</td>
+                <td>${safeText(businessConclusion(result))}</td>
+              </tr>
+            `).join("")
+          : `
+              <tr>
+                <td colspan="5">
+                  Nenhum resultado disponível.
+                </td>
+              </tr>
+            `;
     };
 
     const applyResultFilters = () => {
-      let data =
-        state.results.slice();
-
-      if (
-        state.resultFilter !== "all"
-      ) {
-        data =
-          data.filter(
-            (item) =>
-              item.status === state.resultFilter
-          );
-      }
-
-      const search =
-        state.search
-          .trim()
-          .toLocaleLowerCase("pt-BR");
-
-      if (search) {
-        data =
-          data.filter(
-            (item) =>
-              resultToSearchText(item).includes(search)
-          );
-      }
-
-      state.filteredResults =
-        data;
-
-      const pages =
-        Math.max(
-          1,
-          Math.ceil(
-            data.length /
-            state.pageSize
-          )
-        );
-
-      state.page =
-        Math.min(
-          state.page,
-          pages
-        );
-
+      state.filteredResults = state.results.slice();
       renderResults();
     };
 
     const renderResults = () => {
-      const body =
-        $("resultsTableBody");
+      const body = $("resultsTableBody");
 
-      const start =
-        (state.page - 1) *
-        state.pageSize;
+      body.innerHTML = state.results.length
+        ? state.results.map((result) => `
+            <tr>
+              <td>
+                <span class="result-status ${statusClasses[result.status] || ""}">
+                  ${safeText(statusLabels[result.status] || result.status)}
+                </span>
+              </td>
 
-      const end =
-        start +
-        state.pageSize;
+              <td>
+                <strong>${safeText(result.key)}</strong>
+              </td>
 
-      const pageRows =
-        state.filteredResults.slice(
-          start,
-          end
-        );
+              <td>
+                ${safeText(result.originA || "—")}
+              </td>
 
-      body.innerHTML = "";
+              <td>
+                ${safeText(result.originB || "—")}
+              </td>
 
-      pageRows.forEach((result, index) => {
-        const tr =
-          document.createElement("tr");
+              <td>
+                ${safeText(summarizeRow(result.rowA))}
+              </td>
 
-        tr.innerHTML = `
-          <td>
-            <span
-              class="result-status ${statusClasses[result.status] || ""}"
-            >
-              ${safeText(statusLabels[result.status] || result.status)}
-            </span>
-          </td>
+              <td>
+                ${safeText(summarizeRow(result.rowB))}
+              </td>
 
-          <td>
-            ${safeText(result.key)}
-          </td>
-
-          <td>
-            ${safeText(result.originA || "—")}
-          </td>
-
-          <td>
-            ${safeText(result.originB || "—")}
-          </td>
-
-          <td>
-            ${safeText(summarizeRow(result.rowA))}
-          </td>
-
-          <td>
-            ${safeText(summarizeRow(result.rowB))}
-          </td>
-
-          <td>
-            <button
-              type="button"
-              class="details-button"
-              data-result-index="${start + index}"
-            >
-              Ver detalhes
-            </button>
-          </td>
-        `;
-
-        body.appendChild(tr);
-      });
-
-      body
-        .querySelectorAll(
-          "[data-result-index]"
-        )
-        .forEach((button) => {
-          button.addEventListener(
-            "click",
-            () => {
-              const result =
-                state.filteredResults[
-                  Number(button.dataset.resultIndex)
-                ];
-
-              openResultDetails(result);
-            }
-          );
-        });
+              <td>
+                ${safeText(businessConclusion(result))}
+              </td>
+            </tr>
+          `).join("")
+        : "";
 
       $("resultsEmptyState").hidden =
-        state.filteredResults.length > 0;
+        state.results.length > 0;
 
-      const total =
-        state.filteredResults.length;
-
-      $("paginationInfo").textContent =
-        total === 1
-          ? "1 resultado"
-          : `${formatNumber(total)} resultados`;
-
-      const pages =
-        Math.max(
-          1,
-          Math.ceil(
-            total /
-            state.pageSize
-          )
-        );
-
-      $("currentPageLabel").textContent =
-        `Página ${state.page} de ${pages}`;
-
-      $("previousPageButton").disabled =
-        state.page <= 1;
-
-      $("nextPageButton").disabled =
-        state.page >= pages;
+      renderScreenReport();
     };
 
-    const openResultDetails = (result) => {
-      if (!result) {
-        return;
-      }
-
-      const differences =
-        result.differences || [];
-
-      let differencesHtml =
-        "<p>Nenhuma divergência de campo.</p>";
-
-      if (differences.length) {
-        differencesHtml = `
-          <table class="modal-table">
-            <thead>
-              <tr>
-                <th>Campo</th>
-                <th>Base A</th>
-                <th>Base B</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${differences
-                .map(
-                  (difference) => `
-                    <tr>
-                      <td>${safeText(difference.field)}</td>
-                      <td>${safeText(difference.valueA)}</td>
-                      <td>${safeText(difference.valueB)}</td>
-                    </tr>
-                  `
-                )
-                .join("")}
-            </tbody>
-          </table>
-        `;
-      }
-
-      $("detailsModalTitle").textContent =
-        `Detalhes — ${result.key}`;
-
-      $("detailsModalContent").innerHTML = `
-        <p>
-          <strong>Status:</strong>
-          ${safeText(statusLabels[result.status] || result.status)}
-        </p>
-
-        <p>
-          <strong>Origem Base A:</strong>
-          ${safeText(result.originA || "—")}
-        </p>
-
-        <p>
-          <strong>Origem Base B:</strong>
-          ${safeText(result.originB || "—")}
-        </p>
-
-        <p>
-          <strong>Resumo:</strong>
-          ${safeText(result.details || "")}
-        </p>
-
-        ${differencesHtml}
-      `;
-
-      openModal("detailsModal");
-    };
-
-    $$(".filter-button").forEach((button) => {
-      button.addEventListener(
-        "click",
-        () => {
-          state.resultFilter =
-            button.dataset.resultFilter;
-
-          state.page = 1;
-
-          $$(".filter-button").forEach(
-            (item) => {
-              item.classList.toggle(
-                "is-active",
-                item === button
-              );
-            }
-          );
-
-          applyResultFilters();
-        }
-      );
-    });
-
-    $("resultsSearchInput").addEventListener(
-      "input",
-      (event) => {
-        state.search =
-          event.target.value;
-
-        state.page = 1;
-
-        applyResultFilters();
-      }
-    );
-
-    $("previousPageButton").addEventListener(
+    $("printReportButton").addEventListener(
       "click",
       () => {
-        if (
-          state.page > 1
-        ) {
-          state.page -= 1;
-          renderResults();
-        }
-      }
-    );
-
-    $("nextPageButton").addEventListener(
-      "click",
-      () => {
-        const pages =
-          Math.max(
-            1,
-            Math.ceil(
-              state.filteredResults.length /
-              state.pageSize
-            )
+        if (!state.results.length) {
+          showToast(
+            "Execute uma análise antes de gerar o relatório.",
+            "error"
           );
-
-        if (
-          state.page < pages
-        ) {
-          state.page += 1;
-          renderResults();
+          return;
         }
-      }
-    );
 
-    $("pageSizeSelect").addEventListener(
-      "change",
-      (event) => {
-        state.pageSize =
-          Number(event.target.value);
-
-        state.page = 1;
-
-        renderResults();
+        window.print();
       }
     );
 
