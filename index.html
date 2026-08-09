@@ -174,7 +174,7 @@
     </div>
     <div class="hero-card">
       <div class="mini-grid">
-        <div class="mini-card"><small>Pedidos simulados</small><strong>5.000</strong></div>
+        <div class="mini-card"><small>Pedidos simulados</small><strong>500</strong></div>
         <div class="mini-card"><small>Faturamento</small><strong>≈ 930</strong></div>
         <div class="mini-card"><small>Formas de pagamento</small><strong>4</strong></div>
         <div class="mini-card"><small>Análise</small><strong>Automática</strong></div>
@@ -202,7 +202,7 @@
     <div class="section__heading">
       <span class="eyebrow">DEMONSTRAÇÃO PÚBLICA</span>
       <h2>Loja fictícia: Pedidos × Faturamento / Entrega</h2>
-      <p>A demonstração trabalha com 5.000 pedidos sintéticos para mostrar como o sistema se comporta em uma base maior. As duas planilhas já vêm carregadas, mas o fluxo de upload permanece visível para o cliente entender como seria no uso real.</p>
+      <p>A demonstração trabalha com 500 pedidos sintéticos para mostrar como o sistema se comporta em uma base maior. As duas planilhas já vêm carregadas, mas o fluxo de upload permanece visível para o cliente entender como seria no uso real.</p>
     </div>
 
     <div class="app-shell">
@@ -221,13 +221,13 @@
         <section id="tabConciliacao">
           <div class="bases-grid">
             <article class="base-card">
-              <div class="base-card__header"><div><span class="base-label">SISTEMA DE PEDIDOS</span><h3>Pedidos da loja</h3></div><span class="base-card__status">5.000 registros</span></div>
+              <div class="base-card__header"><div><span class="base-label">SISTEMA DE PEDIDOS</span><h3>Pedidos da loja</h3></div><span class="base-card__status">500 registros</span></div>
               <p>Pedido, cliente, produto, categoria, quantidade, valor, pagamento e situação esperada.</p>
               <div class="drop-zone">
                 <div class="drop-zone__row"><strong>sistema_pedidos_loja.xlsx</strong><span>pré-carregado</span></div>
                 <small>No uso real, o cliente pode selecionar ou arrastar seus próprios arquivos.</small>
               </div>
-              <div class="file-list"><div class="file-item"><span>Base fictícia de pedidos</span><span>5.000 linhas</span></div></div>
+              <div class="file-list"><div class="file-item"><span>Base fictícia de pedidos</span><span>500 linhas</span></div></div>
             </article>
 
             <article class="base-card">
@@ -575,7 +575,7 @@
   $("themeBtn").onclick=()=>applyTheme(document.documentElement.dataset.theme==="light"?"dark":"light");
 
   // -------------------------
-  // GERAÇÃO DE 5.000 PEDIDOS
+  // GERAÇÃO DE 500 PEDIDOS
   // -------------------------
   const products=[
     ["Smart TV 55","Eletrônicos",2899.90],["Cafeteira Premium","Eletroportáteis",349.90],["Aspirador Vertical","Casa",899.00],
@@ -594,7 +594,7 @@
 
   const orders=[];
   const finance=[];
-  for(let i=1;i<=5000;i++){
+  for(let i=1;i<=500;i++){
     const [product,category,unit]=pick(products,i,1);
     const qty=1+Math.floor(seeded(i,2)*3);
     const value=+(unit*qty).toFixed(2);
@@ -712,7 +712,7 @@
 
   async function runProgress(){
     $("demoProgress").hidden=false;
-    const stages=[[18,"Detectando estrutura..."],[38,"Identificando chave..."],[62,"Relacionando colunas..."],[84,"Conferindo 5.000 pedidos..."],[100,"Gerando relatório..."]];
+    const stages=[[18,"Detectando estrutura..."],[38,"Identificando chave..."],[62,"Relacionando colunas..."],[84,"Conferindo 500 pedidos..."],[100,"Gerando relatório..."]];
     for(const [p,t] of stages){$("progressText").textContent=t;$("progressPercent").textContent=p+"%";$("progressFill").style.width=p+"%";await sleep(120)}
   }
 
@@ -738,7 +738,7 @@
       $("progressPercent").textContent="100%";
       $("progressFill").style.width="100%";
 
-      toast("Conciliação concluída com 5.000 pedidos.");
+      toast("Conciliação concluída com 500 pedidos.");
 
       $("resultsArea").scrollIntoView({
         behavior:"smooth",
