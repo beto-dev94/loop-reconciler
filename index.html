@@ -2,1872 +2,681 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Loop Reconciler — conciliação automática de pedidos, faturamento, pagamentos e entregas.">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Loop Reconciler — conciliação inteligente de dados empresariais, offline ou online.">
   <meta name="theme-color" content="#07101d" id="themeColorMeta">
   <title>Loop Reconciler · BRZ1</title>
 
-  <!-- Leitura e exportação -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
-      --bg:#07101d;
-      --bg-2:#0a1422;
-      --panel:#0f1c2d;
-      --panel-2:#132239;
-      --panel-3:#182941;
-      --text:#edf4ff;
-      --muted:#93a4bd;
-      --line:#243650;
-      --blue:#6aa8ff;
-      --blue-2:#3778d6;
-      --green:#40d39b;
-      --yellow:#f5bd56;
-      --red:#ff7180;
-      --violet:#b58cff;
-      --shadow:0 22px 60px rgba(0,0,0,.28);
-      --radius:20px;
+      --bg:#07101d;--bg2:#0b1626;--panel:#0f1c2d;--panel2:#132238;--panel3:#182a44;
+      --text:#edf4ff;--muted:#93a4bd;--line:#2e4363;--blue:#6aa8ff;--blue2:#3778d6;
+      --green:#43d39d;--yellow:#f5be57;--red:#ff7180;--violet:#b58cff;--shadow:0 22px 60px rgba(0,0,0,.28);
+      --report-bg:#0d1725;--report-text:#edf4ff;--report-muted:#aab7cb;--report-line:#30445f;--report-head:#15253a;
     }
-
     html[data-theme="light"]{
-      --bg:#f4f7fb;
-      --bg-2:#edf2f8;
-      --panel:#ffffff;
-      --panel-2:#f7f9fc;
-      --panel-3:#eef3fa;
-      --text:#172033;
-      --muted:#667085;
-      --line:#d9e2ee;
-      --blue:#2563eb;
-      --blue-2:#174db8;
-      --green:#11835d;
-      --yellow:#996400;
-      --red:#c33a49;
-      --violet:#7047c7;
-      --shadow:0 18px 45px rgba(33,53,84,.12);
+      --bg:#f4f7fb;--bg2:#edf2f8;--panel:#fff;--panel2:#f7f9fc;--panel3:#eef3fa;
+      --text:#172033;--muted:#667085;--line:#cdd8e6;--blue:#2563eb;--blue2:#174db8;
+      --green:#11835d;--yellow:#996400;--red:#c33a49;--violet:#7047c7;--shadow:0 18px 45px rgba(33,53,84,.12);
+      --report-bg:#fff;--report-text:#172033;--report-muted:#667085;--report-line:#d9e2ee;--report-head:#f2f4f7;
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      background:
-        radial-gradient(circle at 15% 0%,rgba(106,168,255,.09),transparent 30%),
-        linear-gradient(180deg,var(--bg),var(--bg-2));
-      color:var(--text);
-    }
-
-    button,input,select{font:inherit}
-    button{cursor:pointer}
-    button:disabled{cursor:not-allowed;opacity:.52}
-    [hidden]{display:none!important}
-
-    .container{
-      width:min(1220px,calc(100% - 32px));
-      margin:0 auto;
-    }
-
-    .header{
-      position:sticky;
-      top:0;
-      z-index:60;
-      border-bottom:1px solid var(--line);
-      background:color-mix(in srgb,var(--bg) 88%,transparent);
-      backdrop-filter:blur(16px);
-    }
-
-    .header__inner{
-      min-height:74px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-    }
-
-    .brand{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      color:var(--text);
-      text-decoration:none;
-    }
-
-    .brand__mark{
-      width:43px;
-      height:43px;
-      display:grid;
-      place-items:center;
-      border-radius:13px;
-      font-weight:950;
-      color:#fff;
-      background:linear-gradient(135deg,var(--blue),var(--blue-2));
-      box-shadow:0 9px 25px rgba(55,120,214,.32);
-    }
-
-    .brand strong{display:block;font-size:1rem}
-    .brand small{display:block;color:var(--muted);margin-top:2px}
-
-    .nav{display:flex;gap:5px}
-    .nav a{
-      text-decoration:none;
-      color:var(--muted);
-      padding:10px 12px;
-      border-radius:11px;
-    }
-    .nav a:hover{background:var(--panel);color:var(--text)}
-
-    .header__actions{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .button{
-      border:0;
-      border-radius:12px;
-      padding:12px 16px;
-      font-weight:850;
-      transition:.18s ease;
-    }
-
-    .button:hover:not(:disabled){transform:translateY(-1px)}
-    .button--primary{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff}
-    .button--secondary{background:var(--panel);border:1px solid var(--line);color:var(--text)}
-    .button--ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
-    .button--danger{background:rgba(255,113,128,.1);border:1px solid rgba(255,113,128,.3);color:var(--red)}
-    .button--small{padding:9px 11px;font-size:.85rem}
-
-    .theme-button{
-      border:1px solid var(--line);
-      background:var(--panel);
-      color:var(--text);
-      border-radius:12px;
-      padding:10px 12px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-weight:800;
-    }
-
-    .hero{padding:76px 0 48px}
-    .hero__grid{
-      display:grid;
-      grid-template-columns:1.08fr .92fr;
-      gap:42px;
-      align-items:center;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:7px;
-      padding:7px 10px;
-      border:1px solid rgba(106,168,255,.26);
-      border-radius:999px;
-      background:rgba(106,168,255,.1);
-      color:var(--blue);
-      font-size:.76rem;
-      font-weight:950;
-      letter-spacing:.12em;
-    }
-
-    h1{
-      font-size:clamp(2.5rem,6vw,5.1rem);
-      line-height:.96;
-      letter-spacing:-.055em;
-      margin:18px 0 20px;
-    }
-
-    h1 span{color:var(--blue)}
-    .lead{
-      max-width:720px;
-      color:var(--muted);
-      font-size:1.08rem;
-      line-height:1.7;
-    }
-
-    .hero__actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:24px;
-    }
-
-    .hero__note{
-      margin-top:17px;
-      color:var(--muted);
-      font-size:.88rem;
-    }
-
-    .hero-card{
-      border:1px solid var(--line);
-      border-radius:24px;
-      background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      padding:20px;
-      box-shadow:var(--shadow);
-    }
-
-    .hero-card__top{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:16px;
-    }
-
-    .hero-card__top strong{font-size:1rem}
-    .hero-card__top span{font-size:.78rem;color:var(--green);font-weight:900}
-
-    .mini-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-    }
-
-    .mini-card{
-      border:1px solid var(--line);
-      background:var(--bg-2);
-      border-radius:15px;
-      padding:15px;
-    }
-
-    .mini-card small{color:var(--muted)}
-    .mini-card strong{display:block;font-size:1.55rem;margin-top:4px}
-    .mini-row{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:11px 12px;
-      border:1px solid var(--line);
-      border-radius:11px;
-      background:var(--bg-2);
-      margin-top:9px;
-      font-size:.88rem;
-    }
-
-    .section{padding:56px 0}
-    .section__heading{max-width:780px;margin-bottom:24px}
-    .section__heading h2{
-      font-size:clamp(1.9rem,4vw,2.9rem);
-      margin:12px 0 10px;
-      letter-spacing:-.025em;
-    }
-    .section__heading p{color:var(--muted);line-height:1.65}
-
-    .demo-shell{
-      border:1px solid var(--line);
-      border-radius:24px;
-      background:var(--panel);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-
-    .demo-shell__header{
-      padding:18px 20px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:18px;
-      border-bottom:1px solid var(--line);
-      background:var(--panel-2);
-    }
-
-    .demo-shell__header p{margin:4px 0 0;color:var(--muted);font-size:.88rem}
-    .mode-badge{
-      display:inline-flex;
-      padding:6px 8px;
-      border-radius:8px;
-      font-size:.7rem;
-      letter-spacing:.11em;
-      font-weight:950;
-      background:rgba(64,211,155,.11);
-      color:var(--green);
-      border:1px solid rgba(64,211,155,.22);
-    }
-
-    .workspace{padding:22px}
-
-    .bases-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-
-    .base-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:var(--panel-2);
-      padding:18px;
-      min-width:0;
-    }
-
-    .base-card__header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:14px;
-    }
-
-    .base-card__header h3{margin:4px 0 0}
-    .base-label{
-      font-size:.72rem;
-      font-weight:950;
-      letter-spacing:.12em;
-      color:var(--blue);
-    }
-
-    .base-card__status{
-      padding:5px 8px;
-      border-radius:999px;
-      font-size:.72rem;
-      font-weight:900;
-      background:rgba(64,211,155,.1);
-      color:var(--green);
-    }
-
-    .base-card p{color:var(--muted);font-size:.88rem;line-height:1.55}
-
-    .drop-zone{
-      margin-top:13px;
-      border:1px dashed var(--line);
-      border-radius:14px;
-      padding:14px;
-      background:var(--bg-2);
-    }
-
-    .drop-zone.is-dragging{border-color:var(--blue);background:rgba(106,168,255,.07)}
-    .drop-zone.is-demo{opacity:.9}
-
-    .drop-zone__row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .drop-zone small{display:block;color:var(--muted);margin-top:7px}
-
-    .file-list{margin-top:10px;display:grid;gap:7px}
-    .file-item{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:9px 11px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:var(--bg-2);
-      font-size:.82rem;
-    }
-    .file-item span:last-child{color:var(--muted)}
-
-    .primary-action{
-      margin-top:18px;
-      display:flex;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .compare-button{
-      min-width:min(420px,100%);
-      font-size:1.02rem;
-      padding:15px 22px;
-    }
-
-    .advanced{
-      margin-top:16px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:var(--panel-2);
-      overflow:hidden;
-    }
-
-    .advanced summary{
-      list-style:none;
-      cursor:pointer;
-      padding:15px 17px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      font-weight:850;
-    }
-
-    .advanced summary::-webkit-details-marker{display:none}
-    .advanced summary small{color:var(--muted);font-weight:600}
-    .advanced__body{
-      border-top:1px solid var(--line);
-      padding:17px;
-    }
-
-    .advanced-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:13px;
-    }
-
-    .field label{
-      display:block;
-      font-size:.8rem;
-      font-weight:800;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .field select,.field input[type="text"]{
-      width:100%;
-      min-height:42px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:var(--bg-2);
-      color:var(--text);
-      padding:9px 10px;
-    }
-
-    .checks{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:9px;
-      margin-top:13px;
-    }
-
-    .check{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 11px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:var(--bg-2);
-      color:var(--muted);
-      font-size:.82rem;
-    }
-
-    .analysis-progress{
-      margin-top:16px;
-      border:1px solid var(--line);
-      border-radius:13px;
-      padding:12px;
-      background:var(--panel-2);
-    }
-
-    .progress-top{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      font-size:.83rem;
-      color:var(--muted);
-      margin-bottom:8px;
-    }
-
-    .progress-track{
-      height:9px;
-      border-radius:999px;
-      background:var(--bg-2);
-      overflow:hidden;
-    }
-    .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .18s ease}
-
-    .results{margin-top:22px}
-
-    .dashboard-grid{
-      display:grid;
-      grid-template-columns:repeat(6,1fr);
-      gap:10px;
-      margin-bottom:16px;
-    }
-
-    .metric{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
-      background:var(--panel-2);
-      min-width:0;
-    }
-    .metric small{display:block;color:var(--muted);font-size:.74rem}
-    .metric strong{display:block;font-size:1.45rem;margin-top:4px;overflow-wrap:anywhere}
-    .metric--ok strong{color:var(--green)}
-    .metric--warn strong{color:var(--yellow)}
-    .metric--bad strong{color:var(--red)}
-
-    .insights-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:13px;
-      margin-bottom:16px;
-    }
-
-    .insight-card{
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:var(--panel-2);
-      padding:16px;
-    }
-
-    .insight-card h3{margin:0 0 12px;font-size:1rem}
-    .bar-row{margin-top:10px}
-    .bar-row__top{display:flex;justify-content:space-between;gap:12px;font-size:.8rem}
-    .bar-track{height:7px;border-radius:999px;background:var(--bg-2);overflow:hidden;margin-top:5px}
-    .bar-fill{height:100%;background:var(--blue);border-radius:999px}
-
-    .report-actions{
-      display:flex;
-      gap:9px;
-      flex-wrap:wrap;
-      margin-bottom:15px;
-    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}[hidden]{display:none!important}
+    .container{width:min(1240px,calc(100% - 32px));margin:auto}
 
-    .report-sheet{
-      background:#fff;
-      color:#172033;
-      border-radius:16px;
-      padding:25px;
-      box-shadow:0 18px 50px rgba(0,0,0,.2);
-      border:1px solid #e4e7ec;
-    }
-
-    .report-sheet__header{
-      display:flex;
-      justify-content:space-between;
-      gap:20px;
-      padding-bottom:16px;
-      margin-bottom:16px;
-      border-bottom:2px solid #e7ebf0;
-    }
-
-    .report-sheet__header h2{margin:0 0 5px;color:#172033}
-    .report-sheet__header p{margin:3px 0;color:#667085}
-    .report-sheet__brand{text-align:right}
-    .report-sheet__brand strong{display:block}
-    .report-sheet__brand span{color:#2563eb;font-weight:900;letter-spacing:.09em}
+    .header{position:sticky;top:0;z-index:80;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px)}
+    .header__inner{min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}.brand__mark{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;color:#fff;font-weight:950;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 9px 25px rgba(55,120,214,.32)}
+    .brand strong{display:block}.brand small{display:block;color:var(--muted);margin-top:2px}
+    .nav{display:flex;gap:5px}.nav a{text-decoration:none;color:var(--muted);padding:10px 12px;border-radius:10px}.nav a:hover{background:var(--panel);color:var(--text)}
+    .header__actions{display:flex;gap:8px}.theme-btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;font-weight:800}
 
-    .report-summary{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:9px;
-      margin-bottom:16px;
-    }
-    .report-summary div{padding:11px;border:1px solid #e4e7ec;border-radius:9px;background:#f8fafc}
-    .report-summary small{display:block;color:#667085}
-    .report-summary strong{font-size:1.15rem}
-
-    .table-wrap{
-      overflow:auto;
-      border:1px solid #e4e7ec;
-      border-radius:10px;
-    }
-
-    .report-table{
-      width:100%;
-      min-width:1400px;
-      border-collapse:collapse;
-    }
+    .button{border:0;border-radius:12px;padding:12px 16px;font-weight:850;transition:.18s ease}.button:hover:not(:disabled){transform:translateY(-1px)}
+    .button--primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff}.button--secondary{background:var(--panel);border:1px solid var(--line);color:var(--text)}.button--ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}.button--danger{background:rgba(255,113,128,.1);border:1px solid rgba(255,113,128,.3);color:var(--red)}.button--small{padding:9px 11px;font-size:.84rem}
 
-    .report-table th,.report-table td{
-      padding:8px 9px;
-      border-bottom:1px solid #e4e7ec;
-      text-align:left;
-      vertical-align:top;
-      font-size:.78rem;
-      color:#172033;
-    }
+    .hero{padding:78px 0 48px}.hero__grid{display:grid;grid-template-columns:1.06fr .94fr;gap:42px;align-items:center}.eyebrow{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(106,168,255,.1);border:1px solid rgba(106,168,255,.25);color:var(--blue);font-size:.75rem;font-weight:950;letter-spacing:.12em}
+    h1{font-size:clamp(2.5rem,6vw,5.05rem);line-height:.96;letter-spacing:-.055em;margin:18px 0 20px}h1 span{color:var(--blue)}.lead{color:var(--muted);font-size:1.08rem;line-height:1.7;max-width:760px}.hero__actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.hero__note{margin-top:17px;color:var(--muted);font-size:.9rem;line-height:1.5}
+    .hero-card{border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,var(--panel),var(--panel2));padding:20px;box-shadow:var(--shadow)}
+    .mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.mini-card{padding:15px;border:1px solid var(--line);background:var(--bg2);border-radius:14px}.mini-card small{color:var(--muted)}.mini-card strong{display:block;font-size:1.55rem;margin-top:4px}.mini-row{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;margin-top:9px;border:1px solid var(--line);border-radius:11px;background:var(--bg2);font-size:.87rem}
 
-    .report-table th{
-      position:sticky;
-      top:0;
-      z-index:2;
-      background:#f2f4f7;
-      color:#475467;
-      text-transform:uppercase;
-      font-size:.68rem;
-      letter-spacing:.04em;
-    }
+    .section{padding:56px 0}.section__heading{max-width:820px;margin-bottom:24px}.section__heading h2{font-size:clamp(1.9rem,4vw,2.9rem);margin:12px 0 10px}.section__heading p{color:var(--muted);line-height:1.65}
+    .commercial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.commercial-card{border:1px solid var(--line);border-radius:17px;background:var(--panel);padding:18px}.commercial-card h3{margin:8px 0}.commercial-card p{margin:0;color:var(--muted);line-height:1.55;font-size:.9rem}
 
-    .report-table tr:last-child td{border-bottom:0}
-    .status{
-      display:inline-flex;
-      padding:4px 7px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:.68rem;
-      white-space:nowrap;
-    }
-    .status--ok{background:#ecfdf3;color:#067647}
-    .status--warn{background:#fffaeb;color:#b54708}
-    .status--bad{background:#fef3f2;color:#b42318}
+    .app-shell{border:1px solid var(--line);border-radius:24px;background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
+    .app-shell__top{padding:18px 20px;border-bottom:1px solid var(--line);background:var(--panel2);display:flex;justify-content:space-between;gap:16px;align-items:center}.app-shell__top p{margin:4px 0 0;color:var(--muted);font-size:.87rem}
+    .mode-badge{display:inline-flex;padding:6px 8px;border-radius:8px;font-size:.7rem;font-weight:950;letter-spacing:.11em;background:rgba(64,211,155,.11);color:var(--green);border:1px solid rgba(64,211,155,.24)}
+    .workspace{padding:22px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.tab{border:1px solid var(--line);background:var(--panel2);color:var(--muted);padding:10px 13px;border-radius:11px;font-weight:850}.tab.is-active{color:#fff;background:var(--blue);border-color:var(--blue)}
 
-    .report-footer{
-      display:flex;
-      justify-content:space-between;
-      gap:15px;
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid #e4e7ec;
-      color:#667085;
-      font-size:.75rem;
-    }
+    .bases-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.base-card{border:1px solid var(--line);border-radius:18px;background:var(--panel2);padding:18px;min-width:0}.base-card__header{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.base-card h3{margin:4px 0}.base-label{font-size:.72rem;font-weight:950;letter-spacing:.12em;color:var(--blue)}.base-card__status{padding:5px 8px;border-radius:999px;font-size:.72rem;font-weight:900;background:rgba(64,211,155,.1);color:var(--green)}.base-card p{color:var(--muted);font-size:.87rem;line-height:1.5}
+    .drop-zone{margin-top:12px;border:1px dashed var(--line);border-radius:14px;padding:14px;background:var(--bg2)}.drop-zone__row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.drop-zone small{display:block;color:var(--muted);margin-top:7px}.drop-zone.is-dragging{border-color:var(--blue);background:rgba(106,168,255,.07)}
+    .file-list{margin-top:9px;display:grid;gap:7px}.file-item{display:flex;justify-content:space-between;gap:12px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);font-size:.82rem}.file-item span:last-child{color:var(--muted)}
+    .primary-action{margin-top:18px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.compare-btn{min-width:min(430px,100%);font-size:1rem;padding:15px 22px}
 
-    .access-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:20px;
-      background:var(--panel);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:18px;
-    }
-    .access-card p{margin:5px 0 0;color:var(--muted)}
+    details.advanced{margin-top:16px;border:1px solid var(--line);border-radius:15px;background:var(--panel2);overflow:hidden}details.advanced summary{list-style:none;cursor:pointer;padding:15px 17px;display:flex;justify-content:space-between;gap:12px;align-items:center;font-weight:850}details.advanced summary::-webkit-details-marker{display:none}details.advanced summary small{color:var(--muted);font-weight:600}.advanced__body{padding:17px;border-top:1px solid var(--line)}
+    .advanced-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.field label{display:block;color:var(--muted);font-size:.8rem;font-weight:800;margin-bottom:6px}.field select,.field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text);padding:10px 11px}.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}.check{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:var(--bg2);color:var(--muted);font-size:.82rem}
+    .notice{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--muted);font-size:.86rem;line-height:1.5}
 
-    .full-panel{
-      margin-top:16px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:var(--panel);
-      padding:20px;
-    }
+    .progress{margin-top:16px;border:1px solid var(--line);border-radius:13px;padding:12px;background:var(--panel2)}.progress__top{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.82rem;margin-bottom:8px}.progress__track{height:9px;background:var(--bg2);border-radius:999px;overflow:hidden}.progress__fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .18s ease}
 
-    .notice{
-      padding:12px 14px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:var(--panel-2);
-      color:var(--muted);
-      font-size:.86rem;
-      margin-bottom:14px;
-    }
+    .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:15px}.metric{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel2);min-width:0}.metric small{display:block;color:var(--muted);font-size:.74rem}.metric strong{display:block;font-size:1.4rem;margin-top:4px;overflow-wrap:anywhere}.metric.ok strong{color:var(--green)}.metric.warn strong{color:var(--yellow)}.metric.bad strong{color:var(--red)}
 
-    .footer{
-      margin-top:46px;
-      border-top:1px solid var(--line);
-      padding:27px 0 34px;
-    }
-    .footer__inner{
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      align-items:flex-end;
-    }
-    .footer p{margin:4px 0;color:var(--muted)}
-    .credits{text-align:right}
-    .credits .brz1{color:var(--blue);font-weight:950;letter-spacing:.12em}
+    .filters{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:14px;margin-bottom:14px}.filters__row{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px}.filters input,.filters select{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text);padding:10px}.filters__chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.chip{border:1px solid var(--line);border-radius:999px;background:var(--bg2);color:var(--muted);padding:8px 10px;font-weight:800;font-size:.78rem}.chip.is-active{background:var(--blue);border-color:var(--blue);color:#fff}
 
-    .toast-container{
-      position:fixed;
-      right:18px;
-      bottom:18px;
-      z-index:100;
-      display:grid;
-      gap:8px;
-    }
-    .toast{
-      min-width:260px;
-      max-width:420px;
-      padding:12px 14px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:var(--panel);
-      box-shadow:var(--shadow);
-    }
-    .toast--error{border-color:rgba(255,113,128,.4)}
+    .results-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.results-table{width:100%;min-width:1500px;border-collapse:collapse}.results-table th,.results-table td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.78rem}.results-table th{position:sticky;top:0;background:var(--panel3);color:var(--muted);z-index:2;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}.results-table textarea{min-width:190px;min-height:58px;border:1px solid var(--line);border-radius:8px;background:var(--bg2);color:var(--text);padding:8px}
+    .status{display:inline-flex;padding:4px 7px;border-radius:999px;font-size:.68rem;font-weight:900;white-space:nowrap}.status.ok{background:rgba(64,211,155,.12);color:var(--green)}.status.warn{background:rgba(245,190,87,.12);color:var(--yellow)}.status.bad{background:rgba(255,113,128,.12);color:var(--red)}
+    .resolution{display:flex;align-items:center;gap:7px}.resolution input{width:17px;height:17px}
 
-    .modal{
-      position:fixed;
-      inset:0;
-      z-index:90;
-      display:grid;
-      place-items:center;
-      padding:20px;
-      background:rgba(0,0,0,.62);
-    }
-    .modal__card{
-      width:min(460px,100%);
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:var(--panel);
-      padding:20px;
-      box-shadow:var(--shadow);
-    }
-    .modal__card h2{margin-top:0}
-    .modal__card p{color:var(--muted)}
-    .modal__card input{
-      width:100%;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:var(--bg-2);
-      color:var(--text);
-      padding:11px 12px;
-      margin:7px 0 12px;
-    }
-    .modal__actions{display:flex;justify-content:flex-end;gap:8px}
+    .report-actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.report-sheet{background:var(--report-bg);color:var(--report-text);border:1px solid var(--report-line);border-radius:17px;padding:24px;box-shadow:var(--shadow)}.report-sheet__header{display:flex;justify-content:space-between;gap:18px;padding-bottom:16px;margin-bottom:16px;border-bottom:2px solid var(--report-line)}.report-sheet__header h2{margin:0 0 5px}.report-sheet__header p{margin:3px 0;color:var(--report-muted)}.report-sheet__brand{text-align:right}.report-sheet__brand span{color:var(--blue);font-weight:950;letter-spacing:.1em}.report-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:15px}.report-summary div{padding:11px;border:1px solid var(--report-line);border-radius:9px;background:var(--report-head)}.report-summary small{display:block;color:var(--report-muted)}.report-summary strong{font-size:1.12rem}
+    .report-table-wrap{overflow:auto;border:1px solid var(--report-line);border-radius:10px}.report-table{width:100%;min-width:1350px;border-collapse:collapse}.report-table th,.report-table td{padding:8px 9px;border-bottom:1px solid var(--report-line);text-align:left;vertical-align:top;font-size:.76rem;color:var(--report-text)}.report-table th{background:var(--report-head);color:var(--report-muted);font-size:.67rem;text-transform:uppercase;letter-spacing:.04em}.report-footer{display:flex;justify-content:space-between;gap:15px;margin-top:14px;padding-top:12px;border-top:1px solid var(--report-line);color:var(--report-muted);font-size:.75rem}
 
-    @media(max-width:1050px){
-      .dashboard-grid{grid-template-columns:repeat(3,1fr)}
-      .insights-grid{grid-template-columns:1fr}
-      .advanced-grid,.checks{grid-template-columns:1fr 1fr}
-    }
+    .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.chart-card{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:16px;min-height:340px}.chart-card h3{margin:0 0 12px}.chart-card canvas{max-height:280px}.chart-builder{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.chart-builder select,.chart-builder button{width:100%}
+    .insights{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.insight{border:1px solid var(--line);border-radius:13px;background:var(--panel2);padding:14px}.insight small{color:var(--muted)}.insight strong{display:block;margin-top:4px;line-height:1.4}
 
-    @media(max-width:820px){
-      .hero__grid,.bases-grid{grid-template-columns:1fr}
-      .nav{display:none}
-      .report-summary{grid-template-columns:1fr 1fr}
-      .access-card{align-items:flex-start;flex-direction:column}
-    }
+    .access-card{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:20px;display:flex;justify-content:space-between;gap:18px;align-items:center}.access-card p{margin:5px 0 0;color:var(--muted)}
+    .footer{margin-top:48px;border-top:1px solid var(--line);padding:28px 0 34px}.footer__inner{display:flex;justify-content:space-between;gap:18px;align-items:flex-end}.footer p{margin:4px 0;color:var(--muted)}.credits{text-align:right}.credits .brz1{color:var(--blue);font-weight:950;letter-spacing:.12em}
 
-    @media(max-width:600px){
-      .container{width:min(100% - 20px,1220px)}
-      .header__inner{min-height:66px}
-      .brand small,.theme-button span:last-child{display:none}
-      .hero{padding-top:48px}
-      .dashboard-grid{grid-template-columns:1fr 1fr}
-      .advanced-grid,.checks{grid-template-columns:1fr}
-      .report-sheet{padding:15px}
-      .report-sheet__header,.footer__inner,.report-footer{flex-direction:column;align-items:flex-start}
-      .report-sheet__brand,.credits{text-align:left}
-    }
+    .modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.62)}.modal__card{width:min(460px,100%);border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:20px;box-shadow:var(--shadow)}.modal__card h2{margin-top:0}.modal__card p{color:var(--muted)}.modal__card input{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text);padding:11px 12px;margin:7px 0 12px}.modal__actions{display:flex;justify-content:flex-end;gap:8px}
+    .toast-container{position:fixed;right:18px;bottom:18px;z-index:120;display:grid;gap:8px}.toast{min-width:250px;max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:var(--shadow)}.toast.error{border-color:rgba(255,113,128,.45)}
 
-    @media print{
-      body *{visibility:hidden!important}
-      #reportSheet,#reportSheet *{visibility:visible!important}
-      #reportSheet{
-        position:absolute;
-        left:0;top:0;
-        width:100%;
-        border:0;
-        border-radius:0;
-        box-shadow:none;
-      }
-    }
+    @media(max-width:1050px){.metrics{grid-template-columns:repeat(3,1fr)}.filters__row{grid-template-columns:1fr 1fr}.dashboard-grid{grid-template-columns:1fr}.chart-builder{grid-template-columns:1fr 1fr}.insights{grid-template-columns:1fr 1fr}.commercial-grid{grid-template-columns:1fr}}
+    @media(max-width:820px){.hero__grid,.bases-grid{grid-template-columns:1fr}.nav{display:none}.report-summary{grid-template-columns:1fr 1fr}.advanced-grid,.checks{grid-template-columns:1fr 1fr}.access-card{flex-direction:column;align-items:flex-start}}
+    @media(max-width:600px){.container{width:min(100% - 20px,1240px)}.brand small,.theme-btn span:last-child{display:none}.hero{padding-top:48px}.metrics{grid-template-columns:1fr 1fr}.filters__row,.chart-builder,.advanced-grid,.checks,.insights{grid-template-columns:1fr}.report-sheet{padding:15px}.report-sheet__header,.report-footer,.footer__inner{flex-direction:column;align-items:flex-start}.report-sheet__brand,.credits{text-align:left}}
+    @media print{body *{visibility:hidden!important}#reportSheet,#reportSheet *{visibility:visible!important}#reportSheet{position:absolute;inset:0;width:100%;border:0;border-radius:0;box-shadow:none}}
   </style>
 </head>
-
 <body>
-  <header class="header">
-    <div class="container header__inner">
-      <a class="brand" href="#inicio">
-        <span class="brand__mark">LR</span>
-        <span>
-          <strong>Loop Reconciler</strong>
-          <small>Conciliação automática de operações</small>
-        </span>
-      </a>
+<header class="header">
+  <div class="container header__inner">
+    <a class="brand" href="#inicio"><span class="brand__mark">LR</span><span><strong>Loop Reconciler</strong><small>Conciliação inteligente de dados empresariais</small></span></a>
+    <nav class="nav"><a href="#inicio">Início</a><a href="#demo">Demonstração</a><a href="#personalizacao">Personalização</a><a href="#restrita">Área Restrita</a></nav>
+    <div class="header__actions"><button class="theme-btn" id="themeBtn"><span id="themeIcon">☾</span><span id="themeText">Escuro</span></button></div>
+  </div>
+</header>
 
-      <nav class="nav">
-        <a href="#inicio">Início</a>
-        <a href="#demonstracao">Demonstração</a>
-        <a href="#acesso">Área completa</a>
-      </nav>
-
-      <div class="header__actions">
-        <button class="theme-button" id="themeButton" type="button">
-          <span id="themeIcon">☾</span>
-          <span id="themeText">Escuro</span>
-        </button>
+<main>
+<section class="hero" id="inicio">
+  <div class="container hero__grid">
+    <div>
+      <span class="eyebrow">LOOP SUITE · BRZ1</span>
+      <h1>Conciliação inteligente.<br><span>Relatórios que ajudam a decidir.</span></h1>
+      <p class="lead">
+        Compare pedidos, faturamento, pagamentos, entregas ou qualquer outra operação.
+        O sistema identifica automaticamente a estrutura dos arquivos, encontra divergências e transforma o resultado
+        em relatório operacional e análise gerencial.
+      </p>
+      <div class="hero__actions">
+        <button class="button button--primary" id="goDemoBtn">Executar demonstração</button>
+        <button class="button button--secondary" id="goRestrictedBtn">Área Restrita</button>
+      </div>
+      <div class="hero__note">
+        Pode rodar <strong>100% offline</strong>, sem enviar arquivos para a internet, ou ser implantado online com autenticação,
+        permissões e regras de privacidade definidas pela empresa.
       </div>
     </div>
-  </header>
-
-  <main>
-    <section class="hero" id="inicio">
-      <div class="container hero__grid">
-        <div>
-          <span class="eyebrow">LOOP SUITE · BRZ1</span>
-          <h1>Compare operações.<br><span>Descubra o que não bate.</span></h1>
-          <p class="lead">
-            O Loop Reconciler cruza automaticamente pedidos, faturamento, pagamentos e entregas.
-            O usuário não precisa escolher colunas nem montar regras básicas: o sistema tenta reconhecer
-            a estrutura sozinho e entrega um relatório completo.
-          </p>
-          <div class="hero__actions">
-            <button class="button button--primary" id="heroDemoButton">Executar demonstração</button>
-            <button class="button button--secondary" id="heroFullButton">Área completa</button>
-          </div>
-          <div class="hero__note">
-            🔒 Demonstração com dados fictícios. Arquivos próprios ficam disponíveis somente na área completa.
-          </div>
-        </div>
-
-        <div class="hero-card">
-          <div class="hero-card__top">
-            <strong>Conciliação de hoje</strong>
-            <span>● análise automática</span>
-          </div>
-          <div class="mini-grid">
-            <div class="mini-card"><small>Pedidos</small><strong>12</strong></div>
-            <div class="mini-card"><small>Faturados</small><strong>9</strong></div>
-            <div class="mini-card"><small>Receita</small><strong>R$ 8,9 mil</strong></div>
-            <div class="mini-card"><small>Inconsistências</small><strong>5</strong></div>
-          </div>
-          <div class="mini-row"><span>PED-5001 · PIX</span><span style="color:var(--green);font-weight:900">OK</span></div>
-          <div class="mini-row"><span>PED-5003 · Cartão</span><span style="color:var(--yellow);font-weight:900">Status divergente</span></div>
-          <div class="mini-row"><span>PED-5005 · PIX</span><span style="color:var(--red);font-weight:900">Não faturado</span></div>
-        </div>
+    <div class="hero-card">
+      <div class="mini-grid">
+        <div class="mini-card"><small>Pedidos simulados</small><strong>1.000</strong></div>
+        <div class="mini-card"><small>Faturamento</small><strong>≈ 930</strong></div>
+        <div class="mini-card"><small>Formas de pagamento</small><strong>4</strong></div>
+        <div class="mini-card"><small>Análise</small><strong>Automática</strong></div>
       </div>
-    </section>
+      <div class="mini-row"><span>PIX</span><span style="color:var(--green);font-weight:900">maior participação</span></div>
+      <div class="mini-row"><span>Pedidos cancelados</span><span style="color:var(--yellow);font-weight:900">auditáveis</span></div>
+      <div class="mini-row"><span>Falhas de processamento</span><span style="color:var(--red);font-weight:900">identificadas</span></div>
+    </div>
+  </div>
+</section>
 
-    <section class="section" id="demonstracao">
-      <div class="container">
-        <div class="section__heading">
-          <span class="eyebrow">DEMONSTRAÇÃO PÚBLICA</span>
-          <h2>Loja de departamento: Pedidos × Financeiro / Entrega</h2>
-          <p>
-            As duas bases já estão prontas. Clique em <strong>Comparar agora</strong> e veja o sistema identificar
-            automaticamente pedidos corretos, não faturados, pagamentos pendentes, cancelamentos, divergências
-            de entrega e registros que existem em apenas um dos sistemas.
-          </p>
-        </div>
+<section class="section" id="personalizacao">
+  <div class="container">
+    <div class="section__heading"><span class="eyebrow">PERSONALIZÁVEL</span><h2>O sistema pode ser redesenhado para cada cliente</h2><p>Nome, identidade visual, regras, relatórios, permissões, filtros e formatos de exportação podem ser adaptados à operação de cada empresa.</p></div>
+    <div class="commercial-grid">
+      <article class="commercial-card"><span class="eyebrow">OFFLINE</span><h3>Privacidade máxima</h3><p>O processamento pode acontecer inteiramente no computador do cliente, sem necessidade de conexão com a internet.</p></article>
+      <article class="commercial-card"><span class="eyebrow">ONLINE</span><h3>Acesso controlado</h3><p>Pode ser hospedado com autenticação, perfis, permissões e políticas de acesso definidas pela direção da empresa.</p></article>
+      <article class="commercial-card"><span class="eyebrow">CUSTOM</span><h3>Feito para a operação</h3><p>Fluxos, nomes das áreas, regras de conciliação e dashboards podem ser adaptados ao processo real do cliente.</p></article>
+    </div>
+  </div>
+</section>
 
-        <div class="demo-shell">
-          <div class="demo-shell__header">
-            <div>
-              <span class="mode-badge">DEMONSTRAÇÃO</span>
-              <p>Dados fictícios carregados automaticamente.</p>
-            </div>
-            <strong>Loja BRZ1 Department</strong>
-          </div>
+<section class="section" id="demo">
+  <div class="container">
+    <div class="section__heading">
+      <span class="eyebrow">DEMONSTRAÇÃO PÚBLICA</span>
+      <h2>Loja fictícia: Pedidos × Faturamento / Entrega</h2>
+      <p>A demonstração trabalha com 1.000 pedidos sintéticos para mostrar como o sistema se comporta em uma base maior. As duas planilhas já vêm carregadas, mas o fluxo de upload permanece visível para o cliente entender como seria no uso real.</p>
+    </div>
 
-          <div class="workspace">
-            <div class="bases-grid">
-              <article class="base-card">
-                <div class="base-card__header">
-                  <div>
-                    <span class="base-label">SISTEMA DE PEDIDOS</span>
-                    <h3>Pedidos da loja</h3>
-                  </div>
-                  <span class="base-card__status" id="demoAStatus">Carregada</span>
-                </div>
-                <p>
-                  Base comercial com pedido, cliente, produto, valor, pagamento e situação esperada da entrega.
-                </p>
-                <div class="drop-zone is-demo">
-                  <div class="drop-zone__row">
-                    <strong>sistema_pedidos_loja.xlsx</strong>
-                    <span>12 registros</span>
-                  </div>
-                  <small>Arquivo fictício para demonstração.</small>
-                </div>
-                <div class="file-list" id="demoAList"></div>
-              </article>
-
-              <article class="base-card">
-                <div class="base-card__header">
-                  <div>
-                    <span class="base-label">FINANCEIRO / ENTREGA</span>
-                    <h3>Faturamento e logística</h3>
-                  </div>
-                  <span class="base-card__status" id="demoBStatus">Carregada</span>
-                </div>
-                <p>
-                  Base externa com valor faturado, pagamento efetivo, nota fiscal, transportadora e entrega.
-                </p>
-                <div class="drop-zone is-demo">
-                  <div class="drop-zone__row">
-                    <strong>faturamento_entregas.xlsx</strong>
-                    <span>10 registros</span>
-                  </div>
-                  <small>Arquivo fictício para demonstração.</small>
-                </div>
-                <div class="file-list" id="demoBList"></div>
-              </article>
-            </div>
-
-            <div class="primary-action">
-              <button class="button button--primary compare-button" id="demoCompareButton">
-                Comparar agora — automático
-              </button>
-            </div>
-
-            <details class="advanced" id="demoAdvanced">
-              <summary>
-                <span>Configurações avançadas</span>
-                <small>Opcional — já vem pré-configurado</small>
-              </summary>
-
-              <div class="advanced__body">
-                <div class="notice">
-                  O Loop Reconciler detecta automaticamente a chave e as colunas equivalentes.
-                  Só altere esta área quando o arquivo tiver uma estrutura fora do padrão.
-                </div>
-
-                <div class="advanced-grid">
-                  <div class="field">
-                    <label>Chave detectada — Pedidos</label>
-                    <select id="demoKeyA"></select>
-                  </div>
-                  <div class="field">
-                    <label>Chave detectada — Financeiro</label>
-                    <select id="demoKeyB"></select>
-                  </div>
-                  <div class="field">
-                    <label>Estratégia de comparação</label>
-                    <select id="demoStrategy">
-                      <option value="automatic">Automática</option>
-                      <option value="strict">Estrita</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="checks">
-                  <label class="check"><input type="checkbox" id="demoTrim" checked> Ignorar espaços extras</label>
-                  <label class="check"><input type="checkbox" id="demoCase" checked> Ignorar maiúsculas/minúsculas</label>
-                  <label class="check"><input type="checkbox" id="demoAccents" checked> Ignorar acentos</label>
-                  <label class="check"><input type="checkbox" id="demoMoney" checked> Normalizar valores monetários</label>
-                  <label class="check"><input type="checkbox" id="demoDates" checked> Normalizar datas</label>
-                  <label class="check"><input type="checkbox" id="demoDuplicates" checked> Detectar duplicidades</label>
-                </div>
-              </div>
-            </details>
-
-            <div class="analysis-progress" id="demoProgress" hidden>
-              <div class="progress-top">
-                <span id="demoProgressText">Preparando...</span>
-                <strong id="demoProgressPercent">0%</strong>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" id="demoProgressFill"></div>
-              </div>
-            </div>
-
-            <section class="results" id="demoResults" hidden>
-              <div class="dashboard-grid">
-                <div class="metric"><small>Pedidos da loja</small><strong id="mOrders">0</strong></div>
-                <div class="metric metric--ok"><small>Conciliação OK</small><strong id="mOk">0</strong></div>
-                <div class="metric metric--warn"><small>Divergências</small><strong id="mDiff">0</strong></div>
-                <div class="metric metric--bad"><small>Não processados</small><strong id="mMissing">0</strong></div>
-                <div class="metric"><small>Receita confirmada</small><strong id="mRevenue">R$ 0</strong></div>
-                <div class="metric"><small>Ticket médio</small><strong id="mTicket">R$ 0</strong></div>
-              </div>
-
-              <div class="insights-grid">
-                <article class="insight-card">
-                  <h3>Formas de pagamento</h3>
-                  <div id="paymentBars"></div>
-                </article>
-                <article class="insight-card">
-                  <h3>Produtos mais vendidos</h3>
-                  <div id="productBars"></div>
-                </article>
-                <article class="insight-card">
-                  <h3>Situação operacional</h3>
-                  <div id="statusBars"></div>
-                </article>
-              </div>
-
-              <div class="report-actions">
-                <button class="button button--primary" id="demoExcelButton">Baixar Excel</button>
-                <button class="button button--secondary" id="demoPdfButton">Baixar PDF</button>
-                <button class="button button--secondary" id="demoPrintButton">Imprimir / Salvar PDF</button>
-              </div>
-
-              <article class="report-sheet" id="reportSheet">
-                <div class="report-sheet__header">
-                  <div>
-                    <h2>Relatório de Conciliação Operacional</h2>
-                    <p>Loja BRZ1 Department · Sistema de Pedidos × Financeiro / Entrega</p>
-                    <p id="reportGeneratedAt">—</p>
-                  </div>
-                  <div class="report-sheet__brand">
-                    <strong>Loop Reconciler</strong>
-                    <span>by BRZ1</span>
-                  </div>
-                </div>
-
-                <div class="report-summary">
-                  <div><small>Pedidos</small><strong id="rOrders">0</strong></div>
-                  <div><small>Corretos</small><strong id="rOk">0</strong></div>
-                  <div><small>Problemas</small><strong id="rProblems">0</strong></div>
-                  <div><small>Receita OK</small><strong id="rRevenue">R$ 0</strong></div>
-                  <div><small>Taxa de conciliação</small><strong id="rRate">0%</strong></div>
-                </div>
-
-                <div class="table-wrap">
-                  <table class="report-table">
-                    <thead>
-                      <tr>
-                        <th>Status</th>
-                        <th>Pedido</th>
-                        <th>Cliente</th>
-                        <th>Produto</th>
-                        <th>Pagamento</th>
-                        <th>Valor pedido</th>
-                        <th>Valor faturado</th>
-                        <th>Situação pedido</th>
-                        <th>Situação financeiro</th>
-                        <th>Entrega</th>
-                        <th>Conclusão</th>
-                      </tr>
-                    </thead>
-                    <tbody id="reportBody"></tbody>
-                  </table>
-                </div>
-
-                <div class="report-footer">
-                  <span>Desenvolvido por beto-dev94</span>
-                  <strong>Loop Reconciler · by BRZ1 · © 2026</strong>
-                </div>
-              </article>
-            </section>
-          </div>
-        </div>
+    <div class="app-shell">
+      <div class="app-shell__top">
+        <div><span class="mode-badge">DEMONSTRAÇÃO</span><p>Dados sintéticos. Tudo nesta área pode ser adaptado para o cliente.</p></div>
+        <strong>Loja Horizonte Department</strong>
       </div>
-    </section>
 
-    <section class="section" id="acesso">
-      <div class="container">
-        <div class="section__heading">
-          <span class="eyebrow">ÁREA COMPLETA</span>
-          <h2>Uso com arquivos próprios</h2>
-          <p>
-            A demonstração pública continua simples. O uso real fica separado para não entregar gratuitamente
-            o processamento completo dos arquivos do cliente.
-          </p>
+      <div class="workspace">
+        <div class="tabs">
+          <button class="tab is-active" data-tab="conciliacao">Conciliação</button>
+          <button class="tab" data-tab="dashboard">Dashboard / Análises</button>
+          <button class="tab" data-tab="relatorio">Relatório</button>
         </div>
 
-        <div class="access-card" id="accessCard">
-          <div>
-            <strong>Acesso restrito</strong>
-            <p>Abra a área completa para enviar suas próprias planilhas.</p>
-          </div>
-          <button class="button button--primary" id="openAccessButton">Entrar na área completa</button>
-        </div>
-
-        <div class="full-panel" id="fullPanel" hidden>
-          <div class="notice">
-            <strong>Importante:</strong> este bloqueio é uma trava de interface para demonstração.
-            Em um site público, senha colocada apenas no HTML/JavaScript não é segurança real.
-            Para produção, o acesso deve ser validado no servidor.
-          </div>
-
+        <section id="tabConciliacao">
           <div class="bases-grid">
             <article class="base-card">
-              <div class="base-card__header">
-                <div><span class="base-label">BASE 1</span><h3>Primeiro sistema</h3></div>
-                <span class="base-card__status" id="realAStatus">Vazia</span>
+              <div class="base-card__header"><div><span class="base-label">SISTEMA DE PEDIDOS</span><h3>Pedidos da loja</h3></div><span class="base-card__status">1.000 registros</span></div>
+              <p>Pedido, cliente, produto, categoria, quantidade, valor, pagamento e situação esperada.</p>
+              <div class="drop-zone">
+                <div class="drop-zone__row"><strong>sistema_pedidos_loja.xlsx</strong><span>pré-carregado</span></div>
+                <small>No uso real, o cliente pode selecionar ou arrastar seus próprios arquivos.</small>
               </div>
-              <p>Pedidos, vendas, estoque, financeiro ou qualquer outra base principal.</p>
-              <div class="drop-zone" id="realDropA">
-                <div class="drop-zone__row">
-                  <strong>Arraste ou selecione arquivos</strong>
-                  <label class="button button--primary button--small" for="realInputA">Selecionar</label>
-                </div>
-                <small>CSV · TSV · TXT · XLS · XLSX · ODS</small>
-                <input type="file" id="realInputA" multiple accept=".csv,.tsv,.txt,.xls,.xlsx,.ods" hidden>
-              </div>
-              <div class="file-list" id="realListA"></div>
+              <div class="file-list"><div class="file-item"><span>Base fictícia de pedidos</span><span>1.000 linhas</span></div></div>
             </article>
 
             <article class="base-card">
-              <div class="base-card__header">
-                <div><span class="base-label">BASE 2</span><h3>Segundo sistema</h3></div>
-                <span class="base-card__status" id="realBStatus">Vazia</span>
+              <div class="base-card__header"><div><span class="base-label">FINANCEIRO / ENTREGA</span><h3>Faturamento e logística</h3></div><span class="base-card__status" id="financeCountBadge">—</span></div>
+              <p>Valor faturado, forma de pagamento efetiva, nota fiscal, status financeiro, transportadora e entrega.</p>
+              <div class="drop-zone">
+                <div class="drop-zone__row"><strong>faturamento_entregas.xlsx</strong><span>pré-carregado</span></div>
+                <small>A segunda base simula outro sistema que precisa bater com os pedidos.</small>
               </div>
-              <p>Faturamento, entrega, ERP, banco, fornecedor ou outra fonte de conferência.</p>
-              <div class="drop-zone" id="realDropB">
-                <div class="drop-zone__row">
-                  <strong>Arraste ou selecione arquivos</strong>
-                  <label class="button button--primary button--small" for="realInputB">Selecionar</label>
-                </div>
-                <small>CSV · TSV · TXT · XLS · XLSX · ODS</small>
-                <input type="file" id="realInputB" multiple accept=".csv,.tsv,.txt,.xls,.xlsx,.ods" hidden>
-              </div>
-              <div class="file-list" id="realListB"></div>
+              <div class="file-list"><div class="file-item"><span>Base fictícia financeira/logística</span><span id="financeCountText">—</span></div></div>
             </article>
           </div>
 
           <div class="primary-action">
-            <button class="button button--primary compare-button" id="realCompareButton" disabled>
-              Comparar meus arquivos — automático
-            </button>
+            <button class="button button--primary compare-btn" id="compareDemoBtn">Comparar automaticamente agora</button>
           </div>
 
           <details class="advanced">
-            <summary>
-              <span>Configurações avançadas</span>
-              <small>Use somente se a detecção automática precisar de ajuste</small>
-            </summary>
+            <summary><span>Configurações avançadas</span><small>Opcional — o sistema já vem pré-configurado</small></summary>
             <div class="advanced__body">
+              <div class="notice">O comportamento padrão já ignora espaços extras, diferenças de caixa e acentuação, normaliza valores e detecta a chave automaticamente. Esta área existe apenas para exceções.</div>
               <div class="advanced-grid">
-                <div class="field"><label>Chave Base 1</label><select id="realKeyA"></select></div>
-                <div class="field"><label>Chave Base 2</label><select id="realKeyB"></select></div>
-                <div class="field"><label>Modo</label><select id="realStrategy"><option value="automatic">Automático</option><option value="strict">Estrito</option></select></div>
+                <div class="field"><label>Chave detectada — Pedidos</label><select id="demoKeyA"><option>Pedido</option></select></div>
+                <div class="field"><label>Chave detectada — Financeiro</label><select id="demoKeyB"><option>Pedido</option></select></div>
+                <div class="field"><label>Estratégia</label><select id="demoStrategy"><option value="auto">Automática</option><option value="strict">Estrita</option></select></div>
               </div>
               <div class="checks">
-                <label class="check"><input type="checkbox" id="realTrim" checked> Ignorar espaços</label>
-                <label class="check"><input type="checkbox" id="realCase" checked> Ignorar caixa</label>
-                <label class="check"><input type="checkbox" id="realAccents" checked> Ignorar acentos</label>
-                <label class="check"><input type="checkbox" id="realMoney" checked> Normalizar dinheiro</label>
-                <label class="check"><input type="checkbox" id="realDates" checked> Normalizar datas</label>
-                <label class="check"><input type="checkbox" id="realDuplicates" checked> Detectar duplicados</label>
+                <label class="check"><input type="checkbox" id="cfgTrim" checked> Ignorar espaços</label>
+                <label class="check"><input type="checkbox" id="cfgCase" checked> Ignorar caixa</label>
+                <label class="check"><input type="checkbox" id="cfgAccents" checked> Ignorar acentos</label>
+                <label class="check"><input type="checkbox" id="cfgMoney" checked> Normalizar dinheiro</label>
+                <label class="check"><input type="checkbox" id="cfgDates" checked> Normalizar datas</label>
+                <label class="check"><input type="checkbox" id="cfgDuplicates" checked> Detectar duplicidades</label>
               </div>
             </div>
           </details>
 
-          <div class="analysis-progress" id="realProgress" hidden>
-            <div class="progress-top"><span id="realProgressText">Preparando...</span><strong id="realProgressPercent">0%</strong></div>
-            <div class="progress-track"><div class="progress-fill" id="realProgressFill"></div></div>
+          <div class="progress" id="demoProgress" hidden>
+            <div class="progress__top"><span id="progressText">Preparando...</span><strong id="progressPercent">0%</strong></div>
+            <div class="progress__track"><div class="progress__fill" id="progressFill"></div></div>
           </div>
 
-          <section class="results" id="realResults" hidden>
-            <div class="report-actions">
-              <button class="button button--primary" id="realExcelButton">Baixar Excel</button>
-              <button class="button button--secondary" id="realPdfButton">Baixar PDF</button>
+          <section id="resultsArea" hidden style="margin-top:18px">
+            <div class="metrics">
+              <div class="metric"><small>Pedidos</small><strong id="metricOrders">0</strong></div>
+              <div class="metric ok"><small>Conciliação OK</small><strong id="metricOk">0</strong></div>
+              <div class="metric warn"><small>Divergências</small><strong id="metricDiff">0</strong></div>
+              <div class="metric bad"><small>Não processados</small><strong id="metricMissing">0</strong></div>
+              <div class="metric"><small>Receita confirmada</small><strong id="metricRevenue">R$ 0</strong></div>
+              <div class="metric"><small>Resolvidos</small><strong id="metricResolved">0</strong></div>
             </div>
-            <article class="report-sheet">
-              <div class="report-sheet__header">
-                <div><h2>Relatório de Conciliação</h2><p>Comparação automática dos arquivos enviados</p><p id="realGeneratedAt">—</p></div>
-                <div class="report-sheet__brand"><strong>Loop Reconciler</strong><span>by BRZ1</span></div>
+
+            <div class="filters">
+              <div class="filters__row">
+                <input id="searchInput" placeholder="Buscar pedido, cliente, produto...">
+                <select id="paymentFilter"><option value="">Pagamento: todos</option><option>PIX</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Dinheiro</option></select>
+                <select id="deliveryFilter"><option value="">Entrega: todas</option><option>Entregue</option><option>Em transporte</option><option>Não entregue</option><option>Cancelada</option><option>Não liberada</option></select>
+                <select id="resolutionFilter"><option value="">Resolução: todas</option><option value="resolved">Resolvidos</option><option value="pending">Pendentes</option></select>
+                <select id="categoryFilter"><option value="">Categoria: todas</option></select>
               </div>
-              <div class="table-wrap">
-                <table class="report-table">
-                  <thead><tr><th>Status</th><th>Chave</th><th>Base 1</th><th>Base 2</th><th>Conclusão</th></tr></thead>
-                  <tbody id="realReportBody"></tbody>
-                </table>
+              <div class="filters__chips">
+                <button class="chip is-active" data-status="">Todos</button>
+                <button class="chip" data-status="match">OK</button>
+                <button class="chip" data-status="difference">Divergências</button>
+                <button class="chip" data-status="missingB">Não processados</button>
+                <button class="chip" data-status="missingA">Sem pedido</button>
+                <button class="chip" data-status="cancelled">Cancelados</button>
+                <button class="chip" data-status="paymentIssue">Problema de pagamento</button>
               </div>
-              <div class="report-footer"><span>Desenvolvido por beto-dev94</span><strong>by BRZ1</strong></div>
-            </article>
+            </div>
+
+            <div class="results-table-wrap">
+              <table class="results-table">
+                <thead><tr>
+                  <th>Status</th><th>Pedido</th><th>Cliente</th><th>Produto</th><th>Categoria</th><th>Pagamento</th><th>Valor pedido</th><th>Valor faturado</th><th>Financeiro</th><th>Entrega</th><th>Conclusão</th><th>Resolvido</th><th>Observação</th>
+                </tr></thead>
+                <tbody id="resultsBody"></tbody>
+              </table>
+            </div>
           </section>
-        </div>
-      </div>
-    </section>
-  </main>
+        </section>
 
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div><strong>Loop Reconciler</strong><p>Conciliação automática de dados.</p></div>
-      <div class="credits">
-        <strong>Desenvolvido por beto-dev94</strong>
-        <div class="brz1">by BRZ1</div>
-        <p>Loop Suite · © 2026</p>
-      </div>
-    </div>
-  </footer>
+        <section id="tabDashboard" hidden>
+          <div class="notice">Os gráficos usam os dados já conciliados. Assim, o cliente pode analisar vendas, meios de pagamento, produtos, cancelamentos, entregas e inconsistências sem sair da ferramenta.</div>
 
-  <div class="modal" id="accessModal" hidden>
-    <div class="modal__card">
-      <h2>Área completa</h2>
-      <p>Digite o código de acesso definido para esta versão de demonstração.</p>
-      <input type="password" id="accessCodeInput" placeholder="Código de acesso">
-      <div class="modal__actions">
-        <button class="button button--ghost" id="cancelAccessButton">Cancelar</button>
-        <button class="button button--primary" id="confirmAccessButton">Entrar</button>
+          <div class="chart-builder">
+            <select id="chartDimension">
+              <option value="payment">Forma de pagamento</option>
+              <option value="product">Produto</option>
+              <option value="category">Categoria</option>
+              <option value="status">Status da conciliação</option>
+              <option value="delivery">Status da entrega</option>
+            </select>
+            <select id="chartMetric">
+              <option value="count">Quantidade</option>
+              <option value="revenue">Valor / Receita</option>
+            </select>
+            <select id="chartType">
+              <option value="bar">Barras</option>
+              <option value="pie">Pizza</option>
+              <option value="doughnut">Rosca</option>
+              <option value="line">Linha</option>
+            </select>
+            <button class="button button--primary" id="buildChartBtn">Gerar gráfico</button>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="chart-card"><h3>Gráfico personalizado</h3><canvas id="customChart"></canvas></article>
+            <article class="chart-card"><h3>Visão geral</h3><canvas id="overviewChart"></canvas></article>
+          </div>
+
+          <div class="insights">
+            <div class="insight"><small>Forma de pagamento líder</small><strong id="insightPayment">—</strong></div>
+            <div class="insight"><small>Produto mais vendido</small><strong id="insightProduct">—</strong></div>
+            <div class="insight"><small>Maior causa de problema</small><strong id="insightProblem">—</strong></div>
+            <div class="insight"><small>Receita em pedidos conciliados</small><strong id="insightRevenue">—</strong></div>
+          </div>
+        </section>
+
+        <section id="tabRelatorio" hidden>
+          <div class="report-actions">
+            <button class="button button--primary" id="exportExcelBtn">Excel</button>
+            <button class="button button--secondary" id="exportCsvBtn">CSV</button>
+            <button class="button button--secondary" id="exportJsonBtn">JSON</button>
+            <button class="button button--secondary" id="exportPdfBtn">PDF</button>
+            <button class="button button--ghost" id="printBtn">Imprimir / Salvar PDF</button>
+          </div>
+
+          <article class="report-sheet" id="reportSheet">
+            <div class="report-sheet__header">
+              <div><h2>Relatório Consolidado de Conciliação</h2><p>Loja Horizonte Department · Pedidos × Financeiro / Entrega</p><p id="reportDate">—</p></div>
+              <div class="report-sheet__brand"><strong>Loop Reconciler</strong><span>by BRZ1</span></div>
+            </div>
+            <div class="report-summary">
+              <div><small>Pedidos</small><strong id="reportOrders">0</strong></div>
+              <div><small>Corretos</small><strong id="reportOk">0</strong></div>
+              <div><small>Problemas</small><strong id="reportProblems">0</strong></div>
+              <div><small>Resolvidos</small><strong id="reportResolved">0</strong></div>
+              <div><small>Receita OK</small><strong id="reportRevenue">R$ 0</strong></div>
+            </div>
+            <div class="report-table-wrap">
+              <table class="report-table">
+                <thead><tr><th>Status</th><th>Pedido</th><th>Cliente</th><th>Produto</th><th>Pagamento</th><th>Valor pedido</th><th>Valor faturado</th><th>Financeiro</th><th>Entrega</th><th>Conclusão</th><th>Resolvido</th><th>Observação</th></tr></thead>
+                <tbody id="reportBody"></tbody>
+              </table>
+            </div>
+            <div class="report-footer"><span>Desenvolvido por beto-dev94</span><strong>Loop Reconciler · by BRZ1 · © 2026</strong></div>
+          </article>
+        </section>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="toast-container" id="toastContainer"></div>
+<section class="section" id="restrita">
+  <div class="container">
+    <div class="section__heading"><span class="eyebrow">ÁREA RESTRITA</span><h2>Ambiente completo para arquivos reais</h2><p>O acesso de produção deve ser validado no servidor. A interface abaixo representa como o ambiente restrito pode ser apresentado ao cliente.</p></div>
+    <div class="access-card">
+      <div><strong>Acesso controlado</strong><p>Use autenticação do servidor, perfis de usuário e permissões para liberar o processamento de arquivos reais.</p></div>
+      <button class="button button--primary" id="openRestrictedBtn">Entrar na Área Restrita</button>
+    </div>
+  </div>
+</section>
+</main>
 
-  <script>
-  (() => {
-    "use strict";
+<footer class="footer">
+  <div class="container footer__inner">
+    <div><strong>Loop Reconciler</strong><p>Conciliação e análise de dados empresariais.</p></div>
+    <div class="credits"><strong>Desenvolvido por beto-dev94</strong><div class="brz1">by BRZ1</div><p>Loop Suite · © 2026</p></div>
+  </div>
+</footer>
 
-    const $ = id => document.getElementById(id);
-    const $$ = selector => Array.from(document.querySelectorAll(selector));
+<div class="modal" id="restrictedModal" hidden>
+  <div class="modal__card">
+    <h2>Área Restrita</h2>
+    <p>Nesta versão local, o código abaixo serve apenas como demonstração visual. Em produção, a validação deve ocorrer no servidor.</p>
+    <input type="password" id="restrictedCode" placeholder="Código de acesso">
+    <div class="modal__actions"><button class="button button--ghost" id="closeRestrictedBtn">Cancelar</button><button class="button button--primary" id="confirmRestrictedBtn">Entrar</button></div>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
 
-    const ACCESS_CODE = "BRZ1-2026"; // TROQUE AQUI. Em produção, valide no servidor.
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const ACCESS_CODE = "BRZ1-2026";
 
-    const money = value => new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(value || 0));
-    const number = value => new Intl.NumberFormat("pt-BR").format(Number(value || 0));
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const money = v => new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v||0));
+  const num = v => new Intl.NumberFormat("pt-BR").format(Number(v||0));
+  const escapeHtml = v => String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  const sleep = ms => new Promise(r => setTimeout(r,ms));
 
-    const escapeHtml = value => String(value ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  function toast(msg,type="ok"){const el=document.createElement("div");el.className="toast"+(type==="error"?" error":"");el.textContent=msg;$("toastContainer").appendChild(el);setTimeout(()=>el.remove(),3200)}
 
-    function toast(message, type="ok"){
-      const el = document.createElement("div");
-      el.className = "toast" + (type === "error" ? " toast--error" : "");
-      el.textContent = message;
-      $("toastContainer").appendChild(el);
-      setTimeout(() => el.remove(), 3200);
-    }
+  function applyTheme(theme,persist=true){const t=theme==="light"?"light":"dark";document.documentElement.dataset.theme=t;$("themeIcon").textContent=t==="light"?"☀":"☾";$("themeText").textContent=t==="light"?"Claro":"Escuro";$("themeColorMeta").content=t==="light"?"#f4f7fb":"#07101d";if(persist)localStorage.setItem("loop-theme",t)}
+  applyTheme(localStorage.getItem("loop-theme")==="light"?"light":"dark",false);
+  $("themeBtn").onclick=()=>applyTheme(document.documentElement.dataset.theme==="light"?"dark":"light");
 
-    // ======================================================
-    // TEMA
-    // ======================================================
-    function applyTheme(theme, persist=true){
-      const safe = theme === "light" ? "light" : "dark";
-      document.documentElement.dataset.theme = safe;
-      $("themeIcon").textContent = safe === "light" ? "☀" : "☾";
-      $("themeText").textContent = safe === "light" ? "Claro" : "Escuro";
-      $("themeColorMeta").content = safe === "light" ? "#f4f7fb" : "#07101d";
-      if(persist) localStorage.setItem("loop-theme", safe);
-    }
+  // -------------------------
+  // GERAÇÃO DE 1.000 PEDIDOS
+  // -------------------------
+  const products=[
+    ["Smart TV 55","Eletrônicos",2899.90],["Cafeteira Premium","Eletroportáteis",349.90],["Aspirador Vertical","Casa",899.00],
+    ["Jogo de Panelas","Casa",219.90],["Notebook 15","Informática",3599.00],["Fone Bluetooth","Eletrônicos",239.75],
+    ["Micro-ondas 32L","Eletrodomésticos",749.90],["Liquidificador","Eletroportáteis",279.90],["Ar-condicionado","Climatização",1999.00],
+    ["Conjunto de Toalhas","Cama e Banho",94.90],["Console Game X","Games",3299.00],["Cadeira Escritório","Móveis",899.90],
+    ["Ventilador Turbo","Climatização",299.90],["Air Fryer 5L","Eletroportáteis",499.90],["Celular Pro 128GB","Eletrônicos",2499.00]
+  ];
+  const firstNames=["Ana","Bruno","Carlos","Daniela","Eduardo","Fernanda","Gabriel","Helena","Igor","Juliana","Lucas","Mariana","Nicolas","Paula","Rafael","Sofia","Tiago","Vanessa"];
+  const lastNames=["Silva","Souza","Costa","Oliveira","Santos","Alves","Rocha","Mendes","Ribeiro","Lima","Martins","Nunes","Dias","Melo"];
+  const payments=["PIX","Cartão de crédito","Cartão de débito","Dinheiro"];
+  const deliveryOptions=["Entregue","Em transporte","Não entregue","Cancelada","Não liberada"];
 
-    applyTheme(localStorage.getItem("loop-theme") === "light" ? "light" : "dark", false);
-    $("themeButton").addEventListener("click", () => {
-      applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+  function seeded(i, salt=1){const x=Math.sin(i*12.9898+salt*78.233)*43758.5453;return x-Math.floor(x)}
+  function pick(arr,i,salt){return arr[Math.floor(seeded(i,salt)*arr.length)]}
+
+  const orders=[];
+  const finance=[];
+  for(let i=1;i<=1000;i++){
+    const [product,category,unit]=pick(products,i,1);
+    const qty=1+Math.floor(seeded(i,2)*3);
+    const value=+(unit*qty).toFixed(2);
+    const payment=pick(payments,i,3);
+    const cancelled=seeded(i,4)<0.07;
+    const paymentIssue=!cancelled && seeded(i,5)<0.06;
+    const orderStatus=cancelled?"Cancelado":"Confirmado";
+    const paymentStatus=cancelled?"Estornado":paymentIssue?"Pagamento recusado":"Pago";
+    const expectedDelivery=cancelled?"Cancelada":paymentIssue?"Não liberada":pick(["Entregue","Em transporte","Entregue","Entregue"],i,6);
+    const client=`${pick(firstNames,i,7)} ${pick(lastNames,i,8)}`;
+    const orderId=`PED-${String(5000+i).padStart(4,"0")}`;
+    orders.push({Pedido:orderId,Cliente:client,Produto:product,Categoria:category,Quantidade:qty,Valor:value,Pagamento:payment,Status_Pedido:orderStatus,Status_Pagamento:paymentStatus,Entrega_Esperada:expectedDelivery});
+
+    const missing=seeded(i,9)<0.045;
+    if(missing) continue;
+
+    let billed=value;
+    let finStatus=paymentStatus==="Pagamento recusado"?"Pendente":paymentStatus;
+    let delivery=expectedDelivery;
+    let pay=payment;
+
+    if(seeded(i,10)<0.045) billed=+(value*(seeded(i,11)<.5?0.95:1.05)).toFixed(2);
+    if(seeded(i,12)<0.04) delivery=pick(deliveryOptions,i,13);
+    if(seeded(i,14)<0.025) finStatus=finStatus==="Pago"?"Estornado":"Pago";
+    if(seeded(i,15)<0.018) pay=pick(payments,i,16);
+
+    finance.push({
+      Pedido:orderId,Cliente:client,Produto:product,Valor_Faturado:billed,Pagamento:pay,
+      Status_Financeiro:finStatus,Nota_Fiscal:finStatus==="Pago"?`NF-${9000+i}`:"—",Status_Entrega:delivery,
+      Transportadora:pick(["RotaSul","EntregaJá","NorteLog","Expresso BR"],i,17)
     });
+  }
+  // alguns registros extras sem pedido
+  for(let j=1;j<=12;j++){
+    finance.push({Pedido:`EXT-${j}`,Cliente:`Cliente Externo ${j}`,Produto:pick(products,j,18)[0],Valor_Faturado:+(100+seeded(j,19)*900).toFixed(2),Pagamento:pick(payments,j,20),Status_Financeiro:"Pago",Nota_Fiscal:`NF-X${j}`,Status_Entrega:"Entregue",Transportadora:"RotaSul"});
+  }
 
-    // ======================================================
-    // DEMONSTRAÇÃO — LOJA
-    // ======================================================
-    const demoOrders = [
-      {Pedido:"PED-5001",Cliente:"Mariana Souza",Produto:"Smart TV 55",Categoria:"Eletrônicos",Quantidade:1,Valor:"2899.90",Pagamento:"PIX",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Entregue"},
-      {Pedido:"PED-5002",Cliente:"Carlos Mendes",Produto:"Cafeteira Premium",Categoria:"Eletroportáteis",Quantidade:1,Valor:"349.90",Pagamento:"Cartão",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Em transporte"},
-      {Pedido:"PED-5003",Cliente:"Ana Ribeiro",Produto:"Aspirador Vertical",Categoria:"Casa",Quantidade:1,Valor:"899.00",Pagamento:"Cartão",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Entregue"},
-      {Pedido:"PED-5004",Cliente:"Bruno Costa",Produto:"Jogo de Panelas",Categoria:"Casa",Quantidade:1,Valor:"219.90",Pagamento:"PIX",Status_Pedido:"Cancelado",Status_Pagamento:"Estornado",Entrega_Esperada:"Cancelada"},
-      {Pedido:"PED-5005",Cliente:"Luciana Alves",Produto:"Notebook 15",Categoria:"Informática",Quantidade:1,Valor:"3599.00",Pagamento:"PIX",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Aguardando separação"},
-      {Pedido:"PED-5006",Cliente:"Rafael Lima",Produto:"Fone Bluetooth",Categoria:"Eletrônicos",Quantidade:2,Valor:"479.50",Pagamento:"Cartão",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Entregue"},
-      {Pedido:"PED-5007",Cliente:"Beatriz Nunes",Produto:"Micro-ondas 32L",Categoria:"Eletrodomésticos",Quantidade:1,Valor:"749.90",Pagamento:"Boleto",Status_Pedido:"Confirmado",Status_Pagamento:"Aguardando pagamento",Entrega_Esperada:"Não liberada"},
-      {Pedido:"PED-5008",Cliente:"Fernanda Rocha",Produto:"Liquidificador",Categoria:"Eletroportáteis",Quantidade:1,Valor:"279.90",Pagamento:"PIX",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Entregue"},
-      {Pedido:"PED-5009",Cliente:"Paulo Henrique",Produto:"Ar-condicionado",Categoria:"Climatização",Quantidade:1,Valor:"1999.00",Pagamento:"Cartão",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Em transporte"},
-      {Pedido:"PED-5010",Cliente:"Camila Martins",Produto:"Conjunto de Toalhas",Categoria:"Cama e Banho",Quantidade:2,Valor:"189.80",Pagamento:"PIX",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Entregue"},
-      {Pedido:"PED-5011",Cliente:"Ricardo Dias",Produto:"Console Game X",Categoria:"Games",Quantidade:1,Valor:"3299.00",Pagamento:"Cartão",Status_Pedido:"Confirmado",Status_Pagamento:"Pagamento recusado",Entrega_Esperada:"Não liberada"},
-      {Pedido:"PED-5012",Cliente:"Juliana Melo",Produto:"Cadeira Escritório",Categoria:"Móveis",Quantidade:1,Valor:"899.90",Pagamento:"PIX",Status_Pedido:"Confirmado",Status_Pagamento:"Pago",Entrega_Esperada:"Entregue"}
+  $("financeCountBadge").textContent=`${num(finance.length)} registros`;
+  $("financeCountText").textContent=`${num(finance.length)} linhas`;
+
+  function norm(v){return String(v??"").trim().toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+  function compare(){
+    const idxA=new Map(orders.map(r=>[r.Pedido,r]));
+    const idxB=new Map(finance.map(r=>[r.Pedido,r]));
+    const keys=new Set([...idxA.keys(),...idxB.keys()]);
+    const out=[];
+    keys.forEach(key=>{
+      const a=idxA.get(key),b=idxB.get(key);
+      if(a&&!b){out.push({status:"missingB",key,rowA:a,rowB:null,conclusion:"Pedido existe na loja, mas não foi processado no financeiro/entrega.",resolved:false,note:""});return}
+      if(!a&&b){out.push({status:"missingA",key,rowA:null,rowB:b,conclusion:"Registro existe no financeiro/entrega sem pedido correspondente na loja.",resolved:false,note:""});return}
+      const diffs=[];
+      if(norm(a.Cliente)!==norm(b.Cliente))diffs.push("Cliente");
+      if(norm(a.Produto)!==norm(b.Produto))diffs.push("Produto");
+      if(norm(a.Pagamento)!==norm(b.Pagamento))diffs.push("Pagamento");
+      if(Math.abs(Number(a.Valor)-Number(b.Valor_Faturado))>.009)diffs.push("Valor");
+      if(norm(a.Status_Pagamento)!==norm(b.Status_Financeiro))diffs.push("Financeiro");
+      if(norm(a.Entrega_Esperada)!==norm(b.Status_Entrega))diffs.push("Entrega");
+
+      let conclusion="Pedido, pagamento, faturamento e entrega conciliados corretamente.";
+      if(diffs.length){
+        if(diffs.includes("Valor")) conclusion="Valor faturado diferente do valor do pedido.";
+        else if(diffs.includes("Financeiro")) conclusion="Situação financeira divergente entre os sistemas.";
+        else if(diffs.includes("Entrega")) conclusion="Status de entrega divergente.";
+        else if(diffs.includes("Pagamento")) conclusion="Forma de pagamento diferente entre os sistemas.";
+        else conclusion="Existem dados divergentes entre os sistemas.";
+      }
+      out.push({status:diffs.length?"difference":"match",key,rowA:a,rowB:b,differences:diffs,conclusion,resolved:false,note:""});
+    });
+    return out;
+  }
+
+  let results=[];
+  let currentStatus="";
+  let customChart=null,overviewChart=null;
+
+  async function runProgress(){
+    $("demoProgress").hidden=false;
+    const stages=[[18,"Detectando estrutura..."],[38,"Identificando chave..."],[62,"Relacionando colunas..."],[84,"Conferindo 1.000 pedidos..."],[100,"Gerando relatório..."]];
+    for(const [p,t] of stages){$("progressText").textContent=t;$("progressPercent").textContent=p+"%";$("progressFill").style.width=p+"%";await sleep(120)}
+  }
+
+  $("compareDemoBtn").onclick=async()=>{
+    $("compareDemoBtn").disabled=true;await runProgress();results=compare();$("resultsArea").hidden=false;renderAll();switchTab("conciliacao");$("compareDemoBtn").disabled=false;toast("Conciliação concluída com 1.000 pedidos.");$("resultsArea").scrollIntoView({behavior:"smooth",block:"start"})
+  };
+
+  function labelStatus(r){
+    if(r.status==="match") return "OK";
+    if(r.status==="difference") return "Divergência";
+    if(r.status==="missingB") return "Não processado";
+    if(r.status==="missingA") return "Sem pedido";
+    return r.status;
+  }
+  function classStatus(r){return r.status==="match"?"status ok":r.status==="difference"?"status warn":"status bad"}
+
+  function getFiltered(){
+    const q=norm($("searchInput").value);
+    const pay=$("paymentFilter").value;
+    const delivery=$("deliveryFilter").value;
+    const resolution=$("resolutionFilter").value;
+    const category=$("categoryFilter").value;
+
+    return results.filter(r=>{
+      const a=r.rowA||{},b=r.rowB||{};
+      if(q && !norm([r.key,a.Cliente,b.Cliente,a.Produto,b.Produto].join(" ")).includes(q)) return false;
+      if(pay && (a.Pagamento||b.Pagamento)!==pay) return false;
+      if(delivery && (b.Status_Entrega||a.Entrega_Esperada)!==delivery) return false;
+      if(category && a.Categoria!==category) return false;
+      if(resolution==="resolved" && !r.resolved) return false;
+      if(resolution==="pending" && r.resolved) return false;
+
+      if(currentStatus==="match" && r.status!=="match") return false;
+      if(currentStatus==="difference" && r.status!=="difference") return false;
+      if(currentStatus==="missingB" && r.status!=="missingB") return false;
+      if(currentStatus==="missingA" && r.status!=="missingA") return false;
+      if(currentStatus==="cancelled" && norm(a.Status_Pedido)!=="cancelado" && norm(b.Status_Entrega)!=="cancelada") return false;
+      if(currentStatus==="paymentIssue" && !["pagamento recusado","pendente","estornado"].includes(norm(a.Status_Pagamento||b.Status_Financeiro))) return false;
+
+      return true;
+    });
+  }
+
+  function renderResults(){
+    const data=getFiltered();
+    $("resultsBody").innerHTML=data.map(r=>{
+      const a=r.rowA||{},b=r.rowB||{};
+      return `<tr>
+        <td><span class="${classStatus(r)}">${labelStatus(r)}</span></td>
+        <td><strong>${escapeHtml(a.Pedido||b.Pedido||r.key)}</strong></td>
+        <td>${escapeHtml(a.Cliente||b.Cliente||"—")}</td>
+        <td>${escapeHtml(a.Produto||b.Produto||"—")}</td>
+        <td>${escapeHtml(a.Categoria||"—")}</td>
+        <td>${escapeHtml(a.Pagamento||b.Pagamento||"—")}</td>
+        <td>${a.Valor!=null?money(a.Valor):"—"}</td>
+        <td>${b.Valor_Faturado!=null?money(b.Valor_Faturado):"—"}</td>
+        <td>${escapeHtml(b.Status_Financeiro||a.Status_Pagamento||"—")}</td>
+        <td>${escapeHtml(b.Status_Entrega||a.Entrega_Esperada||"—")}</td>
+        <td>${escapeHtml(r.conclusion)}</td>
+        <td><label class="resolution"><input type="checkbox" data-resolve="${escapeHtml(r.key)}" ${r.resolved?"checked":""}> ${r.resolved?"Sim":"Não"}</label></td>
+        <td><textarea data-note="${escapeHtml(r.key)}" placeholder="Ex.: corrigido no ERP, forma de pagamento atualizada...">${escapeHtml(r.note||"")}</textarea></td>
+      </tr>`;
+    }).join("");
+
+    $$("[data-resolve]").forEach(el=>el.onchange=()=>{
+      const r=results.find(x=>x.key===el.dataset.resolve);if(r){r.resolved=el.checked;renderAll(false)}
+    });
+    $$("[data-note]").forEach(el=>el.oninput=()=>{
+      const r=results.find(x=>x.key===el.dataset.note);if(r)r.note=el.value;
+    });
+  }
+
+  function renderMetrics(){
+    const ok=results.filter(r=>r.status==="match").length;
+    const diff=results.filter(r=>r.status==="difference").length;
+    const missing=results.filter(r=>["missingA","missingB"].includes(r.status)).length;
+    const resolved=results.filter(r=>r.resolved).length;
+    const revenue=results.filter(r=>r.status==="match"&&r.rowB&&norm(r.rowB.Status_Financeiro)==="pago").reduce((s,r)=>s+Number(r.rowB.Valor_Faturado||0),0);
+    $("metricOrders").textContent=num(orders.length);$("metricOk").textContent=num(ok);$("metricDiff").textContent=num(diff);$("metricMissing").textContent=num(missing);$("metricRevenue").textContent=money(revenue);$("metricResolved").textContent=num(resolved);
+    $("reportOrders").textContent=num(orders.length);$("reportOk").textContent=num(ok);$("reportProblems").textContent=num(results.length-ok);$("reportResolved").textContent=num(resolved);$("reportRevenue").textContent=money(revenue);$("reportDate").textContent="Gerado em "+new Date().toLocaleString("pt-BR");
+  }
+
+  function renderReport(){
+    $("reportBody").innerHTML=results.map(r=>{
+      const a=r.rowA||{},b=r.rowB||{};
+      return `<tr><td><span class="${classStatus(r)}">${labelStatus(r)}</span></td><td>${escapeHtml(a.Pedido||b.Pedido||r.key)}</td><td>${escapeHtml(a.Cliente||b.Cliente||"—")}</td><td>${escapeHtml(a.Produto||b.Produto||"—")}</td><td>${escapeHtml(a.Pagamento||b.Pagamento||"—")}</td><td>${a.Valor!=null?money(a.Valor):"—"}</td><td>${b.Valor_Faturado!=null?money(b.Valor_Faturado):"—"}</td><td>${escapeHtml(b.Status_Financeiro||a.Status_Pagamento||"—")}</td><td>${escapeHtml(b.Status_Entrega||a.Entrega_Esperada||"—")}</td><td>${escapeHtml(r.conclusion)}</td><td>${r.resolved?"Sim":"Não"}</td><td>${escapeHtml(r.note||"")}</td></tr>`;
+    }).join("");
+  }
+
+  function fillCategory(){
+    const cats=[...new Set(orders.map(o=>o.Categoria))].sort();$("categoryFilter").innerHTML='<option value="">Categoria: todas</option>'+cats.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
+  }
+
+  function renderAll(includeCharts=true){
+    renderMetrics();renderResults();renderReport();renderInsights();if(includeCharts)renderOverviewChart();
+  }
+
+  ["searchInput","paymentFilter","deliveryFilter","resolutionFilter","categoryFilter"].forEach(id=>$(id).addEventListener(id==="searchInput"?"input":"change",renderResults));
+  $$(".chip").forEach(chip=>chip.onclick=()=>{currentStatus=chip.dataset.status;$$(".chip").forEach(c=>c.classList.toggle("is-active",c===chip));renderResults()});
+
+  // -------------------------
+  // DASHBOARD / GRÁFICOS
+  // -------------------------
+  function aggregate(dimension,metric){
+    const map=new Map();
+    results.forEach(r=>{
+      const a=r.rowA||{},b=r.rowB||{};
+      let key="—";
+      if(dimension==="payment")key=a.Pagamento||b.Pagamento||"—";
+      if(dimension==="product")key=a.Produto||b.Produto||"—";
+      if(dimension==="category")key=a.Categoria||"Sem categoria";
+      if(dimension==="status")key=labelStatus(r);
+      if(dimension==="delivery")key=b.Status_Entrega||a.Entrega_Esperada||"—";
+      const value=metric==="revenue"?Number(b.Valor_Faturado||a.Valor||0):1;
+      map.set(key,(map.get(key)||0)+value);
+    });
+    return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
+  }
+
+  function chartDataset(dimension,metric){
+    const entries=aggregate(dimension,metric);
+    return {labels:entries.map(x=>x[0]),values:entries.map(x=>x[1])};
+  }
+
+  function buildCustomChart(){
+    if(!results.length)return toast("Execute a comparação primeiro.","error");
+    const dim=$("chartDimension").value,met=$("chartMetric").value,type=$("chartType").value;
+    const data=chartDataset(dim,met);
+    if(customChart)customChart.destroy();
+    customChart=new Chart($("customChart"),{type,data:{labels:data.labels,datasets:[{label:met==="revenue"?"Valor":"Quantidade",data:data.values}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type==="pie"||type==="doughnut"}}}});
+  }
+  $("buildChartBtn").onclick=buildCustomChart;
+
+  function renderOverviewChart(){
+    if(!results.length)return;
+    const entries=[
+      ["OK",results.filter(r=>r.status==="match").length],
+      ["Divergências",results.filter(r=>r.status==="difference").length],
+      ["Não processados",results.filter(r=>r.status==="missingB").length],
+      ["Sem pedido",results.filter(r=>r.status==="missingA").length]
     ];
-
-    const demoFinance = [
-      {Pedido:"PED-5001",Cliente:"Mariana Souza",Produto:"Smart TV 55",Valor_Faturado:"2899.90",Pagamento:"PIX",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9001",Status_Entrega:"Entregue",Transportadora:"RotaSul"},
-      {Pedido:"PED-5002",Cliente:"Carlos Mendes",Produto:"Cafeteira Premium",Valor_Faturado:"349.90",Pagamento:"Cartão",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9002",Status_Entrega:"Em transporte",Transportadora:"EntregaJá"},
-      {Pedido:"PED-5003",Cliente:"Ana Ribeiro",Produto:"Aspirador Vertical",Valor_Faturado:"899.00",Pagamento:"Cartão",Status_Financeiro:"Estornado",Nota_Fiscal:"NF-9003",Status_Entrega:"Cancelada",Transportadora:"—"},
-      {Pedido:"PED-5004",Cliente:"Bruno Costa",Produto:"Jogo de Panelas",Valor_Faturado:"219.90",Pagamento:"PIX",Status_Financeiro:"Estornado",Nota_Fiscal:"—",Status_Entrega:"Cancelada",Transportadora:"—"},
-      {Pedido:"PED-5006",Cliente:"Rafael Lima",Produto:"Fone Bluetooth",Valor_Faturado:"479.50",Pagamento:"Cartão",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9006",Status_Entrega:"Entregue",Transportadora:"RotaSul"},
-      {Pedido:"PED-5007",Cliente:"Beatriz Nunes",Produto:"Micro-ondas 32L",Valor_Faturado:"749.90",Pagamento:"Boleto",Status_Financeiro:"Pendente",Nota_Fiscal:"—",Status_Entrega:"Não liberada",Transportadora:"—"},
-      {Pedido:"PED-5008",Cliente:"Fernanda Rocha",Produto:"Liquidificador",Valor_Faturado:"279.90",Pagamento:"PIX",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9008",Status_Entrega:"Entregue",Transportadora:"EntregaJá"},
-      {Pedido:"PED-5009",Cliente:"Paulo Henrique",Produto:"Ar-condicionado",Valor_Faturado:"2099.00",Pagamento:"Cartão",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9009",Status_Entrega:"Em transporte",Transportadora:"RotaSul"},
-      {Pedido:"PED-5010",Cliente:"Camila Martins",Produto:"Conjunto de Toalhas",Valor_Faturado:"189.80",Pagamento:"PIX",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9010",Status_Entrega:"Entregue",Transportadora:"EntregaJá"},
-      {Pedido:"PED-5013",Cliente:"Cliente Externo",Produto:"Ventilador",Valor_Faturado:"299.90",Pagamento:"PIX",Status_Financeiro:"Pago",Nota_Fiscal:"NF-9013",Status_Entrega:"Entregue",Transportadora:"RotaSul"}
-    ];
-
-    const demoMapping = {
-      valueA:"Valor",
-      valueB:"Valor_Faturado",
-      paymentA:"Pagamento",
-      paymentB:"Pagamento",
-      financialA:"Status_Pagamento",
-      financialB:"Status_Financeiro",
-      deliveryA:"Entrega_Esperada",
-      deliveryB:"Status_Entrega",
-      productA:"Produto",
-      productB:"Produto",
-      customerA:"Cliente",
-      customerB:"Cliente"
-    };
-
-    // ======================================================
-    // NORMALIZAÇÃO / DETECÇÃO
-    // ======================================================
-    const aliases = {
-      key:["pedido","id_pedido","idpedido","order_id","orderid","codigo_pedido","numero_pedido","n_pedido","id","codigo","registro","cpf","matricula"],
-      customer:["cliente","nome_cliente","customer","nome"],
-      product:["produto","item","descricao","descrição","product"],
-      value:["valor","valor_total","total","valor_pedido","valor_faturado","amount","preco","preço"],
-      payment:["pagamento","forma_pagamento","metodo_pagamento","método_pagamento","payment"],
-      delivery:["status_entrega","entrega","situacao_entrega","situação_entrega","delivery_status"],
-      financial:["status_financeiro","status_pagamento","situacao_pagamento","situação_pagamento","payment_status"]
-    };
-
-    function normalizeName(value){
-      return String(value ?? "")
-        .trim()
-        .toLocaleLowerCase("pt-BR")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g,"")
-        .replace(/[^a-z0-9]+/g,"_")
-        .replace(/^_+|_+$/g,"");
-    }
-
-    function normalizeValue(value, settings){
-      let v = String(value ?? "");
-      if(settings.trim) v = v.trim();
-      if(settings.case) v = v.toLocaleLowerCase("pt-BR");
-      if(settings.accents) v = v.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-      if(settings.money && /^R?\$?\s*[-\d.,]+$/.test(v)){
-        let n = v.replace(/[R$\s]/g,"");
-        if(n.includes(",") && n.includes(".")){
-          n = n.lastIndexOf(",") > n.lastIndexOf(".") ? n.replace(/\./g,"").replace(",",".") : n.replace(/,/g,"");
-        } else if(n.includes(",")) {
-          n = n.replace(",",".");
-        }
-        const parsed = Number(n);
-        if(Number.isFinite(parsed)) v = String(parsed);
-      }
-      if(settings.dates){
-        const br = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        if(br) v = `${br[3]}-${br[2].padStart(2,"0")}-${br[1].padStart(2,"0")}`;
-      }
-      return v;
-    }
-
-    function columns(rows){
-      const s = new Set();
-      rows.slice(0,500).forEach(r => Object.keys(r).forEach(k => {
-        if(!k.startsWith("__")) s.add(k);
-      }));
-      return [...s];
-    }
-
-    function detectColumn(cols, kind){
-      const normalized = cols.map(c => [c,normalizeName(c)]);
-      for(const alias of aliases[kind] || []){
-        const exact = normalized.find(([,n]) => n === normalizeName(alias));
-        if(exact) return exact[0];
-      }
-      for(const alias of aliases[kind] || []){
-        const partial = normalized.find(([,n]) => n.includes(normalizeName(alias)));
-        if(partial) return partial[0];
-      }
-      return "";
-    }
-
-    function detectKey(cols){
-      return detectColumn(cols,"key") || cols[0] || "";
-    }
-
-    function settings(prefix){
-      return {
-        trim:$(prefix+"Trim").checked,
-        case:$(prefix+"Case").checked,
-        accents:$(prefix+"Accents").checked,
-        money:$(prefix+"Money").checked,
-        dates:$(prefix+"Dates").checked,
-        duplicates:$(prefix+"Duplicates").checked
-      };
-    }
-
-    function populateSelect(id, cols, selected=""){
-      const el = $(id);
-      el.innerHTML = cols.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-      if(cols.includes(selected)) el.value = selected;
-    }
-
-    function autoMapping(rowsA, rowsB){
-      const ca = columns(rowsA), cb = columns(rowsB);
-      const mapping = [];
-      const usedB = new Set();
-
-      ca.forEach(a => {
-        const na = normalizeName(a);
-        let b = cb.find(x => normalizeName(x) === na && !usedB.has(x));
-        if(!b){
-          const kind = Object.keys(aliases).find(k => aliases[k].some(alias => normalizeName(alias) === na));
-          if(kind) b = detectColumn(cb,kind);
-        }
-        if(b && !usedB.has(b)){
-          mapping.push({a,b,label:a});
-          usedB.add(b);
-        }
-      });
-      return mapping;
-    }
-
-    function buildIndex(rows,key,opts){
-      const map = new Map();
-      rows.forEach(row => {
-        const k = normalizeValue(row[key],opts);
-        if(!k) return;
-        if(!map.has(k)) map.set(k,[]);
-        map.get(k).push(row);
-      });
-      return map;
-    }
-
-    function compareGeneric(rowsA,rowsB,keyA,keyB,opts){
-      const idxA = buildIndex(rowsA,keyA,opts);
-      const idxB = buildIndex(rowsB,keyB,opts);
-      const maps = autoMapping(rowsA,rowsB).filter(m => m.a !== keyA && m.b !== keyB);
-      const allKeys = new Set([...idxA.keys(),...idxB.keys()]);
-      const out = [];
-
-      allKeys.forEach(key => {
-        const aList = idxA.get(key) || [];
-        const bList = idxB.get(key) || [];
-        const a = aList[0] || null;
-        const b = bList[0] || null;
-
-        if(opts.duplicates && aList.length > 1){
-          out.push({status:"duplicate",key,rowA:a,rowB:b,detail:`Duplicado ${aList.length} vezes na Base 1.`});
-        }
-        if(opts.duplicates && bList.length > 1){
-          out.push({status:"duplicate",key,rowA:a,rowB:b,detail:`Duplicado ${bList.length} vezes na Base 2.`});
-        }
-
-        if(a && !b){
-          out.push({status:"missingB",key,rowA:a,rowB:null,detail:"Existe na Base 1, mas não foi encontrado na Base 2."});
-          return;
-        }
-        if(!a && b){
-          out.push({status:"missingA",key,rowA:null,rowB:b,detail:"Existe na Base 2, mas não foi encontrado na Base 1."});
-          return;
-        }
-
-        const diffs = [];
-        maps.forEach(m => {
-          const va = normalizeValue(a[m.a],opts);
-          const vb = normalizeValue(b[m.b],opts);
-          if(va !== vb) diffs.push({field:m.label,a:a[m.a],b:b[m.b]});
-        });
-
-        out.push({
-          status:diffs.length ? "difference" : "match",
-          key,rowA:a,rowB:b,differences:diffs,
-          detail:diffs.length ? `${diffs.length} campo(s) divergente(s).` : "Registro conciliado."
-        });
-      });
-
-      return out;
-    }
-
-    function compareDemo(){
-      const opts = settings("demo");
-      const keyA = $("demoKeyA").value || "Pedido";
-      const keyB = $("demoKeyB").value || "Pedido";
-      const idxA = buildIndex(demoOrders,keyA,opts);
-      const idxB = buildIndex(demoFinance,keyB,opts);
-      const allKeys = new Set([...idxA.keys(),...idxB.keys()]);
-      const results = [];
-
-      allKeys.forEach(key => {
-        const aList = idxA.get(key) || [];
-        const bList = idxB.get(key) || [];
-        const a = aList[0] || null;
-        const b = bList[0] || null;
-
-        if(opts.duplicates && aList.length > 1){
-          results.push({status:"duplicate",key,rowA:a,rowB:b,conclusion:`Pedido duplicado ${aList.length} vezes no sistema da loja.`});
-        }
-        if(opts.duplicates && bList.length > 1){
-          results.push({status:"duplicate",key,rowA:a,rowB:b,conclusion:`Pedido duplicado ${bList.length} vezes no financeiro.`});
-        }
-
-        if(a && !b){
-          results.push({status:"missingB",key,rowA:a,rowB:null,conclusion:"Pedido existe na loja, mas não foi faturado/processado no segundo sistema."});
-          return;
-        }
-        if(!a && b){
-          results.push({status:"missingA",key,rowA:null,rowB:b,conclusion:"Faturamento/entrega existe sem pedido correspondente no sistema da loja."});
-          return;
-        }
-
-        const diffs = [];
-        const pairs = [
-          ["Cliente","Cliente","Cliente"],
-          ["Produto","Produto","Produto"],
-          ["Pagamento","Pagamento","Pagamento"],
-          ["Valor","Valor_Faturado","Valor"],
-          ["Status_Pagamento","Status_Financeiro","Financeiro"],
-          ["Entrega_Esperada","Status_Entrega","Entrega"]
-        ];
-        pairs.forEach(([ca,cb,label]) => {
-          if(normalizeValue(a[ca],opts) !== normalizeValue(b[cb],opts)){
-            diffs.push({field:label,a:a[ca],b:b[cb]});
-          }
-        });
-
-        let conclusion = "Pedido, pagamento, faturamento e entrega conciliados corretamente.";
-        if(diffs.length){
-          const fields = diffs.map(d => d.field);
-          if(fields.includes("Valor")) conclusion = "Valor faturado diferente do valor do pedido.";
-          else if(fields.includes("Financeiro")) conclusion = "Situação financeira não confere entre os sistemas.";
-          else if(fields.includes("Entrega")) conclusion = "Status de entrega divergente.";
-          else conclusion = "Existem informações divergentes entre os sistemas.";
-        }
-
-        results.push({status:diffs.length?"difference":"match",key,rowA:a,rowB:b,differences:diffs,conclusion});
-      });
-
-      return results;
-    }
-
-    // ======================================================
-    // DASHBOARD E RELATÓRIO DA DEMO
-    // ======================================================
-    let demoResults = [];
-
-    function statusLabel(status){
-      return {
-        match:"OK",
-        difference:"Divergência",
-        missingB:"Não processado",
-        missingA:"Sem pedido",
-        duplicate:"Duplicado"
-      }[status] || status;
-    }
-
-    function statusClass(status){
-      if(status === "match") return "status status--ok";
-      if(status === "difference" || status === "duplicate") return "status status--warn";
-      return "status status--bad";
-    }
-
-    function countStatus(status){
-      return demoResults.filter(r => r.status === status).length;
-    }
-
-    function renderBars(hostId, map){
-      const host = $(hostId);
-      const entries = [...map.entries()].sort((a,b) => b[1]-a[1]);
-      const max = Math.max(1,...entries.map(x => x[1]));
-      host.innerHTML = entries.map(([label,value]) => `
-        <div class="bar-row">
-          <div class="bar-row__top"><span>${escapeHtml(label)}</span><strong>${value}</strong></div>
-          <div class="bar-track"><div class="bar-fill" style="width:${(value/max)*100}%"></div></div>
-        </div>
-      `).join("");
-    }
-
-    function renderDemoInsights(){
-      const payment = new Map();
-      const product = new Map();
-      const operational = new Map();
-
-      demoOrders.forEach(r => {
-        payment.set(r.Pagamento,(payment.get(r.Pagamento)||0)+1);
-        product.set(r.Produto,(product.get(r.Produto)||0)+Number(r.Quantidade||1));
-      });
-
-      demoResults.forEach(r => {
-        const label = statusLabel(r.status);
-        operational.set(label,(operational.get(label)||0)+1);
-      });
-
-      renderBars("paymentBars",payment);
-      renderBars("productBars",product);
-      renderBars("statusBars",operational);
-    }
-
-    function renderDemoReport(){
-      const ok = countStatus("match");
-      const problems = demoResults.length - ok;
-      const revenue = demoResults
-        .filter(r => r.status === "match" && r.rowB && normalizeName(r.rowB.Status_Financeiro) === "pago")
-        .reduce((sum,r) => sum + Number(r.rowB.Valor_Faturado || 0),0);
-      const paidOrders = demoOrders.filter(r => normalizeName(r.Status_Pagamento) === "pago");
-      const ticket = paidOrders.length ? paidOrders.reduce((s,r) => s + Number(r.Valor||0),0)/paidOrders.length : 0;
-      const rate = demoResults.length ? Math.round((ok/demoResults.length)*100) : 0;
-
-      $("mOrders").textContent = number(demoOrders.length);
-      $("mOk").textContent = number(ok);
-      $("mDiff").textContent = number(countStatus("difference"));
-      $("mMissing").textContent = number(countStatus("missingB")+countStatus("missingA"));
-      $("mRevenue").textContent = money(revenue);
-      $("mTicket").textContent = money(ticket);
-
-      $("rOrders").textContent = number(demoOrders.length);
-      $("rOk").textContent = number(ok);
-      $("rProblems").textContent = number(problems);
-      $("rRevenue").textContent = money(revenue);
-      $("rRate").textContent = rate + "%";
-      $("reportGeneratedAt").textContent = "Gerado em " + new Date().toLocaleString("pt-BR");
-
-      $("reportBody").innerHTML = demoResults.map(r => {
-        const a = r.rowA || {};
-        const b = r.rowB || {};
-        return `
-          <tr>
-            <td><span class="${statusClass(r.status)}">${escapeHtml(statusLabel(r.status))}</span></td>
-            <td><strong>${escapeHtml((a.Pedido||b.Pedido||r.key))}</strong></td>
-            <td>${escapeHtml(a.Cliente||b.Cliente||"—")}</td>
-            <td>${escapeHtml(a.Produto||b.Produto||"—")}</td>
-            <td>${escapeHtml(a.Pagamento||b.Pagamento||"—")}</td>
-            <td>${a.Valor ? money(a.Valor) : "—"}</td>
-            <td>${b.Valor_Faturado ? money(b.Valor_Faturado) : "—"}</td>
-            <td>${escapeHtml(a.Status_Pedido||"—")} · ${escapeHtml(a.Status_Pagamento||"—")}</td>
-            <td>${escapeHtml(b.Status_Financeiro||"—")} · ${escapeHtml(b.Nota_Fiscal||"—")}</td>
-            <td>${escapeHtml(b.Status_Entrega||a.Entrega_Esperada||"—")}</td>
-            <td>${escapeHtml(r.conclusion||"")}</td>
-          </tr>
-        `;
-      }).join("");
-
-      renderDemoInsights();
-    }
-
-    async function runProgress(prefix){
-      $(prefix+"Progress").hidden = false;
-      const stages = [[18,"Detectando estrutura..."],[38,"Identificando chave..."],[62,"Relacionando colunas..."],[84,"Conferindo pedidos..."],[100,"Gerando relatório..."]];
-      for(const [p,text] of stages){
-        $(prefix+"ProgressText").textContent = text;
-        $(prefix+"ProgressPercent").textContent = p+"%";
-        $(prefix+"ProgressFill").style.width = p+"%";
-        await sleep(130);
-      }
-    }
-
-    $("demoCompareButton").addEventListener("click", async () => {
-      $("demoCompareButton").disabled = true;
-      await runProgress("demo");
-      demoResults = compareDemo();
-      renderDemoReport();
-      $("demoResults").hidden = false;
-      $("demoCompareButton").disabled = false;
-      $("demoResults").scrollIntoView({behavior:"smooth",block:"start"});
-      toast("Conciliação concluída. Relatório completo gerado.");
-    });
-
-    $("heroDemoButton").addEventListener("click", () => {
-      $("demonstracao").scrollIntoView({behavior:"smooth"});
-    });
-
-    // ======================================================
-    // EXPORTAÇÃO DEMO
-    // ======================================================
-    function demoExportRows(){
-      return demoResults.map(r => {
-        const a = r.rowA || {}, b = r.rowB || {};
-        return {
-          Status:statusLabel(r.status),
-          Pedido:a.Pedido||b.Pedido||r.key,
-          Cliente:a.Cliente||b.Cliente||"",
-          Produto:a.Produto||b.Produto||"",
-          Pagamento:a.Pagamento||b.Pagamento||"",
-          Valor_Pedido:a.Valor||"",
-          Valor_Faturado:b.Valor_Faturado||"",
-          Status_Pedido:a.Status_Pedido||"",
-          Status_Pagamento:a.Status_Pagamento||"",
-          Status_Financeiro:b.Status_Financeiro||"",
-          Nota_Fiscal:b.Nota_Fiscal||"",
-          Status_Entrega:b.Status_Entrega||a.Entrega_Esperada||"",
-          Conclusao:r.conclusion||""
-        };
-      });
-    }
-
-    $("demoExcelButton").addEventListener("click", () => {
-      if(!demoResults.length) return toast("Execute a comparação primeiro.","error");
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(demoExportRows()),"Conciliacao");
-      const resumo = [
-        {Indicador:"Pedidos",Valor:demoOrders.length},
-        {Indicador:"Corretos",Valor:countStatus("match")},
-        {Indicador:"Divergencias",Valor:countStatus("difference")},
-        {Indicador:"Nao processados",Valor:countStatus("missingB")},
-        {Indicador:"Sem pedido",Valor:countStatus("missingA")}
-      ];
-      XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(resumo),"Resumo");
-      XLSX.writeFile(wb,"loop-reconciler-demo-loja.xlsx");
-    });
-
-    $("demoPdfButton").addEventListener("click", () => {
-      if(!demoResults.length) return toast("Execute a comparação primeiro.","error");
-      const {jsPDF} = window.jspdf;
-      const doc = new jsPDF({orientation:"landscape"});
-      doc.setFontSize(16);
-      doc.text("Loop Reconciler - Relatorio de Conciliacao",14,15);
-      doc.setFontSize(9);
-      doc.text("Loja BRZ1 Department | Pedidos x Financeiro / Entrega",14,22);
-      doc.text("Desenvolvido por beto-dev94 | by BRZ1",14,28);
-
-      const body = demoExportRows().map(r => [
-        r.Status,r.Pedido,r.Cliente,r.Produto,r.Pagamento,
-        r.Valor_Pedido,r.Valor_Faturado,r.Status_Financeiro,r.Status_Entrega,r.Conclusao
-      ]);
-
-      doc.autoTable({
-        startY:34,
-        head:[["Status","Pedido","Cliente","Produto","Pgto","Pedido R$","Faturado R$","Financeiro","Entrega","Conclusao"]],
-        body,
-        styles:{fontSize:6.3,cellPadding:1.8},
-        columnStyles:{9:{cellWidth:52}}
-      });
-      doc.save("loop-reconciler-demo-loja.pdf");
-    });
-
-    $("demoPrintButton").addEventListener("click", () => {
-      if(!demoResults.length) return toast("Execute a comparação primeiro.","error");
-      window.print();
-    });
-
-    // ======================================================
-    // ÁREA COMPLETA — TRAVA DE INTERFACE
-    // ======================================================
-    function openAccess(){
-      $("accessModal").hidden = false;
-      $("accessCodeInput").value = "";
-      setTimeout(() => $("accessCodeInput").focus(),50);
-    }
-
-    $("heroFullButton").addEventListener("click", () => {
-      $("acesso").scrollIntoView({behavior:"smooth"});
-      setTimeout(openAccess,350);
-    });
-    $("openAccessButton").addEventListener("click",openAccess);
-    $("cancelAccessButton").addEventListener("click",() => $("accessModal").hidden = true);
-
-    $("confirmAccessButton").addEventListener("click",() => {
-      if($("accessCodeInput").value !== ACCESS_CODE){
-        toast("Código de acesso incorreto.","error");
-        return;
-      }
-      $("accessModal").hidden = true;
-      $("accessCard").hidden = true;
-      $("fullPanel").hidden = false;
-      toast("Área completa liberada.");
-      $("fullPanel").scrollIntoView({behavior:"smooth",block:"start"});
-    });
-
-    $("accessModal").addEventListener("click",e => {
-      if(e.target === $("accessModal")) $("accessModal").hidden = true;
-    });
-
-    // ======================================================
-    // ARQUIVOS REAIS
-    // ======================================================
-    const real = {
-      filesA:[],filesB:[],rowsA:[],rowsB:[],results:[]
-    };
-
-    async function parseFile(file){
-      const ext = (file.name.split(".").pop()||"").toLowerCase();
-
-      if(["csv","tsv","txt"].includes(ext)){
-        const text = await file.text();
-        return new Promise((resolve,reject) => {
-          Papa.parse(text,{
-            header:true,
-            skipEmptyLines:"greedy",
-            delimiter:ext === "tsv" ? "\t" : "",
-            complete:r => resolve(r.data.map(row => ({...row,__arquivo:file.name}))),
-            error:reject
-          });
-        });
-      }
-
-      if(["xls","xlsx","ods"].includes(ext)){
-        const buf = await file.arrayBuffer();
-        const wb = XLSX.read(buf,{type:"array",raw:false});
-        const all = [];
-        wb.SheetNames.forEach(sheet => {
-          XLSX.utils.sheet_to_json(wb.Sheets[sheet],{defval:"",raw:false}).forEach(row => {
-            all.push({...row,__arquivo:file.name,__aba:sheet});
-          });
-        });
-        return all;
-      }
-
-      throw new Error("Formato não suportado: ."+ext);
-    }
-
-    async function addRealFiles(side,files){
-      const targetFiles = side === "A" ? real.filesA : real.filesB;
-      const targetRows = side === "A" ? real.rowsA : real.rowsB;
-
-      for(const file of files){
-        try{
-          const rows = await parseFile(file);
-          targetFiles.push(file);
-          targetRows.push(...rows);
-        }catch(err){
-          toast(`${file.name}: ${err.message}`,"error");
-        }
-      }
-      renderRealSide(side);
-      configureRealDetection();
-    }
-
-    function renderRealSide(side){
-      const files = side === "A" ? real.filesA : real.filesB;
-      const rows = side === "A" ? real.rowsA : real.rowsB;
-      $(side === "A" ? "realAStatus" : "realBStatus").textContent = rows.length ? `${number(rows.length)} registros` : "Vazia";
-      $(side === "A" ? "realListA" : "realListB").innerHTML = files.map(f => `
-        <div class="file-item"><span>${escapeHtml(f.name)}</span><span>${Math.max(1,Math.round(f.size/1024))} KB</span></div>
-      `).join("");
-      $("realCompareButton").disabled = !(real.rowsA.length && real.rowsB.length);
-    }
-
-    function configureRealDetection(){
-      const ca = columns(real.rowsA), cb = columns(real.rowsB);
-      const ka = detectKey(ca), kb = detectKey(cb);
-      populateSelect("realKeyA",ca,ka);
-      populateSelect("realKeyB",cb,kb);
-    }
-
-    $("realInputA").addEventListener("change",e => addRealFiles("A",[...e.target.files]));
-    $("realInputB").addEventListener("change",e => addRealFiles("B",[...e.target.files]));
-
-    function setupDrop(id,side){
-      const zone = $(id);
-      ["dragenter","dragover"].forEach(name => zone.addEventListener(name,e => {e.preventDefault();zone.classList.add("is-dragging")}));
-      ["dragleave","drop"].forEach(name => zone.addEventListener(name,e => {e.preventDefault();zone.classList.remove("is-dragging")}));
-      zone.addEventListener("drop",e => addRealFiles(side,[...e.dataTransfer.files]));
-    }
-    setupDrop("realDropA","A");
-    setupDrop("realDropB","B");
-
-    $("realCompareButton").addEventListener("click",async () => {
-      if(!real.rowsA.length || !real.rowsB.length) return;
-      $("realCompareButton").disabled = true;
-      await runProgress("real");
-
-      const opts = settings("real");
-      const keyA = $("realKeyA").value || detectKey(columns(real.rowsA));
-      const keyB = $("realKeyB").value || detectKey(columns(real.rowsB));
-      real.results = compareGeneric(real.rowsA,real.rowsB,keyA,keyB,opts);
-
-      $("realGeneratedAt").textContent = "Gerado em " + new Date().toLocaleString("pt-BR");
-      $("realReportBody").innerHTML = real.results.map(r => `
-        <tr>
-          <td><span class="${statusClass(r.status)}">${escapeHtml(statusLabel(r.status))}</span></td>
-          <td><strong>${escapeHtml(r.key)}</strong></td>
-          <td>${escapeHtml(JSON.stringify(r.rowA||{}).replaceAll('"',"").slice(0,420))}</td>
-          <td>${escapeHtml(JSON.stringify(r.rowB||{}).replaceAll('"',"").slice(0,420))}</td>
-          <td>${escapeHtml(r.detail||"")}</td>
-        </tr>
-      `).join("");
-
-      $("realResults").hidden = false;
-      $("realCompareButton").disabled = false;
-      $("realResults").scrollIntoView({behavior:"smooth",block:"start"});
-      toast("Comparação concluída.");
-    });
-
-    function realExportRows(){
-      return real.results.map(r => ({
-        Status:statusLabel(r.status),
-        Chave:r.key,
-        Base_1:JSON.stringify(r.rowA||{}),
-        Base_2:JSON.stringify(r.rowB||{}),
-        Conclusao:r.detail||""
-      }));
-    }
-
-    $("realExcelButton").addEventListener("click",() => {
-      if(!real.results.length) return toast("Execute a comparação primeiro.","error");
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(realExportRows()),"Resultados");
-      XLSX.writeFile(wb,"loop-reconciler-resultados.xlsx");
-    });
-
-    $("realPdfButton").addEventListener("click",() => {
-      if(!real.results.length) return toast("Execute a comparação primeiro.","error");
-      const {jsPDF} = window.jspdf;
-      const doc = new jsPDF({orientation:"landscape"});
-      doc.setFontSize(15);
-      doc.text("Loop Reconciler - Relatorio",14,15);
-      doc.setFontSize(9);
-      doc.text("Desenvolvido por beto-dev94 | by BRZ1",14,22);
-      doc.autoTable({
-        startY:28,
-        head:[["Status","Chave","Base 1","Base 2","Conclusao"]],
-        body:realExportRows().slice(0,500).map(r => [r.Status,r.Chave,r.Base_1.slice(0,250),r.Base_2.slice(0,250),r.Conclusao]),
-        styles:{fontSize:6.5}
-      });
-      doc.save("loop-reconciler-resultados.pdf");
-    });
-
-    // ======================================================
-    // INICIALIZAÇÃO
-    // ======================================================
-    const ca = columns(demoOrders), cb = columns(demoFinance);
-    populateSelect("demoKeyA",ca,detectKey(ca));
-    populateSelect("demoKeyB",cb,detectKey(cb));
-    $("demoKeyA").value = "Pedido";
-    $("demoKeyB").value = "Pedido";
-
-    $("demoAList").innerHTML = `<div class="file-item"><span>Dados fictícios</span><span>${demoOrders.length} linhas</span></div>`;
-    $("demoBList").innerHTML = `<div class="file-item"><span>Dados fictícios</span><span>${demoFinance.length} linhas</span></div>`;
-
-    console.info("Loop Reconciler carregado · desenvolvido por beto-dev94 · by BRZ1");
-  })();
-  </script>
+    if(overviewChart)overviewChart.destroy();
+    overviewChart=new Chart($("overviewChart"),{type:"doughnut",data:{labels:entries.map(x=>x[0]),datasets:[{data:entries.map(x=>x[1])}]},options:{responsive:true,maintainAspectRatio:false}});
+  }
+
+  function topOf(field){
+    const map=new Map();orders.forEach(o=>map.set(o[field],(map.get(o[field])||0)+1));return [...map.entries()].sort((a,b)=>b[1]-a[1])[0]||["—",0];
+  }
+  function renderInsights(){
+    const pay=topOf("Pagamento"),prod=topOf("Produto");
+    const issueCounts=[
+      ["Divergência",results.filter(r=>r.status==="difference").length],
+      ["Não processado",results.filter(r=>r.status==="missingB").length],
+      ["Sem pedido",results.filter(r=>r.status==="missingA").length]
+    ].sort((a,b)=>b[1]-a[1])[0];
+    const revenue=results.filter(r=>r.status==="match"&&r.rowB&&norm(r.rowB.Status_Financeiro)==="pago").reduce((s,r)=>s+Number(r.rowB.Valor_Faturado||0),0);
+    $("insightPayment").textContent=`${pay[0]} · ${pay[1]} pedidos`;
+    $("insightProduct").textContent=`${prod[0]} · ${prod[1]} unidades/pedidos`;
+    $("insightProblem").textContent=`${issueCounts[0]} · ${issueCounts[1]} ocorrências`;
+    $("insightRevenue").textContent=money(revenue);
+  }
+
+  // -------------------------
+  // ABAS
+  // -------------------------
+  function switchTab(name){
+    $("tabConciliacao").hidden=name!=="conciliacao";$("tabDashboard").hidden=name!=="dashboard";$("tabRelatorio").hidden=name!=="relatorio";
+    $$(".tab").forEach(t=>t.classList.toggle("is-active",t.dataset.tab===name));
+    if(name==="dashboard"&&results.length){renderInsights();renderOverviewChart();if(!customChart)buildCustomChart()}
+    if(name==="relatorio"&&results.length)renderReport();
+  }
+  $$(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+
+  // -------------------------
+  // EXPORTAÇÕES
+  // -------------------------
+  function exportRows(){
+    return results.map(r=>{const a=r.rowA||{},b=r.rowB||{};return{
+      Status:labelStatus(r),Pedido:a.Pedido||b.Pedido||r.key,Cliente:a.Cliente||b.Cliente||"",Produto:a.Produto||b.Produto||"",Categoria:a.Categoria||"",
+      Pagamento:a.Pagamento||b.Pagamento||"",Valor_Pedido:a.Valor??"",Valor_Faturado:b.Valor_Faturado??"",Status_Pedido:a.Status_Pedido||"",Status_Financeiro:b.Status_Financeiro||a.Status_Pagamento||"",
+      Status_Entrega:b.Status_Entrega||a.Entrega_Esperada||"",Conclusao:r.conclusion,Resolvido:r.resolved?"Sim":"Não",Observacao:r.note||""
+    }});
+  }
+  $("exportExcelBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(exportRows()),"Conciliacao");XLSX.writeFile(wb,"loop-reconciler-relatorio.xlsx")};
+  $("exportCsvBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");const csv=Papa.unparse(exportRows(),{delimiter:";"});downloadText("\uFEFF"+csv,"loop-reconciler-relatorio.csv","text/csv;charset=utf-8")};
+  $("exportJsonBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");downloadText(JSON.stringify({generatedAt:new Date().toISOString(),developer:"beto-dev94",brand:"BRZ1",results:exportRows()},null,2),"loop-reconciler-relatorio.json","application/json;charset=utf-8")};
+  function downloadText(text,name,type){const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+  $("exportPdfBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:"landscape"});doc.setFontSize(15);doc.text("Loop Reconciler - Relatorio Consolidado",14,15);doc.setFontSize(9);doc.text("Loja Horizonte Department | Pedidos x Financeiro / Entrega",14,22);doc.text("Desenvolvido por beto-dev94 | by BRZ1",14,28);doc.autoTable({startY:34,head:[["Status","Pedido","Cliente","Produto","Pgto","Pedido R$","Faturado R$","Financeiro","Entrega","Resolvido","Observacao"]],body:exportRows().map(r=>[r.Status,r.Pedido,r.Cliente,r.Produto,r.Pagamento,r.Valor_Pedido,r.Valor_Faturado,r.Status_Financeiro,r.Status_Entrega,r.Resolvido,r.Observacao]),styles:{fontSize:5.7,cellPadding:1.4},columnStyles:{10:{cellWidth:40}}});doc.save("loop-reconciler-relatorio.pdf")};
+  $("printBtn").onclick=()=>{if(!results.length)return toast("Execute a comparação primeiro.","error");window.print()};
+
+  // -------------------------
+  // ÁREA RESTRITA
+  // -------------------------
+  function openRestricted(){$("restrictedModal").hidden=false;$("restrictedCode").value="";setTimeout(()=>$("restrictedCode").focus(),50)}
+  $("openRestrictedBtn").onclick=openRestricted;$("goRestrictedBtn").onclick=()=>{$("restrita").scrollIntoView({behavior:"smooth"});setTimeout(openRestricted,350)};$("closeRestrictedBtn").onclick=()=>{$("restrictedModal").hidden=true};
+  $("confirmRestrictedBtn").onclick=()=>{if($("restrictedCode").value!==ACCESS_CODE)return toast("Código incorreto.","error");$("restrictedModal").hidden=true;toast("Acesso visual liberado. Em produção, valide no servidor.")};
+  $("restrictedModal").onclick=e=>{if(e.target===$("restrictedModal"))$("restrictedModal").hidden=true};
+
+  $("goDemoBtn").onclick=()=>$("demo").scrollIntoView({behavior:"smooth"});
+
+  fillCategory();
+})();
+</script>
 </body>
 </html>
